@@ -1,0 +1,102 @@
+FRIDGE DOOR COUNTER - WIRING REFERENCE (Freenove ESP32-S3 WROOM)
+================================================================
+
+BOARD: Freenove ESP32-S3 WROOM (N8R8: 8MB Flash, 8MB PSRAM)
+CHIP:  ESP32-S3-WROOM-1
+
+COMPONENTS:
+  - Freenove ESP32-S3 WROOM board
+  - Reed switch (normally open, 2 wires)
+  - Magnet (for reed switch)
+
+
+CONNECTIONS:
+============
+
+  Reed Switch Wire 1  →  GND (any GND pin)
+  Reed Switch Wire 2  →  GPIO4
+
+  Note: Reed switch has no polarity - wires are interchangeable
+
+
+ESP32-S3 GPIO REFERENCE:
+========================
+
+SAFE FOR GENERAL USE:
+  GPIO 1-7    - General purpose (also touch/ADC)
+  GPIO 4      - Reed switch (our choice) ★
+  GPIO 8-9    - Default I2C (SDA/SCL), usable if not using I2C
+  GPIO 10-14  - General purpose (also SPI2)
+  GPIO 15-18  - General purpose
+  GPIO 21     - General purpose
+
+AVOID THESE PINS:
+  GPIO 0      - Strapping pin (boot mode)
+  GPIO 3      - Strapping pin
+  GPIO 19-20  - USB (D-/D+)
+  GPIO 26-32  - SPI flash/PSRAM (internal)
+  GPIO 38-40  - SD card slot (on back of Freenove board)
+  GPIO 43-44  - UART0 (TX/RX for serial)
+  GPIO 45-46  - Strapping pins
+
+ONBOARD LED:
+  GPIO 48     - RGB LED (directly controllable)
+
+
+PHYSICAL INSTALLATION:
+======================
+
+    FRIDGE DOOR                    FRIDGE FRAME
+    ───────────                    ────────────
+
+    ┌─────────┐                    ┌─────────────────────┐
+    │         │                    │                     │
+    │ [MAGNET]│◄── ~1-2cm gap ──► │[REED SWITCH]        │
+    │         │                    │      │              │
+    │         │                    │      │ wires        │
+    └─────────┘                    │      ▼              │
+                                   │  ┌────────────┐     │
+                                   │  │  ESP32-S3  │     │
+                                   │  │ (in case)  │     │
+                                   │  └────────────┘     │
+                                   └─────────────────────┘
+
+    - Mount MAGNET on the door (the moving part)
+    - Mount REED SWITCH on the frame (the stationary part)
+    - Keep gap under 2cm for reliable triggering
+
+
+HOW IT WORKS:
+=============
+
+    Door CLOSED:  Magnet near → Reed switch CLOSED → GPIO4 reads LOW
+    Door OPEN:    Magnet away → Reed switch OPEN → GPIO4 reads HIGH (internal pullup)
+
+    The code detects the LOW→HIGH transition and increments the counter.
+
+
+TROUBLESHOOTING:
+================
+
+    Problem: No detection
+    → Check wiring connections
+    → Test reed switch with multimeter (continuity mode)
+    → Make sure magnet is close enough
+
+    Problem: Double counting
+    → Increase DEBOUNCE_MS in config.h (try 300 or 500)
+
+    Problem: Missing counts
+    → Decrease DEBOUNCE_MS in config.h (try 100)
+    → Magnet may be too far from switch
+
+    Problem: Can't upload code
+    → Hold BOOT button, press RESET, release BOOT
+    → Or: Hold BOOT while clicking Upload
+
+
+SOURCES:
+========
+  - PlatformIO Freenove board: https://docs.platformio.org/en/latest/boards/espressif32/freenove_esp32_s3_wroom.html
+  - ESP32-S3 pinout guide: https://randomnerdtutorials.com/esp32-s3-devkitc-pinout-guide/
+  - Freenove GitHub: https://github.com/Freenove/Freenove_ESP32_S3_WROOM_Board
