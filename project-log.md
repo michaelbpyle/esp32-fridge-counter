@@ -74,7 +74,7 @@ See `build-out-tutorial.md` Section 6 for full details on each option.
 ### Data Solution
 - [ ] Choose data logging backend (see options in tutorial)
 - [ ] Set up server/webhook
-- [ ] Configure WiFi credentials
+- [x] Configure WiFi credentials (secrets.h - gitignored)
 - [ ] Test end-to-end data flow
 
 ### Core Functionality
@@ -97,6 +97,37 @@ See `build-out-tutorial.md` Section 6 for full details on each option.
 
 ## Session Log
 
+### 2026-01-19 - Devices Ready for Testing
+
+**Summary**:
+- Configured WiFi credentials via `secrets.h` (gitignored)
+- Rebuilt and uploaded firmware to both devices
+- Both devices running and ready for reed switches tomorrow
+- Set up git repo with secrets pattern
+- Documented 7 data logging options in tutorial
+
+**Device Status**:
+| Device | Port | WiFi | Status |
+|--------|------|------|--------|
+| Pico 2W | COM8 | Hermes | Ready for reed switch |
+| ESP32-S3 | COM9 | Hermes | Ready for reed switch |
+
+**Files Added**:
+- `include/secrets.h` - WiFi credentials (gitignored)
+- `include/secrets.h.example` - Template for others
+
+**Git**:
+- Repo: https://github.com/michaelbpyle/esp32-fridge-counter
+- Initial commit + secrets pattern pushed
+- secrets.h excluded from repo
+
+**Tomorrow**:
+- Reed switches arrive
+- Wire to GPIO4 (ESP32) or GP15 (Pico) + GND
+- Test door counting
+
+---
+
 ### 2026-01-19 - Firmware Upload and Data Planning
 
 **Summary**:
@@ -104,18 +135,16 @@ See `build-out-tutorial.md` Section 6 for full details on each option.
 - Pico 2W: COM8 (copied .uf2 to bootloader drive E:)
 - ESP32-S3: COM9 (uploaded via PlatformIO)
 - Added shopping list from original project doc
-- Researching data logging solutions
+- Documented 7 data logging backend options
 
-**Device Status**:
-| Device | Port | Status |
-|--------|------|--------|
-| Pico 2W | COM8 | Running, WiFi attempting connection |
-| ESP32-S3 | COM9 | Running, WiFi attempting connection |
-
-**Pending**:
-- Reed switches arriving tomorrow
-- Need to decide on data logging backend
-- Need to configure real WiFi credentials
+**Data Logging Options Evaluated**:
+1. Google Sheets (recommended for simplicity)
+2. Supabase/Firebase
+3. InfluxDB + Grafana
+4. Home Assistant
+5. MQTT Broker
+6. VPS + REST API
+7. Cellular + Cloud (no WiFi needed)
 
 ---
 
