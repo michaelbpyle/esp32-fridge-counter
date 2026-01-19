@@ -2,27 +2,17 @@
  * Configuration file for Fridge Door Counter
  * Supports: Pico 2W and ESP32-S3
  *
- * IMPORTANT: Edit this file with your WiFi credentials before uploading!
+ * WiFi credentials are in secrets.h (gitignored).
+ * Copy secrets.h.example to secrets.h and fill in your values.
  */
 
 #ifndef CONFIG_H
 #define CONFIG_H
 
 // ============================================================================
-// WiFi Configuration - EDIT THESE VALUES
+// WiFi & Server Configuration (in secrets.h - gitignored)
 // ============================================================================
-
-#define WIFI_SSID     "YourWiFiName"      // Your WiFi network name
-#define WIFI_PASSWORD "YourWiFiPassword"   // Your WiFi password
-
-// ============================================================================
-// Server Configuration (Optional)
-// ============================================================================
-
-// URL to send door count data (leave empty to disable)
-// Example: "http://192.168.1.100:8080/fridge"
-// Example: "http://your-server.com/api/fridge-count"
-#define SERVER_URL    ""
+#include "secrets.h"
 
 // ============================================================================
 // Hardware Configuration - Platform-specific
