@@ -68,14 +68,15 @@ See `build-out-tutorial.md` Section 6 for full details on each option.
 - [x] Both firmwares compile and upload successfully
 - [x] Pico 2W detected and running (COM8)
 - [x] ESP32-S3 detected and running (COM9)
-- [ ] Reed switches (arriving tomorrow)
-- [ ] Test hardware wiring
+- [x] Reed switches arrived and tested
+- [x] ESP32-S3 wiring verified and counting works
+- [ ] Pico 2W reed switch wiring and testing
 
 ### Data Solution
 - [ ] Choose data logging backend (see options in tutorial)
-- [ ] Set up server/webhook
+- [ ] Set up server/webhook on TrueNAS (explore via SSH)
 - [x] Configure WiFi credentials (secrets.h - gitignored)
-- [ ] Test end-to-end data flow
+- [ ] Test end-to-end data flow (off-USB, standalone WiFi)
 
 ### Core Functionality
 - [x] Basic door counting with reed switch
@@ -96,6 +97,31 @@ See `build-out-tutorial.md` Section 6 for full details on each option.
 ---
 
 ## Session Log
+
+### 2026-01-21 - ESP32-S3 Reed Switch Working
+
+**Summary**:
+- Reed switches arrived and wired to ESP32-S3 (GPIO4 + GND)
+- Fixed serial monitor configuration (removed incorrect USB CDC flags)
+- ESP32-S3 successfully counting door opens via WiFi
+
+**Device Status**:
+| Device | Port | Status |
+|--------|------|--------|
+| ESP32-S3 | COM9 | ✓ Counting door opens, WiFi connected |
+| Pico 2W | COM8 | Pending - needs reed switch wiring/testing |
+
+**Config Fix**:
+- Removed `-DARDUINO_USB_MODE=1` and `-DARDUINO_USB_CDC_ON_BOOT=1` from platformio.ini
+- Added explicit `monitor_port = COM9` and `upload_port = COM9`
+- Serial output now works reliably on UART port
+
+**Next Session**:
+- Get Pico 2W working with reed switch
+- Test both devices running standalone (off USB, powered separately)
+- Set up data logging server (explore TrueNAS options via SSH)
+
+---
 
 ### 2026-01-19 - Devices Ready for Testing
 
