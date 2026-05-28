@@ -388,27 +388,116 @@ Note: Reed switch has no polarity - wires are interchangeable.
 
 ### Option 7: Cellular + Cloud (No WiFi Needed)
 
-**How it works**: Use [4G/LTE HAT](https://www.pishop.us/product/4g-3g-2g-gsm-gprs-gnss-hat-for-raspberry-pi-lte-cat4-the-global-version/) for connectivity. Send to any cloud backend.
+**How it works**: Add a cellular modem module to the ESP32 (or Pico) over UART using the
+[TinyGSM](https://github.com/vshymanskyy/TinyGSM) library, then send to any cloud backend.
+
+> **Correction**: An earlier version of this doc claimed cellular "requires a Raspberry Pi,
+> not Pico/ESP32 directly." That is **not true**. The ESP32 talks to a cellular modem over
+> UART and is well-supported by TinyGSM. The "needs a Pi" note only applied to one specific
+> Raspberry-Pi-HAT-shaped product, not to cellular in general.
+
+**Recommended hardware for this project**:
+- **ESP32 + SIM7080G modem** (LTE **Cat-M1 / NB-IoT**). This is the right class of modem for a
+  door counter: tiny payloads, ~3µA sleep current, low data cost. Avoid full LTE Cat-1 modems
+  (A7670 / SIM7600) — faster but unnecessary power/cost here. Avoid 2G modules (SIM800); 2G/3G
+  networks are shut down in the US.
+- All-in-one boards exist (e.g. **LILYGO T-SIM7000G** = ESP32 + modem + SIM slot + GPS), which
+  are the simplest path. ESP32-S3 + SIM7080G boards are also available.
+
+**SIM choice — eSIM vs physical SIM**:
+| | Physical SIM (nano) | eSIM / eUICC (MFF2 soldered chip) |
+|---|---|---|
+| Form | Removable card in a slot | Soldered chip on the board |
+| Reprovision carrier | Swap card by hand | Remote, over the air — no device access |
+| Outdoor durability | Slot is a failure point | Sealed; resists moisture/corrosion/vibration |
+| Best for | Prototyping | Deployed/sealed/outdoor devices |
+
+For an outdoor unit in a sealed IP65 enclosure, a **soldered eSIM/eUICC chip is preferable** —
+no slot to corrode, and the carrier can be re-provisioned remotely without opening the box.
+
+**Recommended data plan**: **1NCE IoT Lifetime Flat — ~$14 for 500 MB over 10 years**, with
+**no monthly bill**. A door counter uses a tiny fraction of 500 MB. 1NCE offers it as a physical
+nano-SIM, a eUICC eSIM, *and* a solderable chip. (In the US these IoT SIMs roam onto Cat-M
+coverage via T-Mobile/AT&T — verify coverage at the fridge site first.)
 
 **Pros**:
-- No WiFi required at fridge location
-- Works anywhere with cell coverage
-- GPS tracking possible (HAT includes GNSS)
+- No WiFi required at fridge location; works anywhere with Cat-M/NB-IoT coverage
+- No WiFi-bridge hardware needed
+- One-time SIM cost, no recurring monthly fee (with 1NCE lifetime plan)
+- Low power — suitable for battery/solar
 
 **Cons**:
-- Requires SIM card + data plan
-- More expensive hardware (~$90)
-- Monthly data cost
-- More power consumption
-- Requires Raspberry Pi (not Pico/ESP32 directly)
+- Requires a cellular modem module + IoT SIM
+- Coverage varies by location (check Cat-M/NB-IoT availability)
+- Slightly more firmware work than plain WiFi (TinyGSM vs built-in WiFi)
 
 **Setup**:
-1. Attach LTE HAT to Raspberry Pi
-2. Insert SIM card with data plan
-3. Configure PPP or NetworkManager
-4. Send data to any cloud endpoint
+1. Use an ESP32 + SIM7080G board (or wire a modem module to ESP32 over UART)
+2. Install an IoT SIM/eSIM (1NCE recommended)
+3. Use TinyGSM to bring up the cellular connection
+4. POST to any cloud endpoint (same payload as the WiFi path)
 
-**Complexity**: Medium-Hard | **Cost**: $90 + data plan
+**Complexity**: Medium | **Cost**: ~$25–40 board + ~$14 SIM (10 yr) — no monthly fee
+
+---
+
+### Option 8: LoRa Mesh / Meshtastic (No WiFi, No Cellular, No Fees) ⭐ LEADING CANDIDATE
+
+**How it works**: [Meshtastic](https://meshtastic.org/) is an open-source LoRa mesh network on
+license-free 915 MHz (US). Cheap ESP32-based radios relay messages for each other — no WiFi, no
+SIM, no monthly fee. The fridge node sends its count over LoRa; a **gateway node** (one with
+WiFi/internet) bridges the mesh to MQTT, which feeds a database/dashboard.
+
+```
+Fridge LoRa node  →(LoRa hops)→  Gateway node (WiFi/internet)  →  MQTT  →  database/dashboard
+```
+
+**The key requirement**: A lone LoRa node cannot reach the internet. Meshtastic only works if
+**either**:
+1. You place a **gateway node within ~1–3 km** (urban, line-of-sight dependent) of the fridge —
+   e.g., at home / on the same network as **TrueNAS**; **or**
+2. There is already a **community Meshtastic mesh** near the fridge (check the live public node
+   map first).
+
+If the fridge is isolated with no node in range, this option does not apply.
+
+**Recommended hardware**:
+- **Fridge node**: **Heltec WiFi LoRa 32 V3** (~$25) — ESP32-S3 + SX1262 LoRa + OLED. Same ESP32
+  family as the rest of this project; serves as both the counter MCU and the LoRa radio.
+- **Gateway / base station**: **B&Q Station G2** (~$109) — a high-power backbone node (35 dBm PA,
+  ESP32-S3, rugged SMA socket, USB-C PD / 9–19V DC input). This is a permanent, substantial base
+  station, not a dev board — paired with an elevated high-gain outdoor antenna, a single Station G2
+  can cover a wide area, which is what gives the link the reach to reach the fridge reliably.
+- **Antenna**: a 915 MHz high-gain (5.8+ dBi) outdoor antenna mounted at elevation for the gateway —
+  antenna placement is the single biggest factor in range.
+- **License note**: running the Station G2 at full 35 dBm power in the US requires an Amateur Radio
+  (ham) license; it can run at reduced power without one.
+
+**Data path**: Meshtastic has built-in MQTT — telemetry packets are auto-serialized to JSON and
+published to an MQTT topic, commonly piped through **Node-RED** into a dashboard. The MQTT broker
+can run **self-hosted on TrueNAS** → fully private, zero cloud, zero recurring cost.
+
+**Pros**:
+- **$0 recurring — free forever.** No SIM, no data plan, no WiFi infrastructure.
+- Long range (1–3 km urban, more with good antenna/line-of-sight); low power (good for battery/solar)
+- Tiny payloads (a count) are an ideal fit for LoRa's low bandwidth
+- Resilient mesh; self-hostable end-to-end on TrueNAS
+- Same ESP32 ecosystem already in use
+
+**Cons**:
+- Requires **≥2 nodes** (fridge + gateway) unless a community mesh already covers the site
+- Range depends on terrain/line-of-sight — must verify a gateway is reachable
+- Slightly more setup (mesh config + MQTT bridge) than plain WiFi
+
+**Setup**:
+1. Flash Meshtastic onto the Heltec V3 fridge node and the Station G2 base station
+2. Install the Station G2 with its elevated outdoor antenna where it has WiFi/internet, within
+   LoRa range of the fridge
+3. Enable MQTT on the gateway; point it at an MQTT broker (self-hosted on TrueNAS)
+4. Fridge node sends count as telemetry → mesh → gateway → MQTT → Node-RED → dashboard
+
+**Complexity**: Medium | **Cost**: ~$205 (Heltec V3 fridge node + Station G2 + outdoor antenna),
+$0 recurring
 
 ---
 
@@ -421,8 +510,17 @@ For the Hollygrove Community Fridge:
 - Easy to share usage reports with community/funders
 - Zero ongoing cost
 
-**If no WiFi**: Cellular HAT (Option 7) + Google Sheets
-- Higher upfront cost but no WiFi infrastructure needed
-- Same easy reporting
+**If no WiFi — LEADING DIRECTION**: LoRa Mesh / Meshtastic (Option 8)
+- Free forever — no SIM, no data plan, no WiFi infrastructure
+- Heltec V3 fridge node + **Station G2 base station** with elevated outdoor antenna (~$205);
+  the high-power gateway is a permanent backbone, not a dev board
+- Fully self-hostable on TrueNAS (MQTT + Node-RED), zero cloud dependency
+- **Requires**: the base station to have internet and be within LoRa range of the fridge.
+  Verify reachability before committing.
+
+**If no WiFi and no gateway in LoRa range**: ESP32 + SIM7080G cellular (Option 7)
+- Works anywhere with Cat-M coverage; no dependency on a nearby node
+- ~$25–40 board + ~$14 1NCE SIM (500 MB / 10 years, no monthly fee)
+- Soldered eSIM preferred for the outdoor enclosure
 
 ---

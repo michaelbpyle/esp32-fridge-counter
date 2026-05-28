@@ -46,14 +46,29 @@ THIS IS DISTINCT FROM build-out-tutorial.md:
 | 9 | Micro SD Card | $13.95 | For Pi (if needed) |
 | 10 | Cable budget | $30.00 | USB cables, jumper wires |
 | 11 | Programming and labor (40hrs) | $0.00 | Volunteer/in-kind |
+| 12 | Heltec WiFi LoRa 32 V3 — fridge node | ~$25.00 | ESP32-S3 + LoRa. Serves as the fridge counter MCU **and** LoRa radio (replaces separate Pico/ESP32 #2-3 for the fridge unit). |
+| 13 | B&Q Station G2 — base-station gateway | ~$109.00 | High-power backbone node (35 dBm PA, ESP32-S3, rugged SMA, USB-C PD / 9-19V DC). Permanent base station that bridges the LoRa mesh to the internet/MQTT. Far more range/reliability than a dev board. |
+| 14 | High-gain outdoor antenna + mount + coax | ~$60.00 | 915MHz 5.8+ dBi external antenna mounted at elevation (rooftop) for the Station G2. Antenna placement is the single biggest range factor. |
+| 15 | LoRa antenna (915MHz) — fridge node | ~$10.00 | Upgrade over stock antenna on the Heltec V3 fridge node, as needed. |
 | **Total** | | **~$267.77** | |
+
+> **Notes**:
+> - The ~$267.77 total is a ceiling that bundles optional and either/or items. For the
+>   **Meshtastic build path** (leading direction), the two LoRa nodes (#12-13) replace both a
+>   separate microcontroller (#2-3) and the WiFi bridge (#4-5). Estimated real build: reed switch
+>   (#1) + Heltec V3 fridge node (#12) + Station G2 base station (#13) + outdoor antenna (#14) +
+>   IP65 enclosure (#6) + cables (#10) + fridge antenna (#15) ≈ **~$255**, with **$0 recurring** cost.
+> - **License note**: running the Station G2 at its full 35 dBm power in the US requires an Amateur
+>   Radio (ham) license. It can be run at lower power without one; high power + elevated antenna is
+>   what gives the backbone its reach.
 
 ### Connectivity Options (choose one)
 | Option | Price | Notes |
 |--------|-------|-------|
+| **LoRa Mesh / Meshtastic** ⭐ | ~$205 (nodes+antenna) | **LEADING DIRECTION.** No WiFi/SIM/fees. Heltec V3 fridge node + **Station G2 base station** (high-power backbone) w/ elevated outdoor antenna. Self-host MQTT+Node-RED on TrueNAS. See tutorial Option 8. |
 | WiFi (built-in) | $0 | Requires nearby WiFi network |
 | WiFi Bridge (#4-5 above) | $130 | Extends WiFi to fridge location |
-| [4G/LTE Cellular HAT](https://www.pishop.us/product/4g-3g-2g-gsm-gprs-gnss-hat-for-raspberry-pi-lte-cat4-the-global-version/) | $89.95 | No WiFi needed, requires SIM + data plan |
+| ESP32 + SIM7080G cellular (Cat-M/NB-IoT) | ~$25-40 board + ~$14 SIM | Fallback if no gateway in LoRa range. ESP32 does cellular directly via TinyGSM (NOT a Pi). 1NCE SIM = 500MB/10yr, no monthly fee. See tutorial Option 7. |
 
 ### Data Logging Options (choose one)
 See `build-out-tutorial.md` Section 6 for full details on each option.
@@ -97,6 +112,37 @@ See `build-out-tutorial.md` Section 6 for full details on each option.
 ---
 
 ## Session Log
+
+### 2026-05-26 - Cellular/eSIM Research (doc correction)
+
+**Summary**:
+- Corrected the "cellular requires a Raspberry Pi" error in the tutorial. ESP32 talks to a
+  cellular modem over UART directly via the TinyGSM library — no Pi needed.
+- Researched modem options: SIM7080G (Cat-M1/NB-IoT) is the right fit for low-data/low-power
+  door counting. LILYGO T-SIM7000G is an easy all-in-one ESP32+modem board.
+- Documented eSIM/eUICC vs physical SIM tradeoffs; soldered eSIM preferred for the sealed
+  outdoor enclosure (no corrodible slot, remote carrier reprovisioning).
+- Recommended 1NCE IoT Lifetime Flat (~$14 / 500MB / 10yr, no monthly fee) as the data plan.
+- Reframed cost: cellular path (~$25-40 board + ~$14 SIM) is likely cheaper over device
+  lifetime than the $130 WiFi-bridge option.
+
+- **DECISION: LoRa Mesh / Meshtastic is the leading direction for connectivity.** Added as
+  tutorial Option 8. Fridge node = Heltec V3 (~$25); gateway = **B&Q Station G2 (~$109)**, a
+  high-power backbone base station with an elevated outdoor antenna (not a dev board). Self-host
+  MQTT + Node-RED on TrueNAS for a fully private, zero-fee pipeline. Cellular (Option 7) demoted to
+  the fallback if no base station is reachable in LoRa range.
+- Note: Station G2 at full 35 dBm power in the US requires a ham license (can run lower without).
+
+**Files Changed**:
+- `build-out-tutorial.md` - Rewrote Option 7 (cellular), added Option 8 (Meshtastic), updated recommendation
+- `project-log.md` - Updated connectivity options table (Meshtastic now top option)
+
+**Open Questions** (for connectivity decision):
+- Meshtastic: is there an internet-connected gateway node reachable within ~1-3km of the fridge,
+  or an existing community mesh covering the site? (verify before buying)
+- Is there WiFi at the fridge site? (would simplify everything if yes)
+
+---
 
 ### 2026-01-21 - ESP32-S3 Reed Switch Working
 
