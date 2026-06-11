@@ -95,9 +95,49 @@ See `build-out-tutorial.md` Section 6 for full details on each option.
 
 ### Core Functionality
 - [x] Basic door counting with reed switch
-- [x] WiFi connectivity
-- [x] Data transmission to server endpoint
+- [x] WiFi connectivity (LEGACY - being replaced by Meshtastic)
+- [x] Data transmission to server endpoint (LEGACY - HTTP, being replaced by LoRa)
 - [x] LED feedback for events
+
+### Mesh / Connectivity (pivot 2026-06-07)
+- [ ] Engage SwampNet (swampnet.info) for site survey + node setup
+- [ ] Confirm 8430 Apple ↔ 9000 Oleander link with empirical RSSI/SNR test (~694m hop)
+- [ ] Decide: join existing community mesh vs stand up own gateway
+- [ ] Decide: stock Meshtastic firmware vs custom RadioLib firmware
+- [ ] Replace WiFi/HTTP path in main.cpp with LoRa transmit
+
+### Sensors / Telemetry (all reported over Meshtastic)
+Native Meshtastic telemetry covers 3 of 4 sensors with NO custom code (Environment, Power,
+Detection Sensor modules). Shelf weights (HX711) are the only non-native piece.
+
+**Phase 1 — stock Meshtastic for the simple sensors (no custom code):**
+- [ ] Door open count — Meshtastic **Detection Sensor** module on reed-switch GPIO
+- [ ] Weather — Meshtastic **Environment Telemetry** module + BME280 (I2C)
+- [ ] Validate full path end-to-end with SwampNet (Heltec V3 stock firmware → mesh → MQTT)
+
+**Phase 2 — power-system telemetry (read real equipment, NOT hobby shunts):**
+The fridge runs off a real off-grid power system (see 2026-06-11 entry). Pull telemetry from the
+equipment's own buses rather than adding INA-series sensors:
+- [ ] Read **Growatt SPF 3000TL LVM** inverter via **Modbus RTU** (RS485 expansion port or USB) —
+      PV input V/power, battery V/current, load, AC out, daily kWh. ESP32 + MAX485 transceiver.
+      Reference open-source register maps: grott / growatt2mqtt / ESPHome growatt component.
+- [ ] Read **EG4 LifePower4 48V BMS** via **RS485** — SoC, pack V, current, per-cell V, temps.
+      (Inverter already gets battery V/SoC over closed-loop CAN/RS485; BMS direct read = cell detail.)
+- [ ] Forward selected fields over Meshtastic (custom payload — not a native telemetry type)
+- [ ] OPEN: which port for monitoring (USB vs RS485 expansion) without colliding with ShineWiFi /
+      the inverter↔battery BMS link; confirm Growatt protocol # for the EG4 (LCD Program 36)
+
+**Phase 3 — shelf weights (custom subsystem):**
+- [ ] Per-shelf weights, **2–4 scales** (decided 2026-06-07) — load cells + one HX711 per shelf
+- [ ] Companion MCU (existing ESP32-S3) reads HX711s + RS485 Modbus, injects into mesh via Heltec
+
+**Architecture (TBD, discuss w/ SwampNet)**: a **companion ESP32-S3 sensor aggregator** is the
+natural hub — it reads load cells (HX711), weather (BME280), and the power system (MAX485/Modbus),
+then injects a combined payload into the mesh via the Heltec V3's serial API, keeping the radio on
+stock Meshtastic. Door + weather stay native Meshtastic modules (Phase 1). Firmware fork
+(stock+companion vs full custom RadioLib) still undecided — needs SwampNet input + a serial-injection
+spike. The sensor node draws 5V off the 48V battery via a buck converter (power budget now a
+non-issue — it sips from the big system).
 
 ### Improvements
 - [ ] Persistent count storage (survives power loss)
@@ -112,6 +152,80 @@ See `build-out-tutorial.md` Section 6 for full details on each option.
 ---
 
 ## Session Log
+
+### 2026-06-11 - Real Power System Identified; Telemetry Architecture Revised
+
+**Summary**:
+- Two equipment manuals added to `research/`, defining the actual off-grid power system at the
+  fridge site (this powers the **fridge appliance**, not just the sensor node):
+  - **EG4 LifePower4 48V** — server-rack **LiFePO4** battery w/ high-precision BMS (per-cell V,
+    current, temp, SoC). Comms over **RS485**; up to 16 modules parallel; "Host" battery (DIP ID 0)
+    bridges to inverter via RS485/CAT5 or closed-loop CAN.
+  - **Growatt SPF 3000TL LVM** — 3000W off-grid solar **inverter/charger**. Ports: **USB**,
+    **RS485 expansion**, **BMS CAN/RS485**, optional WiFi/GPRS (ShineWiFi). Speaks Growatt
+    **Modbus** — already aggregates PV power, battery V/current, load, AC output, daily kWh.
+- **Architecture impact**: "solar + converter data" is no longer hobby INA3221 shunts. We read the
+  equipment's own telemetry buses:
+  - Growatt inverter via **Modbus RTU** (ESP32 + MAX485 on RS485 expansion port, or USB) — richest
+    single source. Open-source register maps exist (grott, growatt2mqtt, ESPHome growatt).
+  - EG4 BMS via **RS485** for cell-level detail/SoC.
+- **Power budget for the sensor node is now moot** — it taps 5V off the 48V battery via a buck
+  converter instead of needing its own panel/18650.
+- Reorganized sensor plan into Phase 1 (native Meshtastic: door + weather), Phase 2 (power-system
+  Modbus/RS485 telemetry), Phase 3 (per-shelf weights). A **companion ESP32-S3 aggregator** reads
+  HX711 + BME280 + MAX485/Modbus and injects into the mesh via the Heltec serial API.
+
+**Open Questions**:
+- Which Growatt port to tap for monitoring (USB vs RS485 expansion) without colliding with the
+  inverter↔battery BMS link or a ShineWiFi dongle?
+- Which Growatt protocol # matches the EG4 BMS (inverter LCD Program 36)?
+- Is the AC fridge load itself in scope for monitoring, or just PV/battery health?
+
+**Files Changed**:
+- `research/` - Added EG4 LifePower4 + Growatt SPF 3000TL manuals
+- `project-log.md` - This entry + revised Sensors/Telemetry phases
+- `build-out-tutorial.md` - Noted power-system telemetry path
+- `SWAMPNET-BRIEF.md` / `SWAMPNET-EMAIL.md` - Updated power telemetry, prepared outreach email
+
+---
+
+### 2026-06-07 - Pivot to Mesh-Only; SwampNet Partnership; Sensor Scope Expansion
+
+**Summary**:
+- **DECISION: Pivoting to Meshtastic/LoRa entirely.** Dropping the WiFi connectivity path. The
+  existing `src/main.cpp` (WiFi always-on + HTTP POST, no sleep) is now legacy — it idles at
+  ~80–120 mA, which is incompatible with the solar/battery budget at the fridge site. Mesh deletes
+  that draw (LoRa idle ~8–12 mA always-listening, ~0.13 mA deep-sleep).
+- **Partner: SwampNet ([swampnet.info](https://swampnet.info))** — New Orleans mutual-aid Meshtastic
+  network with local RF expertise. They'll handle site survey + node setup, and may let us join an
+  existing community mesh (possibly removing the need for our own gateway). Engage early.
+- **Site link analysis**: 8430 Apple St (gateway, ~3 stories) ↔ 9000 Oleander (fridge, ~2 stories)
+  = **~694 m / 0.43 mi**. Short urban hop. LOS not strictly required at this range but is the
+  dominant factor; 1st Fresnel radius ~7.5 m at midpoint. Antennas at 2–3 stories should clear most
+  Hollygrove 1–2-story rooftops. SwampNet to confirm with an empirical RSSI/SNR test.
+- **Scope expansion — fridge node now a multi-sensor telemetry node**, all reported over Meshtastic:
+  1. **Door open count** (reed switch) — original goal
+  2. **Shelf weights** — load cells (HX711 amps) under shelves → inventory/stock level
+  3. **Solar/power telemetry** — panel voltage, battery voltage/SoC, charge current from the
+     solar charge controller / INA-series sensor
+  4. **Weather** — ambient temp/humidity (+ optionally pressure) at the fridge site
+
+**Power note**: Power budget figures (WiFi vs LoRa-always-on vs LoRa-deep-sleep) gathered. Adding
+always-on sensors (load cells, weather, power monitor) pushes toward the always-listening profile
+(~10–15 mA) rather than pure deep-sleep; size solar/battery accordingly (~5 W panel + 18650(s)).
+
+**Open Questions**:
+- Stock Meshtastic firmware (telemetry modules + serial sensor) vs custom RadioLib firmware for the
+  multi-sensor payload? Stock is simpler but rigid; custom gives full control of the payload.
+- How many shelves / load cells, and required weight resolution?
+- Which solar charge controller? (determines whether power telemetry comes from the controller
+  directly or a separate INA226/INA3221 sensor)
+
+**Files Changed**:
+- `build-out-tutorial.md` - Added SwampNet partner + Hollygrove site-link/LOS analysis to Option 8
+- `project-log.md` - This entry
+
+---
 
 ### 2026-05-26 - Cellular/eSIM Research (doc correction)
 

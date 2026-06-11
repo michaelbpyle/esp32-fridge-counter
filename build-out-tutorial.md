@@ -461,6 +461,26 @@ Fridge LoRa node  →(LoRa hops)→  Gateway node (WiFi/internet)  →  MQTT  �
 
 If the fridge is isolated with no node in range, this option does not apply.
 
+**Local partner — SwampNet**: [swampnet.info](https://swampnet.info) is a New Orleans (Bvlbancha)
+mutual-aid Meshtastic network that has built LoRa links connecting mutual-aid distribution hubs
+across the city since 2023 (a ~3.5-mile proof-of-concept mesh). They have the local RF expertise to
+do the site survey, set up the nodes, and potentially tie this fridge counter into an existing
+community mesh — which could remove the need to stand up our own dedicated gateway. **Engage SwampNet
+early** for siting and setup.
+
+**Site link (Hollygrove)**: planned hop is **8430 Apple St** (gateway/relay site, antenna up to
+~3 stories) ↔ **9000 Oleander** (fridge node, antenna up to ~2 stories), measured at **~694 m
+(0.43 mi)** apart. This is a short urban hop, well within Meshtastic range.
+- **Is line-of-sight required?** Not strictly at this distance, but it is the dominant factor. At
+  915 MHz, range is essentially LOS-limited and degraded by buildings/tree canopy; a clear path is
+  worth far more than antenna gain.
+- **Fresnel zone**: the first Fresnel zone is only ~7.5 m radius at the midpoint (60% clearance
+  ≈ 4.5 m). Getting both antennas above the surrounding 1–2-story rooftops/tree line is what
+  matters. At 3 stories (Apple St) and 2 stories (fridge), the nodes should clear most single-family
+  rooftops in Hollygrove — likely a workable link even without perfect optical LOS.
+- **Action**: have SwampNet do an empirical RSSI/SNR test (walk a node to each candidate mount
+  height) before committing to permanent mounts. Cheaper and more reliable than modeling.
+
 **Recommended hardware**:
 - **Fridge node**: **Heltec WiFi LoRa 32 V3** (~$25) — ESP32-S3 + SX1262 LoRa + OLED. Same ESP32
   family as the rest of this project; serves as both the counter MCU and the LoRa radio.
@@ -498,6 +518,18 @@ can run **self-hosted on TrueNAS** → fully private, zero cloud, zero recurring
 
 **Complexity**: Medium | **Cost**: ~$205 (Heltec V3 fridge node + Station G2 + outdoor antenna),
 $0 recurring
+
+**Beyond door count — multi-sensor telemetry over the mesh** (see project-log.md for phased plan):
+- **Door + weather** ride on **native Meshtastic modules** (Detection Sensor + Environment
+  Telemetry / BME280) — no custom code.
+- **Power-system health** comes from the fridge's real off-grid gear, read over their own buses, not
+  hobby shunts: the **Growatt SPF 3000TL** inverter via **Modbus RTU** (ESP32 + MAX485 on the RS485
+  expansion port; PV power, battery V/SoC/current, load, daily kWh) and the **EG4 LifePower4 48V**
+  BMS via **RS485** (cell detail). Open-source register maps exist (grott, growatt2mqtt, ESPHome).
+- **Per-shelf weights** (inventory) via load cells + HX711, the one non-native piece.
+- A **companion ESP32-S3** aggregates the custom sensors and injects a combined payload into the mesh
+  via the Heltec's serial API, keeping the radio node on stock Meshtastic. The node powers itself
+  from 5V bucked off the 48V battery.
 
 ---
 
