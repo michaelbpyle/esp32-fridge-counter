@@ -1,0 +1,297 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1100 850" width="11in" height="8.5in" font-family="Arial, Helvetica, sans-serif">
+<rect x="0" y="0" width="1100" height="850" fill="#ffffff"/>
+<text x="26" y="30" font-size="19" text-anchor="start" font-weight="bold" fill="#1a1a1a">Hollygrove Community Fridge door counter - wiring diagram</text>
+<text x="26" y="48" font-size="11.5" text-anchor="start" font-weight="normal" fill="#444444">Board shown: ESP32-S3-DevKitC-1 style N16R8 (22 pins per side). Wire to the GPIO NUMBER printed next to each pin. All sensors run on 3.3 V.</text>
+<path d="M30 640 L30 60 L1070 60 L1070 430" fill="none" stroke="#d62828" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M48 100 L48 812 L1052 812 L1052 230" fill="none" stroke="#111111" stroke-width="3.2" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="120" y="75" font-size="11" text-anchor="start" font-weight="bold" fill="#d62828">3V3 (3.3 V) - red</text>
+<text x="120" y="828" font-size="11" text-anchor="start" font-weight="bold" fill="#111111">GND (ground) - black</text>
+<rect x="470" y="70" width="200" height="640" rx="8" fill="#1f2937" stroke="#111827" stroke-width="1.5"/>
+<text x="570" y="85" font-size="11" text-anchor="middle" font-weight="bold" fill="#e5e7eb">ESP32-S3-WROOM-1 (N16R8)</text>
+<text x="570" y="99" font-size="9.5" text-anchor="middle" font-weight="normal" fill="#fde68a">RGB status LED on board = GPIO48</text>
+<rect x="512" y="694" width="44" height="26" rx="4" fill="#d1d5db" stroke="#6b7280" stroke-width="1.2"/>
+<text x="534" y="711" font-size="9.5" text-anchor="middle" font-weight="normal" fill="#111827">USB-C</text>
+<rect x="584" y="694" width="44" height="26" rx="4" fill="#d1d5db" stroke="#6b7280" stroke-width="1.2"/>
+<text x="606" y="711" font-size="9.5" text-anchor="middle" font-weight="normal" fill="#111827">USB-C</text>
+<text x="570" y="736" font-size="10.5" text-anchor="middle" font-weight="normal" fill="#444444">USB-C: 5 V power + programming</text>
+<text x="570" y="749" font-size="10.5" text-anchor="middle" font-weight="normal" fill="#444444">(use the port marked UART / COM)</text>
+<rect x="82" y="92" width="230" height="66" rx="6" fill="#f8fafc" stroke="#334155" stroke-width="1.3"/>
+<text x="92" y="110" font-size="13" text-anchor="start" font-weight="bold" fill="#1a1a1a">Reed switch (door)</text>
+<text x="92" y="125" font-size="10.5" text-anchor="start" font-weight="normal" fill="#475569">2 wires, either way round</text>
+<rect x="218" y="98" width="86" height="17" rx="8.5" fill="#1d4ed8" stroke="#1d4ed8" stroke-width="1.2"/>
+<text x="261" y="110.5" font-size="10.5" text-anchor="middle" font-weight="bold" fill="#ffffff">IN USE NOW</text>
+<text x="306" y="146" font-size="11" text-anchor="end" font-weight="bold" fill="#1a1a1a">to GPIO4</text>
+<text x="92" y="146" font-size="11" text-anchor="start" font-weight="bold" fill="#1a1a1a">other wire to GND</text>
+<path d="M82 142 L48 142" fill="none" stroke="#ffffff" stroke-width="5.9" stroke-linejoin="round"/>
+<path d="M82 142 L48 142" fill="none" stroke="#111111" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="48" cy="142" r="4" fill="#111111"/>
+<rect x="82" y="170" width="230" height="92" rx="6" fill="#f8fafc" stroke="#334155" stroke-width="1.3"/>
+<text x="92" y="188" font-size="13" text-anchor="start" font-weight="bold" fill="#1a1a1a">DS18B20 probe</text>
+<text x="92" y="203" font-size="10.5" text-anchor="start" font-weight="normal" fill="#475569">fridge temperature, waterproof</text>
+<rect x="246.8" y="176" width="57.2" height="17" rx="8.5" fill="#b45309" stroke="#b45309" stroke-width="1.2"/>
+<text x="275.4" y="188.5" font-size="10.5" text-anchor="middle" font-weight="bold" fill="#ffffff">TO BUY</text>
+<text x="306" y="224" font-size="11" text-anchor="end" font-weight="bold" fill="#1a1a1a">DATA (yellow)</text>
+<text x="92" y="222" font-size="11" text-anchor="start" font-weight="bold" fill="#1a1a1a">VDD (red) to 3V3</text>
+<text x="92" y="250" font-size="11" text-anchor="start" font-weight="bold" fill="#1a1a1a">GND (black) to GND</text>
+<path d="M82 218 L30 218" fill="none" stroke="#ffffff" stroke-width="5.9" stroke-linejoin="round"/>
+<path d="M82 218 L30 218" fill="none" stroke="#d62828" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="30" cy="218" r="4" fill="#d62828"/>
+<path d="M82 246 L48 246" fill="none" stroke="#ffffff" stroke-width="5.9" stroke-linejoin="round"/>
+<path d="M82 246 L48 246" fill="none" stroke="#111111" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="48" cy="246" r="4" fill="#111111"/>
+<path d="M306 220 L306 232" fill="none" stroke="#c99700" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/>
+<rect x="300" y="232" width="12" height="20" rx="2" fill="#fef3c7" stroke="#92400e" stroke-width="1.2"/>
+<text x="294" y="241" font-size="10.5" text-anchor="end" font-weight="bold" fill="#92400e">4.7 k pull-up</text>
+<text x="294" y="253" font-size="10" text-anchor="end" font-weight="normal" fill="#92400e">DATA to 3V3</text>
+<rect x="82" y="274" width="230" height="72" rx="6" fill="#f8fafc" stroke="#334155" stroke-width="1.3"/>
+<text x="92" y="292" font-size="13" text-anchor="start" font-weight="bold" fill="#1a1a1a">DHT11 / DHT22</text>
+<text x="92" y="307" font-size="10.5" text-anchor="start" font-weight="normal" fill="#475569">air temp + humidity (DHT11 on hand)</text>
+<rect x="239.6" y="280" width="64.4" height="17" rx="8.5" fill="#1f8a3b" stroke="#1f8a3b" stroke-width="1.2"/>
+<text x="271.8" y="292.5" font-size="10.5" text-anchor="middle" font-weight="bold" fill="#ffffff">ON HAND</text>
+<text x="306" y="332" font-size="11" text-anchor="end" font-weight="bold" fill="#1a1a1a">DATA</text>
+<text x="92" y="324" font-size="11" text-anchor="start" font-weight="bold" fill="#1a1a1a">+ / VCC to 3V3</text>
+<text x="92" y="339" font-size="11" text-anchor="start" font-weight="bold" fill="#1a1a1a">- / GND to GND</text>
+<path d="M82 320 L30 320" fill="none" stroke="#ffffff" stroke-width="5.9" stroke-linejoin="round"/>
+<path d="M82 320 L30 320" fill="none" stroke="#d62828" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="30" cy="320" r="4" fill="#d62828"/>
+<path d="M82 335 L48 335" fill="none" stroke="#ffffff" stroke-width="5.9" stroke-linejoin="round"/>
+<path d="M82 335 L48 335" fill="none" stroke="#111111" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="48" cy="335" r="4" fill="#111111"/>
+<rect x="82" y="358" width="230" height="116" rx="6" fill="#f8fafc" stroke="#334155" stroke-width="1.3" stroke-dasharray="6 4"/>
+<text x="92" y="376" font-size="13" text-anchor="start" font-weight="bold" fill="#1a1a1a">RS485 (reserved)</text>
+<text x="92" y="391" font-size="10.5" text-anchor="start" font-weight="normal" fill="#475569">future link to the solar inverter (Modbus)</text>
+<rect x="246.8" y="364" width="57.2" height="17" rx="8.5" fill="#b45309" stroke="#b45309" stroke-width="1.2"/>
+<text x="275.4" y="376.5" font-size="10.5" text-anchor="middle" font-weight="bold" fill="#ffffff">TO BUY</text>
+<text x="306" y="418" font-size="11" text-anchor="end" font-weight="bold" fill="#1a1a1a">DE + RE</text>
+<text x="306" y="437" font-size="11" text-anchor="end" font-weight="bold" fill="#1a1a1a">DI</text>
+<text x="306" y="456" font-size="11" text-anchor="end" font-weight="bold" fill="#1a1a1a">RO</text>
+<text x="92" y="412" font-size="11" text-anchor="start" font-weight="bold" fill="#1a1a1a">VCC to 3V3</text>
+<text x="92" y="431" font-size="11" text-anchor="start" font-weight="bold" fill="#1a1a1a">GND to GND</text>
+<text x="92" y="450" font-size="11" text-anchor="start" font-weight="bold" fill="#1a1a1a">A / B to inverter</text>
+<text x="92" y="466" font-size="10" text-anchor="start" font-weight="normal" fill="#b45309">Buy a 3.3 V type (MAX3485)</text>
+<path d="M82 408 L30 408" fill="none" stroke="#ffffff" stroke-width="5.9" stroke-linejoin="round"/>
+<path d="M82 408 L30 408" fill="none" stroke="#d62828" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="30" cy="408" r="4" fill="#d62828"/>
+<path d="M82 427 L48 427" fill="none" stroke="#ffffff" stroke-width="5.9" stroke-linejoin="round"/>
+<path d="M82 427 L48 427" fill="none" stroke="#111111" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="48" cy="427" r="4" fill="#111111"/>
+<rect x="82" y="486" width="230" height="92" rx="6" fill="#f8fafc" stroke="#334155" stroke-width="1.3"/>
+<text x="92" y="504" font-size="13" text-anchor="start" font-weight="bold" fill="#1a1a1a">BMP280 (or BME280)</text>
+<text x="92" y="519" font-size="10.5" text-anchor="start" font-weight="normal" fill="#475569">air temperature + pressure, I2C</text>
+<rect x="239.6" y="492" width="64.4" height="17" rx="8.5" fill="#1f8a3b" stroke="#1f8a3b" stroke-width="1.2"/>
+<text x="271.8" y="504.5" font-size="10.5" text-anchor="middle" font-weight="bold" fill="#ffffff">ON HAND</text>
+<text x="306" y="544" font-size="11" text-anchor="end" font-weight="bold" fill="#1a1a1a">SDA</text>
+<text x="306" y="566" font-size="11" text-anchor="end" font-weight="bold" fill="#1a1a1a">SCL</text>
+<text x="92" y="542" font-size="11" text-anchor="start" font-weight="bold" fill="#1a1a1a">VCC / VIN to 3V3</text>
+<text x="92" y="564" font-size="11" text-anchor="start" font-weight="bold" fill="#1a1a1a">GND to GND</text>
+<path d="M82 538 L30 538" fill="none" stroke="#ffffff" stroke-width="5.9" stroke-linejoin="round"/>
+<path d="M82 538 L30 538" fill="none" stroke="#d62828" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="30" cy="538" r="4" fill="#d62828"/>
+<path d="M82 560 L48 560" fill="none" stroke="#ffffff" stroke-width="5.9" stroke-linejoin="round"/>
+<path d="M82 560 L48 560" fill="none" stroke="#111111" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="48" cy="560" r="4" fill="#111111"/>
+<rect x="82" y="596" width="230" height="150" rx="6" fill="#fffbeb" stroke="#b45309" stroke-width="1.2"/>
+<text x="92" y="614" font-size="12.5" text-anchor="start" font-weight="bold" fill="#92400e">Rules that protect the board</text>
+<text x="92" y="634" font-size="11" text-anchor="start" font-weight="normal" fill="#451a03">3.3 V ONLY on every GPIO pin.</text>
+<text x="92" y="650" font-size="11" text-anchor="start" font-weight="normal" fill="#451a03">Never connect 5 V to a GPIO pin.</text>
+<text x="92" y="666" font-size="11" text-anchor="start" font-weight="normal" fill="#451a03">Power every sensor from 3V3, not 5V.</text>
+<text x="92" y="682" font-size="11" text-anchor="start" font-weight="normal" fill="#451a03">Unplug USB before changing wires.</text>
+<text x="92" y="698" font-size="11" text-anchor="start" font-weight="normal" fill="#451a03">Pink pins on the board: leave empty</text>
+<text x="92" y="714" font-size="11" text-anchor="start" font-weight="normal" fill="#451a03">(boot, memory, USB, serial, LED).</text>
+<text x="92" y="730" font-size="11" text-anchor="start" font-weight="normal" fill="#451a03">Grey pins are free for later use.</text>
+<rect x="790" y="196" width="220" height="214" rx="6" fill="#f8fafc" stroke="#334155" stroke-width="1.3" stroke-dasharray="6 4"/>
+<text x="852" y="214" font-size="13" text-anchor="start" font-weight="bold" fill="#1a1a1a">HX711 amplifiers x4</text>
+<text x="852" y="229" font-size="10.5" text-anchor="start" font-weight="normal" fill="#475569">shelf scales - experimental</text>
+<rect x="944.8" y="236" width="57.2" height="17" rx="8.5" fill="#b45309" stroke="#b45309" stroke-width="1.2"/>
+<text x="973.4" y="248.5" font-size="10.5" text-anchor="middle" font-weight="bold" fill="#ffffff">TO BUY</text>
+<text x="798" y="246" font-size="11" text-anchor="start" font-weight="bold" fill="#1a1a1a">SCK (all 4 joined)</text>
+<text x="798" y="272" font-size="11" text-anchor="start" font-weight="bold" fill="#1a1a1a">DT of HX711 #1</text>
+<text x="798" y="298" font-size="11" text-anchor="start" font-weight="bold" fill="#1a1a1a">DT of HX711 #2</text>
+<text x="798" y="324" font-size="11" text-anchor="start" font-weight="bold" fill="#1a1a1a">DT of HX711 #3</text>
+<text x="798" y="350" font-size="11" text-anchor="start" font-weight="bold" fill="#1a1a1a">DT of HX711 #4</text>
+<text x="1002" y="372" font-size="11" text-anchor="end" font-weight="bold" fill="#1a1a1a">VCC (each) to 3V3</text>
+<text x="1002" y="396" font-size="11" text-anchor="end" font-weight="bold" fill="#1a1a1a">GND (each) to GND</text>
+<path d="M1010 368 L1070 368" fill="none" stroke="#ffffff" stroke-width="5.9" stroke-linejoin="round"/>
+<path d="M1010 368 L1070 368" fill="none" stroke="#d62828" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="1070" cy="368" r="4" fill="#d62828"/>
+<path d="M1010 392 L1052 392" fill="none" stroke="#ffffff" stroke-width="5.9" stroke-linejoin="round"/>
+<path d="M1010 392 L1052 392" fill="none" stroke="#111111" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="1052" cy="392" r="4" fill="#111111"/>
+<rect x="794" y="428" width="48" height="34" rx="3" fill="#e2e8f0" stroke="#475569" stroke-width="1.2"/>
+<text x="818" y="442" font-size="9.5" text-anchor="middle" font-weight="normal" fill="#1a1a1a">load</text>
+<text x="818" y="454" font-size="9.5" text-anchor="middle" font-weight="normal" fill="#1a1a1a">cell 1</text>
+<path d="M818 428 L818 410" fill="none" stroke="#475569" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="3 2"/>
+<rect x="848" y="428" width="48" height="34" rx="3" fill="#e2e8f0" stroke="#475569" stroke-width="1.2"/>
+<text x="872" y="442" font-size="9.5" text-anchor="middle" font-weight="normal" fill="#1a1a1a">load</text>
+<text x="872" y="454" font-size="9.5" text-anchor="middle" font-weight="normal" fill="#1a1a1a">cell 2</text>
+<path d="M872 428 L872 410" fill="none" stroke="#475569" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="3 2"/>
+<rect x="902" y="428" width="48" height="34" rx="3" fill="#e2e8f0" stroke="#475569" stroke-width="1.2"/>
+<text x="926" y="442" font-size="9.5" text-anchor="middle" font-weight="normal" fill="#1a1a1a">load</text>
+<text x="926" y="454" font-size="9.5" text-anchor="middle" font-weight="normal" fill="#1a1a1a">cell 3</text>
+<path d="M926 428 L926 410" fill="none" stroke="#475569" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="3 2"/>
+<rect x="956" y="428" width="48" height="34" rx="3" fill="#e2e8f0" stroke="#475569" stroke-width="1.2"/>
+<text x="980" y="442" font-size="9.5" text-anchor="middle" font-weight="normal" fill="#1a1a1a">load</text>
+<text x="980" y="454" font-size="9.5" text-anchor="middle" font-weight="normal" fill="#1a1a1a">cell 4</text>
+<path d="M980 428 L980 410" fill="none" stroke="#475569" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="3 2"/>
+<text x="790" y="478" font-size="10.5" text-anchor="start" font-weight="normal" fill="#475569">Each load cell plugs into its own HX711</text>
+<text x="790" y="491" font-size="10.5" text-anchor="start" font-weight="normal" fill="#475569">(E+, E-, A+, A-: see the HX711 board labels).</text>
+<rect x="762" y="512" width="276" height="96" rx="6" fill="#f0fdf4" stroke="#166534" stroke-width="1.2"/>
+<text x="772" y="530" font-size="12.5" text-anchor="start" font-weight="bold" fill="#14532d">What works today</text>
+<text x="772" y="549" font-size="11" text-anchor="start" font-weight="normal" fill="#14532d">Door counting (reed switch): working.</text>
+<text x="772" y="564" font-size="11" text-anchor="start" font-weight="normal" fill="#14532d">Any sensor here is found automatically</text>
+<text x="772" y="579" font-size="11" text-anchor="start" font-weight="normal" fill="#14532d">at power-up. A sensor that is not</text>
+<text x="772" y="594" font-size="11" text-anchor="start" font-weight="normal" fill="#14532d">plugged in is simply ignored.</text>
+<rect x="762" y="620" width="276" height="124" rx="6" fill="#eff6ff" stroke="#1e40af" stroke-width="1.2"/>
+<text x="772" y="638" font-size="12.5" text-anchor="start" font-weight="bold" fill="#1e3a8a">Other boards</text>
+<text x="772" y="657" font-size="11" text-anchor="start" font-weight="normal" fill="#1e3a8a">Freenove ESP32-S3 WROOM (20 pins per</text>
+<text x="772" y="671.5" font-size="11" text-anchor="start" font-weight="normal" fill="#1e3a8a">side): same GPIO numbers, same order.</text>
+<text x="772" y="686" font-size="11" text-anchor="start" font-weight="normal" fill="#1e3a8a">Leave its microSD slot EMPTY (it uses</text>
+<text x="772" y="700.5" font-size="11" text-anchor="start" font-weight="normal" fill="#1e3a8a">GPIO38-40, the HX711 #2-#4 pins).</text>
+<text x="772" y="715" font-size="11" text-anchor="start" font-weight="normal" fill="#1e3a8a">Walter (LTE-M): same GPIO numbers;</text>
+<text x="772" y="729.5" font-size="11" text-anchor="start" font-weight="normal" fill="#1e3a8a">see the second table in wiring.md.</text>
+<path d="M461 112 L446 112 L446 60" fill="none" stroke="#ffffff" stroke-width="6.5" stroke-linejoin="round"/>
+<path d="M461 112 L446 112 L446 60" fill="none" stroke="#d62828" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="446" cy="60" r="4" fill="#d62828"/>
+<path d="M461 658 L446 658 L446 812" fill="none" stroke="#ffffff" stroke-width="6.5" stroke-linejoin="round"/>
+<path d="M461 658 L446 658 L446 812" fill="none" stroke="#111111" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="446" cy="812" r="4" fill="#111111"/>
+<rect x="318" y="738" width="112" height="66" rx="6" fill="#fff7ed" stroke="#c2410c" stroke-width="1.3"/>
+<text x="374" y="754" font-size="12" text-anchor="middle" font-weight="bold" fill="#7c2d12">5 V power in</text>
+<text x="374" y="768" font-size="10.5" text-anchor="middle" font-weight="normal" fill="#7c2d12">(field: 5 V buck)</text>
+<text x="374" y="783" font-size="10" text-anchor="middle" font-weight="normal" fill="#7c2d12">Bench: USB-C only.</text>
+<text x="374" y="796" font-size="10" text-anchor="middle" font-weight="bold" fill="#7c2d12">Never both at once.</text>
+<path d="M461 632 L430 632 L430 748 L430 748" fill="none" stroke="#ffffff" stroke-width="6.5" stroke-linejoin="round"/>
+<path d="M461 632 L430 632 L430 748 L430 748" fill="none" stroke="#e07b00" stroke-width="3" stroke-linejoin="round" stroke-linecap="round"/>
+<text x="424" y="626" font-size="10.5" text-anchor="end" font-weight="bold" fill="#e07b00">5V</text>
+<path d="M374 804 L374 812" fill="none" stroke="#ffffff" stroke-width="5.9" stroke-linejoin="round"/>
+<path d="M374 804 L374 812" fill="none" stroke="#111111" stroke-width="2.4" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="374" cy="812" r="4" fill="#111111"/>
+<path d="M312 142 L336 142 L336 190 L461 190" fill="none" stroke="#ffffff" stroke-width="6.1" stroke-linejoin="round"/>
+<path d="M312 142 L336 142 L336 190 L461 190" fill="none" stroke="#7a4a21" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M312 220 L348 220 L348 216 L461 216" fill="none" stroke="#ffffff" stroke-width="6.1" stroke-linejoin="round"/>
+<path d="M312 220 L348 220 L348 216 L461 216" fill="none" stroke="#c99700" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M312 328 L360 328 L360 242 L461 242" fill="none" stroke="#ffffff" stroke-width="6.1" stroke-linejoin="round"/>
+<path d="M312 328 L360 328 L360 242 L461 242" fill="none" stroke="#2a9d3a" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M312 414 L372 414 L372 320 L461 320" fill="none" stroke="#ffffff" stroke-width="6.1" stroke-linejoin="round"/>
+<path d="M312 414 L372 414 L372 320 L461 320" fill="none" stroke="#6b7280" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M312 433 L384 433 L384 346 L461 346" fill="none" stroke="#ffffff" stroke-width="6.1" stroke-linejoin="round"/>
+<path d="M312 433 L384 433 L384 346 L461 346" fill="none" stroke="#0f8b8d" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M312 452 L396 452 L396 372 L461 372" fill="none" stroke="#ffffff" stroke-width="6.1" stroke-linejoin="round"/>
+<path d="M312 452 L396 452 L396 372 L461 372" fill="none" stroke="#d1338a" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M312 540 L408 540 L408 398 L461 398" fill="none" stroke="#ffffff" stroke-width="6.1" stroke-linejoin="round"/>
+<path d="M312 540 L408 540 L408 398 L461 398" fill="none" stroke="#1f6fd1" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M312 562 L420 562 L420 476 L461 476" fill="none" stroke="#ffffff" stroke-width="6.1" stroke-linejoin="round"/>
+<path d="M312 562 L420 562 L420 476 L461 476" fill="none" stroke="#7b3fc4" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M679 242 L790 242" fill="none" stroke="#ffffff" stroke-width="6.1" stroke-linejoin="round"/>
+<path d="M679 242 L790 242" fill="none" stroke="#6b7280" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M679 268 L790 268" fill="none" stroke="#ffffff" stroke-width="6.1" stroke-linejoin="round"/>
+<path d="M679 268 L790 268" fill="none" stroke="#1f6fd1" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M679 294 L790 294" fill="none" stroke="#ffffff" stroke-width="6.1" stroke-linejoin="round"/>
+<path d="M679 294 L790 294" fill="none" stroke="#2a9d3a" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M679 320 L790 320" fill="none" stroke="#ffffff" stroke-width="6.1" stroke-linejoin="round"/>
+<path d="M679 320 L790 320" fill="none" stroke="#c99700" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<path d="M679 346 L790 346" fill="none" stroke="#ffffff" stroke-width="6.1" stroke-linejoin="round"/>
+<path d="M679 346 L790 346" fill="none" stroke="#7b3fc4" stroke-width="2.6" stroke-linejoin="round" stroke-linecap="round"/>
+<circle cx="312" cy="142" r="3.5" fill="#7a4a21"/>
+<circle cx="312" cy="220" r="3.5" fill="#c99700"/>
+<circle cx="312" cy="328" r="3.5" fill="#2a9d3a"/>
+<circle cx="312" cy="414" r="3.5" fill="#6b7280"/>
+<circle cx="312" cy="433" r="3.5" fill="#0f8b8d"/>
+<circle cx="312" cy="452" r="3.5" fill="#d1338a"/>
+<circle cx="312" cy="540" r="3.5" fill="#1f6fd1"/>
+<circle cx="312" cy="562" r="3.5" fill="#7b3fc4"/>
+<circle cx="790" cy="242" r="3.5" fill="#6b7280"/>
+<circle cx="790" cy="268" r="3.5" fill="#1f6fd1"/>
+<circle cx="790" cy="294" r="3.5" fill="#2a9d3a"/>
+<circle cx="790" cy="320" r="3.5" fill="#c99700"/>
+<circle cx="790" cy="346" r="3.5" fill="#7b3fc4"/>
+<rect x="461" y="107.5" width="9" height="9" rx="1.5" fill="#d62828" stroke="#111827" stroke-width="0.8"/>
+<text x="477" y="116" font-size="10.5" text-anchor="start" font-weight="bold" fill="#ffffff">3V3</text>
+<rect x="461" y="133.5" width="9" height="9" rx="1.5" fill="#d62828" stroke="#111827" stroke-width="0.8"/>
+<text x="477" y="142" font-size="10.5" text-anchor="start" font-weight="bold" fill="#ffffff">3V3</text>
+<rect x="461" y="159.5" width="9" height="9" rx="1.5" fill="#d1d5db" stroke="#111827" stroke-width="0.8"/>
+<text x="477" y="168" font-size="10.5" text-anchor="start" font-weight="normal" fill="#9ca3af">RST</text>
+<rect x="461" y="185.5" width="9" height="9" rx="1.5" fill="#7a4a21" stroke="#111827" stroke-width="0.8"/>
+<text x="477" y="194" font-size="10.5" text-anchor="start" font-weight="bold" fill="#ffffff">GPIO4</text>
+<rect x="461" y="211.5" width="9" height="9" rx="1.5" fill="#c99700" stroke="#111827" stroke-width="0.8"/>
+<text x="477" y="220" font-size="10.5" text-anchor="start" font-weight="bold" fill="#ffffff">GPIO5</text>
+<rect x="461" y="237.5" width="9" height="9" rx="1.5" fill="#2a9d3a" stroke="#111827" stroke-width="0.8"/>
+<text x="477" y="246" font-size="10.5" text-anchor="start" font-weight="bold" fill="#ffffff">GPIO6</text>
+<rect x="461" y="263.5" width="9" height="9" rx="1.5" fill="#d1d5db" stroke="#111827" stroke-width="0.8"/>
+<text x="477" y="272" font-size="10.5" text-anchor="start" font-weight="normal" fill="#9ca3af">GPIO7</text>
+<rect x="461" y="289.5" width="9" height="9" rx="1.5" fill="#d1d5db" stroke="#111827" stroke-width="0.8"/>
+<text x="477" y="298" font-size="10.5" text-anchor="start" font-weight="normal" fill="#9ca3af">GPIO15</text>
+<rect x="461" y="315.5" width="9" height="9" rx="1.5" fill="#6b7280" stroke="#111827" stroke-width="0.8"/>
+<text x="477" y="324" font-size="10.5" text-anchor="start" font-weight="bold" fill="#ffffff">GPIO16</text>
+<rect x="461" y="341.5" width="9" height="9" rx="1.5" fill="#0f8b8d" stroke="#111827" stroke-width="0.8"/>
+<text x="477" y="350" font-size="10.5" text-anchor="start" font-weight="bold" fill="#ffffff">GPIO17</text>
+<rect x="461" y="367.5" width="9" height="9" rx="1.5" fill="#d1338a" stroke="#111827" stroke-width="0.8"/>
+<text x="477" y="376" font-size="10.5" text-anchor="start" font-weight="bold" fill="#ffffff">GPIO18</text>
+<rect x="461" y="393.5" width="9" height="9" rx="1.5" fill="#1f6fd1" stroke="#111827" stroke-width="0.8"/>
+<text x="477" y="402" font-size="10.5" text-anchor="start" font-weight="bold" fill="#ffffff">GPIO8</text>
+<rect x="461" y="419.5" width="9" height="9" rx="1.5" fill="#fca5a5" stroke="#111827" stroke-width="0.8"/>
+<text x="477" y="428" font-size="10.5" text-anchor="start" font-weight="normal" fill="#fca5a5">GPIO3 (boot)</text>
+<rect x="461" y="445.5" width="9" height="9" rx="1.5" fill="#fca5a5" stroke="#111827" stroke-width="0.8"/>
+<text x="477" y="454" font-size="10.5" text-anchor="start" font-weight="normal" fill="#fca5a5">GPIO46 (boot)</text>
+<rect x="461" y="471.5" width="9" height="9" rx="1.5" fill="#7b3fc4" stroke="#111827" stroke-width="0.8"/>
+<text x="477" y="480" font-size="10.5" text-anchor="start" font-weight="bold" fill="#ffffff">GPIO9</text>
+<rect x="461" y="497.5" width="9" height="9" rx="1.5" fill="#d1d5db" stroke="#111827" stroke-width="0.8"/>
+<text x="477" y="506" font-size="10.5" text-anchor="start" font-weight="normal" fill="#9ca3af">GPIO10</text>
+<rect x="461" y="523.5" width="9" height="9" rx="1.5" fill="#d1d5db" stroke="#111827" stroke-width="0.8"/>
+<text x="477" y="532" font-size="10.5" text-anchor="start" font-weight="normal" fill="#9ca3af">GPIO11</text>
+<rect x="461" y="549.5" width="9" height="9" rx="1.5" fill="#d1d5db" stroke="#111827" stroke-width="0.8"/>
+<text x="477" y="558" font-size="10.5" text-anchor="start" font-weight="normal" fill="#9ca3af">GPIO12</text>
+<rect x="461" y="575.5" width="9" height="9" rx="1.5" fill="#d1d5db" stroke="#111827" stroke-width="0.8"/>
+<text x="477" y="584" font-size="10.5" text-anchor="start" font-weight="normal" fill="#9ca3af">GPIO13</text>
+<rect x="461" y="601.5" width="9" height="9" rx="1.5" fill="#d1d5db" stroke="#111827" stroke-width="0.8"/>
+<text x="477" y="610" font-size="10.5" text-anchor="start" font-weight="normal" fill="#9ca3af">GPIO14</text>
+<rect x="461" y="627.5" width="9" height="9" rx="1.5" fill="#e07b00" stroke="#111827" stroke-width="0.8"/>
+<text x="477" y="636" font-size="10.5" text-anchor="start" font-weight="bold" fill="#ffffff">5V</text>
+<rect x="461" y="653.5" width="9" height="9" rx="1.5" fill="#000000" stroke="#111827" stroke-width="0.8"/>
+<text x="477" y="662" font-size="10.5" text-anchor="start" font-weight="bold" fill="#ffffff">GND</text>
+<rect x="670" y="107.5" width="9" height="9" rx="1.5" fill="#000000" stroke="#111827" stroke-width="0.8"/>
+<text x="663" y="116" font-size="10.5" text-anchor="end" font-weight="bold" fill="#ffffff">GND</text>
+<rect x="670" y="133.5" width="9" height="9" rx="1.5" fill="#fca5a5" stroke="#111827" stroke-width="0.8"/>
+<text x="663" y="142" font-size="10.5" text-anchor="end" font-weight="normal" fill="#fca5a5">(serial) TX</text>
+<rect x="670" y="159.5" width="9" height="9" rx="1.5" fill="#fca5a5" stroke="#111827" stroke-width="0.8"/>
+<text x="663" y="168" font-size="10.5" text-anchor="end" font-weight="normal" fill="#fca5a5">(serial) RX</text>
+<rect x="670" y="185.5" width="9" height="9" rx="1.5" fill="#d1d5db" stroke="#111827" stroke-width="0.8"/>
+<text x="663" y="194" font-size="10.5" text-anchor="end" font-weight="normal" fill="#9ca3af">GPIO1</text>
+<rect x="670" y="211.5" width="9" height="9" rx="1.5" fill="#d1d5db" stroke="#111827" stroke-width="0.8"/>
+<text x="663" y="220" font-size="10.5" text-anchor="end" font-weight="normal" fill="#9ca3af">GPIO2</text>
+<rect x="670" y="237.5" width="9" height="9" rx="1.5" fill="#6b7280" stroke="#111827" stroke-width="0.8"/>
+<text x="663" y="246" font-size="10.5" text-anchor="end" font-weight="bold" fill="#ffffff">GPIO42</text>
+<rect x="670" y="263.5" width="9" height="9" rx="1.5" fill="#1f6fd1" stroke="#111827" stroke-width="0.8"/>
+<text x="663" y="272" font-size="10.5" text-anchor="end" font-weight="bold" fill="#ffffff">GPIO41</text>
+<rect x="670" y="289.5" width="9" height="9" rx="1.5" fill="#2a9d3a" stroke="#111827" stroke-width="0.8"/>
+<text x="663" y="298" font-size="10.5" text-anchor="end" font-weight="bold" fill="#ffffff">GPIO40</text>
+<rect x="670" y="315.5" width="9" height="9" rx="1.5" fill="#c99700" stroke="#111827" stroke-width="0.8"/>
+<text x="663" y="324" font-size="10.5" text-anchor="end" font-weight="bold" fill="#ffffff">GPIO39</text>
+<rect x="670" y="341.5" width="9" height="9" rx="1.5" fill="#7b3fc4" stroke="#111827" stroke-width="0.8"/>
+<text x="663" y="350" font-size="10.5" text-anchor="end" font-weight="bold" fill="#ffffff">GPIO38</text>
+<rect x="670" y="367.5" width="9" height="9" rx="1.5" fill="#fca5a5" stroke="#111827" stroke-width="0.8"/>
+<text x="663" y="376" font-size="10.5" text-anchor="end" font-weight="normal" fill="#fca5a5">(memory) GPIO37</text>
+<rect x="670" y="393.5" width="9" height="9" rx="1.5" fill="#fca5a5" stroke="#111827" stroke-width="0.8"/>
+<text x="663" y="402" font-size="10.5" text-anchor="end" font-weight="normal" fill="#fca5a5">(memory) GPIO36</text>
+<rect x="670" y="419.5" width="9" height="9" rx="1.5" fill="#fca5a5" stroke="#111827" stroke-width="0.8"/>
+<text x="663" y="428" font-size="10.5" text-anchor="end" font-weight="normal" fill="#fca5a5">(memory) GPIO35</text>
+<rect x="670" y="445.5" width="9" height="9" rx="1.5" fill="#fca5a5" stroke="#111827" stroke-width="0.8"/>
+<text x="663" y="454" font-size="10.5" text-anchor="end" font-weight="normal" fill="#fca5a5">(boot) GPIO0</text>
+<rect x="670" y="471.5" width="9" height="9" rx="1.5" fill="#fca5a5" stroke="#111827" stroke-width="0.8"/>
+<text x="663" y="480" font-size="10.5" text-anchor="end" font-weight="normal" fill="#fca5a5">(boot) GPIO45</text>
+<rect x="670" y="497.5" width="9" height="9" rx="1.5" fill="#fca5a5" stroke="#111827" stroke-width="0.8"/>
+<text x="663" y="506" font-size="10.5" text-anchor="end" font-weight="normal" fill="#fca5a5">(LED) GPIO48</text>
+<rect x="670" y="523.5" width="9" height="9" rx="1.5" fill="#d1d5db" stroke="#111827" stroke-width="0.8"/>
+<text x="663" y="532" font-size="10.5" text-anchor="end" font-weight="normal" fill="#9ca3af">GPIO47</text>
+<rect x="670" y="549.5" width="9" height="9" rx="1.5" fill="#d1d5db" stroke="#111827" stroke-width="0.8"/>
+<text x="663" y="558" font-size="10.5" text-anchor="end" font-weight="normal" fill="#9ca3af">GPIO21</text>
+<rect x="670" y="575.5" width="9" height="9" rx="1.5" fill="#fca5a5" stroke="#111827" stroke-width="0.8"/>
+<text x="663" y="584" font-size="10.5" text-anchor="end" font-weight="normal" fill="#fca5a5">(USB) GPIO20</text>
+<rect x="670" y="601.5" width="9" height="9" rx="1.5" fill="#fca5a5" stroke="#111827" stroke-width="0.8"/>
+<text x="663" y="610" font-size="10.5" text-anchor="end" font-weight="normal" fill="#fca5a5">(USB) GPIO19</text>
+<rect x="670" y="627.5" width="9" height="9" rx="1.5" fill="#000000" stroke="#111827" stroke-width="0.8"/>
+<text x="663" y="636" font-size="10.5" text-anchor="end" font-weight="bold" fill="#ffffff">GND</text>
+<rect x="670" y="653.5" width="9" height="9" rx="1.5" fill="#000000" stroke="#111827" stroke-width="0.8"/>
+<text x="663" y="662" font-size="10.5" text-anchor="end" font-weight="bold" fill="#ffffff">GND</text>
+<text x="1074" y="840" font-size="9.5" text-anchor="end" font-weight="normal" fill="#6b7280">Generated by tools/gen_wiring_svg.py - pin map from include/config.h (firmware 1.0.0)</text>
+</svg>

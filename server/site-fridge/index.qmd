@@ -1,0 +1,1309 @@
+---
+title: "Community Fridge Door Counter"
+format:
+  html:
+    include-in-header:
+      - text: |
+          <style>
+            .fridge-app {
+              --fridge-surface: #FFFFFF;
+              --fridge-ink: #2D2D2D;
+              --fridge-ink-2: #4F5552;
+              --fridge-muted: #6B706D;
+              --fridge-grid: #E6E8E6;
+              --fridge-axis: #C4C8C5;
+              --fridge-border: rgba(45, 45, 45, 0.12);
+              --fridge-sage: #8FB596;
+              --fridge-sage-dark: #7A9F80;
+              --fridge-sage-wash: #E3EEE5;
+              --fridge-link: #3F7A4C;
+              --fridge-series-1: #4A9160;
+              --fridge-series-1-strong: #2A6238;
+              --fridge-series-1-soft: #A9CBB0;
+              --fridge-series-2: #6250D6;
+              --fridge-zero: #ECEFEC;
+              --fridge-good: #0CA30C;
+              --fridge-warn: #B26A00;
+              position: relative;
+              color: var(--fridge-ink);
+              margin-bottom: 2rem;
+            }
+            .fridge-app *, .fridge-app *::before, .fridge-app *::after { box-sizing: border-box; }
+            .fridge-app [hidden] { display: none !important; }
+            .fridge-lede { font-size: 1.08rem; max-width: 62ch; }
+            .fridge-banner {
+              background: #2D2D2D;
+              color: #fff;
+              border-radius: 8px;
+              padding: 0.7rem 1rem;
+              margin: 0 0 1rem;
+              font-size: 0.95rem;
+              line-height: 1.45;
+            }
+            .fridge-banner strong { letter-spacing: 0.08em; }
+            .fridge-app .fridge-banner a { color: #fff; text-decoration: underline; }
+            .fridge-status {
+              display: flex;
+              align-items: flex-start;
+              gap: 0.55rem;
+              min-height: 3rem;
+              margin: 0 0 1rem;
+              font-size: 0.95rem;
+              color: var(--fridge-ink-2);
+              line-height: 1.5;
+            }
+            .fridge-dot {
+              flex: 0 0 auto;
+              width: 0.7rem;
+              height: 0.7rem;
+              margin-top: 0.4rem;
+              border-radius: 50%;
+              background: var(--fridge-axis);
+            }
+            .fridge-dot[data-state="online"] { background: var(--fridge-good); }
+            .fridge-dot[data-state="offline"] { background: transparent; border: 3px solid var(--fridge-warn); }
+            .fridge-panel {
+              background: var(--fridge-surface);
+              border: 1px solid var(--fridge-border);
+              border-left: 4px solid var(--fridge-sage);
+              border-radius: 0 8px 8px 0;
+              padding: 1.25rem 1.5rem;
+              margin: 0 0 1.5rem;
+            }
+            .fridge-panel p { max-width: 60ch; }
+            .fridge-panel p:last-child { margin-bottom: 0; }
+            .fridge-panel-title { font-size: 1.25rem; font-weight: 600; margin: 0 0 0.5rem; }
+            .fridge-main { min-height: 60vh; }
+            .fridge-main[data-busy="1"] .fridge-card,
+            .fridge-main[data-busy="1"] .fridge-kpi { opacity: 0.6; }
+            .fridge-card, .fridge-kpi { transition: opacity 0.15s; }
+            .fridge-kpis {
+              display: grid;
+              grid-template-columns: repeat(4, minmax(0, 1fr));
+              gap: 0.75rem;
+              margin: 0 0 1.5rem;
+            }
+            .fridge-kpi {
+              background: var(--fridge-surface);
+              border: 1px solid var(--fridge-border);
+              border-radius: 8px;
+              padding: 0.9rem 1rem;
+              min-height: 7.6rem;
+            }
+            .fridge-kpi-label { font-size: 0.85rem; color: var(--fridge-ink-2); margin: 0; }
+            .fridge-kpi-value { font-size: 2.1rem; font-weight: 600; line-height: 1.15; margin: 0.15rem 0 0.25rem; }
+            .fridge-kpi-note { font-size: 0.82rem; color: var(--fridge-ink-2); margin: 0; line-height: 1.35; }
+            .fridge-card {
+              position: relative;
+              background: var(--fridge-surface);
+              border: 1px solid var(--fridge-border);
+              border-radius: 8px;
+              padding: 1rem 1.1rem 0.9rem;
+              margin: 0 0 1rem;
+            }
+            .fridge-app .fridge-card-title {
+              font-size: 1.12rem;
+              font-weight: 600;
+              margin: 0 0 0.15rem;
+              padding: 0;
+              border: 0;
+              color: var(--fridge-ink);
+            }
+            .fridge-card-sub { font-size: 0.9rem; color: var(--fridge-ink-2); margin: 0 0 0.6rem; }
+            .fridge-card-foot { font-size: 0.88rem; color: var(--fridge-ink-2); margin: 0.5rem 0 0; }
+            .fridge-demo .fridge-card::after, .fridge-demo .fridge-kpi::after {
+              content: "SAMPLE DATA";
+              position: absolute;
+              top: 0.55rem;
+              right: 0.6rem;
+              font-size: 0.62rem;
+              font-weight: 700;
+              letter-spacing: 0.08em;
+              color: #fff;
+              background: #2D2D2D;
+              border-radius: 3px;
+              padding: 0.1rem 0.35rem;
+              pointer-events: none;
+            }
+            .fridge-demo .fridge-kpi { position: relative; padding-top: 1.5rem; }
+            .fridge-demo .fridge-card { padding-top: 1.6rem; }
+            .fridge-two { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 1rem; }
+            .fridge-two .fridge-card { margin-bottom: 1rem; }
+            .fridge-plot { position: relative; width: 100%; }
+            .fridge-plot svg { display: block; max-width: 100%; touch-action: pan-y; outline: none; }
+            .fridge-plot svg:focus-visible { outline: 3px solid var(--fridge-series-1-strong); outline-offset: 3px; border-radius: 4px; }
+            .fridge-plot text { font-size: 11px; fill: var(--fridge-muted); font-variant-numeric: tabular-nums; }
+            .fridge-h-daily { min-height: 250px; }
+            .fridge-h-hours { min-height: 210px; }
+            .fridge-h-typical { min-height: 190px; }
+            .fridge-scroll { overflow-x: auto; overflow-y: hidden; padding-bottom: 4px; }
+            .fridge-legend {
+              display: flex;
+              flex-wrap: wrap;
+              gap: 0.3rem 1.1rem;
+              font-size: 0.85rem;
+              color: var(--fridge-ink-2);
+              margin: 0 0 0.4rem;
+              padding: 0;
+              list-style: none;
+            }
+            .fridge-legend li { display: inline-flex; align-items: center; gap: 0.4rem; margin: 0; }
+            .fridge-key-rect { width: 10px; height: 12px; border-radius: 2px 2px 0 0; background: var(--fridge-series-1); }
+            .fridge-key-rect.fridge-key-soft { background: var(--fridge-series-1-soft); }
+            .fridge-key-line { width: 18px; height: 0; border-top: 2px solid var(--fridge-series-2); }
+            .fridge-scale { display: inline-flex; align-items: center; gap: 3px; }
+            .fridge-scale i { width: 14px; height: 14px; border-radius: 2px; display: inline-block; }
+            .fridge-filters {
+              display: flex;
+              flex-wrap: wrap;
+              align-items: center;
+              gap: 0.5rem 0.9rem;
+              margin: 0 0 1rem;
+            }
+            .fridge-seg { display: inline-flex; flex-wrap: wrap; gap: 0.35rem; }
+            .fridge-btn {
+              font: inherit;
+              font-size: 0.9rem;
+              min-height: 2.4rem;
+              padding: 0.3rem 0.85rem;
+              border: 1px solid var(--fridge-axis);
+              border-radius: 6px;
+              background: var(--fridge-surface);
+              color: var(--fridge-ink);
+              cursor: pointer;
+            }
+            .fridge-btn:hover { background: var(--fridge-sage-wash); }
+            .fridge-btn[aria-pressed="true"] {
+              background: var(--fridge-sage-wash);
+              border-color: var(--fridge-series-1-strong);
+              box-shadow: inset 0 0 0 1px var(--fridge-series-1-strong);
+              font-weight: 600;
+            }
+            .fridge-btn:disabled { opacity: 0.45; cursor: default; }
+            .fridge-btn:focus-visible, .fridge-date:focus-visible, .fridge-link-btn:focus-visible {
+              outline: 3px solid var(--fridge-series-1-strong);
+              outline-offset: 2px;
+            }
+            .fridge-custom { display: flex; flex: 0 1 auto; min-width: 0; align-items: center; gap: 0.4rem; font-size: 0.9rem; color: var(--fridge-ink-2); }
+            .fridge-custom .fridge-date { flex: 1 1 8.2rem; }
+            .fridge-date {
+              min-width: 0;
+              max-width: 9.6rem;
+              font: inherit;
+              font-size: 0.9rem;
+              min-height: 2.4rem;
+              padding: 0.2rem 0.45rem;
+              border: 1px solid var(--fridge-axis);
+              border-radius: 6px;
+              background: var(--fridge-surface);
+              color: var(--fridge-ink);
+            }
+            .fridge-daynav { display: flex; align-items: center; gap: 0.4rem; margin: 0 0 0.6rem; }
+            .fridge-daynav .fridge-btn { white-space: nowrap; flex: 0 0 auto; }
+            .fridge-daynav .fridge-date { flex: 0 1 9.6rem; }
+            .fridge-link-btn {
+              font: inherit;
+              font-size: 0.85rem;
+              background: none;
+              border: 0;
+              padding: 0.35rem 0;
+              color: var(--fridge-link);
+              text-decoration: underline;
+              cursor: pointer;
+            }
+            .fridge-app a { color: var(--fridge-link); text-decoration: underline; }
+            .fridge-table-wrap { max-height: 320px; overflow: auto; margin-top: 0.4rem; border: 1px solid var(--fridge-grid); border-radius: 6px; }
+            .fridge-table { width: 100%; border-collapse: collapse; font-size: 0.86rem; font-variant-numeric: tabular-nums; margin: 0; }
+            .fridge-table th, .fridge-table td { padding: 0.3rem 0.6rem; text-align: right; border-bottom: 1px solid var(--fridge-grid); white-space: nowrap; }
+            .fridge-table th:first-child, .fridge-table td:first-child { text-align: left; }
+            .fridge-table thead th { position: sticky; top: 0; background: #F6F7F6; font-weight: 600; }
+            .fridge-rows { display: grid; gap: 0.4rem; margin: 0.3rem 0 0; }
+            .fridge-row { display: grid; grid-template-columns: 6.2rem minmax(0, 1fr) 5.4rem; align-items: center; gap: 0.6rem; font-size: 0.9rem; }
+            .fridge-row-label { color: var(--fridge-ink-2); }
+            .fridge-row-track { height: 14px; }
+            .fridge-row-bar { height: 14px; min-width: 2px; background: var(--fridge-series-1); border-radius: 0 4px 4px 0; }
+            .fridge-row-value { font-variant-numeric: tabular-nums; }
+            .fridge-stat { font-size: 1.7rem; font-weight: 600; line-height: 1.2; margin: 0.2rem 0 0.1rem; }
+            .fridge-tip {
+              position: absolute;
+              z-index: 20;
+              pointer-events: none;
+              background: #fff;
+              color: var(--fridge-ink);
+              border: 1px solid var(--fridge-border);
+              border-radius: 6px;
+              box-shadow: 0 4px 14px rgba(0, 0, 0, 0.14);
+              padding: 0.4rem 0.6rem;
+              font-size: 0.82rem;
+              line-height: 1.35;
+              max-width: 230px;
+            }
+            .fridge-tip-title { color: var(--fridge-ink-2); margin-bottom: 0.1rem; }
+            .fridge-tip-row { display: flex; align-items: center; gap: 0.4rem; }
+            .fridge-tip-row b { font-size: 0.95rem; }
+            .fridge-tip-key { width: 12px; height: 0; border-top: 3px solid var(--fridge-series-1); flex: 0 0 auto; }
+            .fridge-sr {
+              position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px;
+              overflow: hidden; clip: rect(0, 0, 0, 0); white-space: nowrap; border: 0;
+            }
+            @media (max-width: 900px) {
+              .fridge-kpis { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+            }
+            @media (max-width: 640px) {
+              .fridge-two { grid-template-columns: minmax(0, 1fr); gap: 0; }
+              .fridge-card { padding: 0.85rem 0.75rem 0.8rem; }
+              .fridge-kpi { padding: 0.75rem 0.8rem; min-height: 8.6rem; }
+              .fridge-kpi-value { font-size: 1.8rem; }
+              .fridge-row { grid-template-columns: 5.4rem minmax(0, 1fr) 5.2rem; gap: 0.45rem; }
+              .fridge-custom { flex: 1 1 100%; }
+              .fridge-date { font-size: 0.82rem; padding: 0.2rem 0.3rem; }
+              .fridge-daynav .fridge-btn { padding: 0.3rem 0.55rem; }
+            }
+            @media (prefers-reduced-motion: reduce) {
+              .fridge-card, .fridge-kpi { transition: none; }
+            }
+          </style>
+    include-after-body:
+      - text: |
+          <script>
+          (function () {
+            'use strict';
+            var root = document.getElementById('fridge-app');
+            if (!root) return;
+
+            var API = '/fridge/api/v1/';
+            var REFRESH_MS = 60000;
+            var qs = new URLSearchParams(window.location.search);
+            var DEMO = qs.get('demo') === '1';
+            /* AUTODEMO: no real counts exist yet, so the page shows sample data by itself and
+               keeps checking the real API; the first real count reloads the page. */
+            var AUTODEMO = false;
+            var DEVICE = /^[A-Za-z0-9_-]{1,32}$/.test(qs.get('device') || '') ? qs.get('device') : null;
+            var MONTHS = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+            var MONTHS_LONG = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
+            var DAYS = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+            var RAMP = ['#D5E6D8', '#A9CBB0', '#78AB82', '#4A8A58', '#2A6238'];
+            var ZERO = '#ECEFEC';
+            var SVGNS = 'http://www.w3.org/2000/svg';
+
+            var state = {
+              summary: null, rev: null, preset: '30', start: null, end: null, day: null,
+              cal: null, daily: null, heat: null, dur: null, hours: {}, env: {}, loaded: false, timer: null
+            };
+
+            /* ---------- small helpers ---------- */
+            function $(id) { return document.getElementById(id); }
+            function h(tag, attrs, kids) {
+              var e = document.createElement(tag), k;
+              for (k in (attrs || {})) {
+                if (k === 'text') e.textContent = attrs[k];
+                else if (k === 'class') e.className = attrs[k];
+                else e.setAttribute(k, attrs[k]);
+              }
+              (kids || []).forEach(function (c) { if (c) e.appendChild(typeof c === 'string' ? document.createTextNode(c) : c); });
+              return e;
+            }
+            function s(tag, attrs, text) {
+              var e = document.createElementNS(SVGNS, tag), k;
+              for (k in (attrs || {})) e.setAttribute(k, attrs[k]);
+              if (text != null) e.textContent = text;
+              return e;
+            }
+            function clear(e) { while (e.firstChild) e.removeChild(e.firstChild); }
+            function num(n) { return Number(n).toLocaleString('en-US'); }
+            function round1(n) { return (Math.round(n * 10) / 10).toLocaleString('en-US'); }
+            function avg1(n) { return Number(n).toLocaleString('en-US', { minimumFractionDigits: 1, maximumFractionDigits: 1 }); }
+            function pd(str) { var p = str.split('-'); return new Date(Date.UTC(+p[0], +p[1] - 1, +p[2])); }
+            function fd(d) { return d.toISOString().slice(0, 10); }
+            function addDays(str, n) { var d = pd(str); d.setUTCDate(d.getUTCDate() + n); return fd(d); }
+            function daysBetween(a, b) { return Math.round((pd(b) - pd(a)) / 86400000); }
+            function dow(str) { return pd(str).getUTCDay(); }
+            function shortDate(str) { var d = pd(str); return MONTHS[d.getUTCMonth()] + ' ' + d.getUTCDate(); }
+            function medDate(str) { return DAYS[dow(str)].slice(0, 3) + ', ' + shortDate(str); }
+            function longDate(str) { var d = pd(str); return DAYS[d.getUTCDay()] + ', ' + MONTHS_LONG[d.getUTCMonth()] + ' ' + d.getUTCDate() + ', ' + d.getUTCFullYear(); }
+            function monthDayYear(str) { var d = pd(str); return MONTHS_LONG[d.getUTCMonth()] + ' ' + d.getUTCDate() + ', ' + d.getUTCFullYear(); }
+            function hourLabel(hr) { var x = hr % 12 === 0 ? 12 : hr % 12; return x + (hr < 12 ? ' AM' : ' PM'); }
+            function hourShort(hr) { var x = hr % 12 === 0 ? 12 : hr % 12; return x + (hr < 12 ? 'a' : 'p'); }
+            function hourSpan(hr) { return hourLabel(hr) + ' to ' + hourLabel((hr + 1) % 24); }
+            function plural(n, one, many) { return num(n) + ' ' + (n === 1 ? one : many); }
+            function seconds(sec) {
+              if (sec == null) return 'not known yet';
+              if (sec < 90) return Math.round(sec) + ' seconds';
+              return round1(sec / 60) + ' minutes';
+            }
+            /* A round axis top and how many equal steps divide it cleanly. */
+            function niceAxis(v) {
+              if (v <= 4) return { max: 4, div: 4 };
+              var p = Math.pow(10, Math.floor(Math.log10(v))), f = v / p;
+              if (f <= 1) return { max: p, div: 5 };
+              if (f <= 2) return { max: 2 * p, div: 4 };
+              if (f <= 3) return { max: 3 * p, div: 3 };
+              if (f <= 4) return { max: 4 * p, div: 4 };
+              if (f <= 5) return { max: 5 * p, div: 5 };
+              if (f <= 6) return { max: 6 * p, div: 3 };
+              if (f <= 8) return { max: 8 * p, div: 4 };
+              return { max: 10 * p, div: 5 };
+            }
+            /* Round tick values covering lo..hi for a line chart that need not start at zero. */
+            function niceTicks(lo, hi, want) {
+              var raw = (hi - lo) / want, p = Math.pow(10, Math.floor(Math.log10(raw))), f = raw / p;
+              var step = (f <= 1 ? 1 : f <= 2 ? 2 : f <= 5 ? 5 : 10) * p;
+              var a = Math.floor(lo / step) * step, b = Math.ceil(hi / step) * step, out = [];
+              for (var v = a; v <= b + step / 2; v += step) out.push(v);
+              return { ticks: out, lo: a, hi: b, digits: Math.max(0, -Math.floor(Math.log10(step))) };
+            }
+            function sunFirst(mondayIndex) { return (mondayIndex + 1) % 7; }
+
+            /* ---------- data access (real API, or sample data in demo mode) ---------- */
+            function api(name, params, real) {
+              params = params || {};
+              if (DEMO && !real) {
+                return new Promise(function (resolve) { resolve(demo[name](params)); });
+              }
+              if (DEVICE) params.device = DEVICE;
+              var q = Object.keys(params).map(function (k) { return encodeURIComponent(k) + '=' + encodeURIComponent(params[k]); }).join('&');
+              return fetch(API + name + (q ? '?' + q : ''), { headers: { 'Accept': 'application/json' } }).then(function (r) {
+                if (!r.ok) throw new Error('HTTP ' + r.status);
+                return r.json();
+              });
+            }
+
+            /* ---------- tooltip ---------- */
+            var tip = h('div', { 'class': 'fridge-tip', role: 'status', 'aria-live': 'polite' });
+            tip.hidden = true;
+            root.appendChild(tip);
+            function showTip(clientX, clientY, content) {
+              clear(tip);
+              tip.appendChild(h('div', { 'class': 'fridge-tip-title', text: content.title }));
+              content.rows.forEach(function (r) {
+                var key = h('span', { 'class': 'fridge-tip-key' });
+                if (r.color) key.style.borderTopColor = r.color;
+                tip.appendChild(h('div', { 'class': 'fridge-tip-row' }, [key, h('b', { text: r.value }), h('span', { text: r.label })]));
+              });
+              tip.hidden = false;
+              var rr = root.getBoundingClientRect(), tw = tip.offsetWidth, th = tip.offsetHeight;
+              var x = clientX - rr.left - tw / 2, y = clientY - rr.top - th - 12;
+              x = Math.max(4, Math.min(x, rr.width - tw - 4));
+              if (y + rr.top < 4) y = clientY - rr.top + 16;
+              tip.style.left = x + 'px';
+              tip.style.top = y + 'px';
+            }
+            function hideTip() { tip.hidden = true; }
+            document.addEventListener('pointerdown', function (e) {
+              if (!e.target.closest || !e.target.closest('.fridge-plot svg')) hideTip();
+            });
+
+            /* One interaction model for every chart: hover or tap finds the nearest
+               mark, arrow keys walk the marks, Enter or Space activates one. */
+            function interact(svgEl, o) {
+              var cur = -1;
+              function set(i) {
+                if (i === cur) return;
+                cur = i;
+                o.mark(i);
+                if (i < 0) { hideTip(); return; }
+                var p = o.pos(i), r = svgEl.getBoundingClientRect();
+                showTip(r.left + p.x, r.top + p.y, o.tip(i));
+              }
+              function at(e) { var r = svgEl.getBoundingClientRect(); return o.at(e.clientX - r.left, e.clientY - r.top); }
+              svgEl.addEventListener('pointermove', function (e) { set(at(e)); });
+              svgEl.addEventListener('pointerdown', function (e) { set(at(e)); });
+              svgEl.addEventListener('pointerleave', function (e) { if (e.pointerType !== 'touch') set(-1); });
+              svgEl.addEventListener('blur', function () { set(-1); });
+              svgEl.addEventListener('click', function (e) { var i = at(e); if (i >= 0 && o.act) o.act(i); });
+              svgEl.addEventListener('keydown', function (e) {
+                var d = { ArrowLeft: o.keys[0], ArrowRight: o.keys[1], ArrowUp: o.keys[2], ArrowDown: o.keys[3] }[e.key];
+                if (d !== undefined && d !== 0) {
+                  e.preventDefault();
+                  var i = cur < 0 ? o.first() : cur + d;
+                  if (i >= 0 && i < o.n && o.ok(i)) set(i);
+                } else if ((e.key === 'Enter' || e.key === ' ') && cur >= 0 && o.act) {
+                  e.preventDefault(); o.act(cur);
+                } else if (e.key === 'Escape') { set(-1); }
+              });
+            }
+
+            function plotSvg(host, w, hgt, label) {
+              clear(host);
+              var el = s('svg', { width: w, height: hgt, viewBox: '0 0 ' + w + ' ' + hgt, role: 'group', tabindex: '0', 'aria-label': label });
+              host.appendChild(el);
+              return el;
+            }
+            function hostWidth(host) { return Math.max(260, Math.floor(host.clientWidth || 300)); }
+
+            /* ---------- vertical bar chart (optionally with a trend line) ---------- */
+            function drawBars(host, c) {
+              var w = hostWidth(host), hgt = c.height, m = { l: 34, r: 10, t: 12, b: 24 };
+              var pw = w - m.l - m.r, ph = hgt - m.t - m.b, n = c.items.length;
+              var el = plotSvg(host, w, hgt, c.label);
+              var top = 0;
+              c.items.forEach(function (it) { if (it.v != null && it.v > top) top = it.v; });
+              (c.line || []).forEach(function (v) { if (v != null && v > top) top = v; });
+              var axis = niceAxis(top), ymax = axis.max, band = pw / Math.max(n, 1);
+              var gap = band >= 6 ? 2 : 0, bw = Math.max(1, Math.min(24, band - gap));
+              function X(i) { return m.l + band * i + band / 2; }
+              function Y(v) { return m.t + ph - (v / ymax) * ph; }
+              var g = s('g'); el.appendChild(g);
+              for (var t = 0; t <= axis.div; t++) {
+                var v = ymax * t / axis.div, y = Math.round(Y(v)) + 0.5;
+                g.appendChild(s('line', { x1: m.l, x2: w - m.r, y1: y, y2: y, stroke: t === 0 ? 'var(--fridge-axis)' : 'var(--fridge-grid)', 'stroke-width': 1 }));
+                g.appendChild(s('text', { x: m.l - 6, y: y + 4, 'text-anchor': 'end' }, num(v)));
+              }
+              var wash = s('rect', { x: 0, y: m.t, width: Math.max(band, 2), height: ph, fill: 'rgba(45,45,45,0.07)', visibility: 'hidden' });
+              el.appendChild(wash);
+              var rects = [];
+              c.items.forEach(function (it, i) {
+                if (it.v == null || it.v <= 0) { rects.push(null); return; }
+                var x = X(i) - bw / 2, y = Y(it.v), r = Math.min(4, bw / 2, (m.t + ph - y));
+                var d = 'M' + x + ',' + (m.t + ph) + 'V' + (y + r) + 'Q' + x + ',' + y + ' ' + (x + r) + ',' + y +
+                  'H' + (x + bw - r) + 'Q' + (x + bw) + ',' + y + ' ' + (x + bw) + ',' + (y + r) + 'V' + (m.t + ph) + 'Z';
+                var fill = i === c.selected ? 'var(--fridge-series-1-strong)' : it.soft ? 'var(--fridge-series-1-soft)' : 'var(--fridge-series-1)';
+                var p = s('path', { d: d, fill: fill });
+                el.appendChild(p); rects.push(p);
+              });
+              if (c.selected != null && c.selected >= 0 && c.selected < n) {
+                el.appendChild(s('path', { d: 'M' + (X(c.selected) - 4) + ',' + (hgt - 2) + 'h8l-4,-5z', fill: 'var(--fridge-series-1-strong)' }));
+              }
+              if (c.line) {
+                var path = '', pen = false;
+                c.line.forEach(function (v, i) {
+                  if (v == null) { pen = false; return; }
+                  path += (pen ? 'L' : 'M') + X(i) + ',' + Y(v); pen = true;
+                });
+                if (path) el.appendChild(s('path', { d: path, fill: 'none', stroke: 'var(--fridge-series-2)', 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
+              }
+              c.ticks(n, pw).forEach(function (tk) {
+                var x = X(tk.i), anchor = x < m.l + 14 ? 'start' : x > w - m.r - 14 ? 'end' : 'middle';
+                if (c.selected === tk.i) return;
+                el.appendChild(s('text', { x: anchor === 'middle' ? x : (anchor === 'start' ? x - band / 2 : x + band / 2), y: hgt - 7, 'text-anchor': anchor }, tk.text));
+              });
+              var dot = s('circle', { r: 5, fill: 'var(--fridge-series-2)', stroke: '#fff', 'stroke-width': 2, visibility: 'hidden' });
+              el.appendChild(dot);
+              interact(el, {
+                n: n, keys: [-1, 1, 0, 0],
+                first: function () { return c.selected != null && c.selected >= 0 ? c.selected : n - 1; },
+                ok: function () { return true; },
+                at: function (x) { var i = Math.floor((x - m.l) / band); return i < 0 || i >= n ? -1 : i; },
+                pos: function (i) { var it = c.items[i]; return { x: X(i), y: it.v != null ? Y(it.v) : m.t + ph }; },
+                tip: c.tip, act: c.act,
+                mark: function (i) {
+                  if (i < 0) { wash.setAttribute('visibility', 'hidden'); dot.setAttribute('visibility', 'hidden'); return; }
+                  wash.setAttribute('x', m.l + band * i - (Math.max(band, 2) - band) / 2);
+                  wash.setAttribute('visibility', 'visible');
+                  if (c.line && c.line[i] != null) {
+                    dot.setAttribute('cx', X(i)); dot.setAttribute('cy', Y(c.line[i])); dot.setAttribute('visibility', 'visible');
+                  } else { dot.setAttribute('visibility', 'hidden'); }
+                }
+              });
+            }
+            function hourTicks(n, pw) {
+              var step = pw > 520 ? 2 : pw > 300 ? 3 : 6, out = [];
+              for (var i = 0; i < n; i += step) out.push({ i: i, text: hourShort(i) });
+              return out;
+            }
+
+            /* ---------- line chart for sensor readings ---------- */
+            function drawLine(host, c) {
+              var w = hostWidth(host), hgt = 190, m = { l: 44, r: 12, t: 12, b: 24 };
+              var pw = w - m.l - m.r, ph = hgt - m.t - m.b, pts = c.points, n = pts.length;
+              var el = plotSvg(host, w, hgt, c.label);
+              if (!n) return;
+              var lo = Infinity, hi = -Infinity;
+              pts.forEach(function (p) { lo = Math.min(lo, p.min); hi = Math.max(hi, p.max); });
+              if (hi - lo < 1e-6) { hi += 1; lo -= 1; }
+              var sc = niceTicks(lo, hi, 3); lo = sc.lo; hi = sc.hi;
+              var t0 = pts[0].ms, t1 = pts[n - 1].ms, span = Math.max(1, t1 - t0);
+              function X(i) { return m.l + (n === 1 ? pw / 2 : (pts[i].ms - t0) / span * pw); }
+              function Y(v) { return m.t + ph - (v - lo) / (hi - lo) * ph; }
+              sc.ticks.forEach(function (v) {
+                var y = Math.round(Y(v)) + 0.5;
+                el.appendChild(s('line', { x1: m.l, x2: w - m.r, y1: y, y2: y, stroke: 'var(--fridge-grid)', 'stroke-width': 1 }));
+                el.appendChild(s('text', { x: m.l - 6, y: y + 4, 'text-anchor': 'end' }, v.toFixed(sc.digits)));
+              });
+              var upper = '', lower = '', line = '';
+              pts.forEach(function (p, i) {
+                upper += (i ? 'L' : 'M') + X(i) + ',' + Y(p.max);
+                lower = 'L' + X(i) + ',' + Y(p.min) + lower;
+                line += (i ? 'L' : 'M') + X(i) + ',' + Y(p.avg);
+              });
+              el.appendChild(s('path', { d: upper + lower + 'Z', fill: 'var(--fridge-series-1)', opacity: 0.12 }));
+              el.appendChild(s('path', { d: line, fill: 'none', stroke: 'var(--fridge-series-1)', 'stroke-width': 2, 'stroke-linejoin': 'round', 'stroke-linecap': 'round' }));
+              var labels = Math.max(2, Math.floor(pw / 90));
+              for (var k = 0; k < labels; k++) {
+                var i = Math.round(k * (n - 1) / Math.max(1, labels - 1));
+                el.appendChild(s('text', { x: X(i), y: hgt - 7, 'text-anchor': k === 0 ? 'start' : k === labels - 1 ? 'end' : 'middle' }, shortDate(pts[i].date)));
+                if (n === 1) break;
+              }
+              var hair = s('line', { y1: m.t, y2: m.t + ph, stroke: 'var(--fridge-axis)', 'stroke-width': 1, visibility: 'hidden' });
+              var dot = s('circle', { r: 5, fill: 'var(--fridge-series-1)', stroke: '#fff', 'stroke-width': 2, visibility: 'hidden' });
+              el.appendChild(hair); el.appendChild(dot);
+              interact(el, {
+                n: n, keys: [-1, 1, 0, 0],
+                first: function () { return n - 1; }, ok: function () { return true; },
+                at: function (x) {
+                  var best = -1, bd = Infinity;
+                  for (var i = 0; i < n; i++) { var d = Math.abs(X(i) - x); if (d < bd) { bd = d; best = i; } }
+                  return best;
+                },
+                pos: function (i) { return { x: X(i), y: Y(pts[i].avg) }; },
+                tip: function (i) {
+                  var p = pts[i];
+                  return { title: p.title, rows: [
+                    { value: round1(p.avg) + ' ' + c.unit, label: 'average' },
+                    { value: round1(p.min) + ' to ' + round1(p.max), label: 'low to high', color: 'var(--fridge-series-1-soft)' }
+                  ] };
+                },
+                mark: function (i) {
+                  var vis = i < 0 ? 'hidden' : 'visible';
+                  hair.setAttribute('visibility', vis); dot.setAttribute('visibility', vis);
+                  if (i < 0) return;
+                  hair.setAttribute('x1', X(i)); hair.setAttribute('x2', X(i));
+                  dot.setAttribute('cx', X(i)); dot.setAttribute('cy', Y(pts[i].avg));
+                }
+              });
+            }
+
+            /* ---------- colour scale for the two heatmaps ---------- */
+            function shade(v, max) {
+              if (v == null) return null;
+              if (v <= 0 || max <= 0) return ZERO;
+              return RAMP[Math.min(RAMP.length - 1, Math.floor((v / max) * RAMP.length - 1e-9))];
+            }
+            function scaleLegend(host, max, unit) {
+              clear(host);
+              var sc = h('span', { 'class': 'fridge-scale', 'aria-hidden': 'true' });
+              [ZERO].concat(RAMP).forEach(function (c) { var i = h('i'); i.style.background = c; sc.appendChild(i); });
+              host.appendChild(h('li', {}, [h('span', { text: '0' }), sc, h('span', { text: num(Math.ceil(max)) + ' ' + unit })]));
+            }
+
+            /* ---------- table view (the accessible twin of every chart) ---------- */
+            function setTable(id, head, rows) {
+              var wrap = $(id);
+              if (!wrap) return;
+              clear(wrap);
+              var table = h('table', { 'class': 'fridge-table' });
+              var tr = h('tr');
+              head.forEach(function (t) { tr.appendChild(h('th', { scope: 'col', text: t })); });
+              table.appendChild(h('thead', {}, [tr]));
+              var body = h('tbody');
+              rows.forEach(function (r) {
+                var row = h('tr');
+                r.forEach(function (cell, i) { row.appendChild(h(i === 0 ? 'th' : 'td', i === 0 ? { scope: 'row', text: String(cell) } : { text: String(cell) })); });
+                body.appendChild(row);
+              });
+              table.appendChild(body);
+              wrap.appendChild(table);
+            }
+            Array.prototype.forEach.call(root.querySelectorAll('[data-fridge-table]'), function (btn) {
+              btn.addEventListener('click', function () {
+                var wrap = $(btn.getAttribute('data-fridge-table'));
+                var open = wrap.hidden;
+                wrap.hidden = !open;
+                btn.setAttribute('aria-expanded', open ? 'true' : 'false');
+                btn.textContent = open ? 'Hide the table' : 'Show as a table';
+              });
+            });
+
+            /* ---------- headline tiles and status line ---------- */
+            function renderStatus(problem) {
+              var su = state.summary, dot = $('fridge-dot'), text = $('fridge-status-text');
+              if (!su) { return; }
+              var through = su.data_through, d = through.slice(0, 10), hr = +through.slice(11, 13);
+              var when = (d === su.today.date ? 'today' : medDate(d)) + ' at ' + hourLabel(hr);
+              var sen = su.sensor, msg;
+              if (sen.online) {
+                dot.setAttribute('data-state', 'online');
+                msg = 'The sensor is online. ';
+              } else if (sen.last_heard) {
+                dot.setAttribute('data-state', 'offline');
+                var ld = sen.last_heard.slice(0, 10);
+                msg = 'The sensor was last heard from ' + (ld === su.today.date ? 'today' : 'on ' + medDate(ld)) +
+                  ' around ' + hourLabel(+sen.last_heard.slice(11, 13)) + ', so recent openings may be missing. ';
+              } else {
+                dot.setAttribute('data-state', 'waiting');
+                msg = 'Waiting for the sensor to check in for the first time. ';
+              }
+              if (su.has_data) {
+                msg += su.publish_granularity_s >= 3600
+                  ? 'Counts include everything up to ' + when + ' and are added once an hour.'
+                  : 'Counts include everything up to ' + when + '.';
+              }
+              if (problem) msg += ' We could not refresh just now, so these may be a little old.';
+              if (AUTODEMO) {
+                dot.setAttribute('data-state', 'waiting');
+                msg = 'The counter is not installed at the fridge yet. Everything below is sample data.';
+              }
+              text.textContent = msg;
+            }
+            function renderKpis() {
+              var su = state.summary;
+              function cmp(wn, days) {
+                if (!wn.previous_complete) return 'Not enough history yet to compare.';
+                if (wn.previous === 0) return 'None in the ' + days + ' days before.';
+                var pct = Math.round((wn.count - wn.previous) / wn.previous * 100);
+                if (pct === 0) return 'About the same as the ' + days + ' days before (' + num(wn.previous) + ').';
+                return (pct > 0 ? 'Up ' : 'Down ') + Math.abs(pct) + '% from the ' + days + ' days before (' + num(wn.previous) + ').';
+              }
+              $('fridge-k-today').textContent = num(su.today.count);
+              $('fridge-k-today-note').textContent = 'Yesterday by this time: ' + num(su.today.yesterday_same_time) + '. All day yesterday: ' + num(su.yesterday.count) + '.';
+              $('fridge-k-7').textContent = num(su.last_7_days.count);
+              $('fridge-k-7-note').textContent = cmp(su.last_7_days, 7);
+              $('fridge-k-30').textContent = num(su.last_30_days.count);
+              $('fridge-k-30-note').textContent = cmp(su.last_30_days, 30);
+              $('fridge-k-all').textContent = num(su.all_time.count);
+              $('fridge-k-all-note').textContent = 'Since ' + monthDayYear(su.all_time.first_date) + ', about ' + round1(su.all_time.avg_per_day) + ' a day.';
+            }
+
+            /* ---------- calendar of daily totals ---------- */
+            function renderCalendar() {
+              var data = state.cal, su = state.summary, host = $('fridge-cal');
+              if (!data) return;
+              var by = {}, max = 0;
+              data.days.forEach(function (d) { by[d.date] = d; if (d.count > max) max = d.count; });
+              var today = su.today.date, first = su.all_time.first_date;
+              /* From the week the counter started (at least 20 weeks, at most a year). */
+              var end = today, span = Math.floor((daysBetween(first, end) + dow(first)) / 7);
+              var gap = 3, left = 30, topPad = 18, avail = hostWidth($('fridge-cal-scroll')) - left;
+              /* At least as many weeks as fit (so a new counter does not look lost), at most a year. */
+              var fit = Math.max(8, Math.min(19, Math.floor(avail / 16) - 1));
+              var start = addDays(end, -(Math.max(fit, Math.min(52, span)) * 7 + dow(end)));
+              var total = daysBetween(start, end) + 1, weeks = Math.ceil(total / 7);
+              var cell = Math.max(13, Math.min(20, Math.floor(avail / weeks) - gap)), step = cell + gap;
+              var w = left + weeks * step, hgt = topPad + 7 * step;
+              var el = plotSvg(host, w, hgt, 'Calendar of openings per day for the past year. Use the arrow keys to move between days and Enter to see that day hour by hour.');
+              el.style.maxWidth = 'none';
+              [1, 3, 5].forEach(function (r) { el.appendChild(s('text', { x: 0, y: topPad + r * step + cell - 2 }, DAYS[r].slice(0, 3))); });
+              var cells = [], dates = [], lastMonth = -1, lastLabelX = -100;
+              for (var i = 0; i < total; i++) {
+                var date = addDays(start, i), col = Math.floor(i / 7), rowi = i % 7, d = by[date];
+                dates.push(date);
+                var x = left + col * step, y = topPad + rowi * step;
+                var dm = pd(date).getUTCMonth();
+                if (rowi === 0 && dm !== lastMonth) {
+                  if (x - lastLabelX > 30 && i + 7 < total) { el.appendChild(s('text', { x: x, y: 11 }, MONTHS[dm])); lastLabelX = x; }
+                  lastMonth = dm;
+                }
+                var known = d && date >= first;
+                var r = s('rect', { x: x, y: y, width: cell, height: cell, rx: 2,
+                  fill: known ? shade(d.count, max) : 'none',
+                  stroke: known ? 'none' : 'var(--fridge-grid)', 'stroke-width': 1 });
+                if (date === state.day) { r.setAttribute('stroke', 'var(--fridge-ink)'); r.setAttribute('stroke-width', 2); }
+                el.appendChild(r); cells.push(r);
+              }
+              var ring = s('rect', { width: cell + 4, height: cell + 4, rx: 3, fill: 'none', stroke: 'var(--fridge-ink)', 'stroke-width': 2, visibility: 'hidden' });
+              el.appendChild(ring);
+              interact(el, {
+                n: total, keys: [-7, 7, -1, 1],
+                first: function () { return total - 1; }, ok: function () { return true; },
+                at: function (x, y) {
+                  var col = Math.floor((x - left) / step), rowi = Math.floor((y - topPad) / step);
+                  if (col < 0 || rowi < 0 || rowi > 6) return -1;
+                  var i = col * 7 + rowi; return i < total ? i : -1;
+                },
+                pos: function (i) { return { x: left + Math.floor(i / 7) * step + cell / 2, y: topPad + (i % 7) * step }; },
+                tip: function (i) {
+                  var d = by[dates[i]];
+                  if (!d || dates[i] < first) return { title: longDate(dates[i]), rows: [{ value: 'No data', label: 'before the counter was installed', color: 'var(--fridge-axis)' }] };
+                  return { title: longDate(dates[i]), rows: [{ value: num(d.count), label: (d.count === 1 ? 'opening' : 'openings') + (d.complete ? '' : ' so far') }] };
+                },
+                act: function (i) { if (by[dates[i]] && dates[i] >= first) selectDay(dates[i], true); },
+                mark: function (i) {
+                  if (i < 0) { ring.setAttribute('visibility', 'hidden'); return; }
+                  ring.setAttribute('x', left + Math.floor(i / 7) * step - 2);
+                  ring.setAttribute('y', topPad + (i % 7) * step - 2);
+                  ring.setAttribute('visibility', 'visible');
+                }
+              });
+              var sc = $('fridge-cal-scroll');
+              sc.scrollLeft = sc.scrollWidth;
+              scaleLegend($('fridge-cal-legend'), max, 'openings a day');
+              setTable('fridge-cal-table', ['Day', 'Openings'], data.days.slice().reverse().map(function (d) {
+                return [medDate(d.date) + ', ' + d.date.slice(0, 4), num(d.count) + (d.complete ? '' : ' so far')];
+              }));
+            }
+
+            /* ---------- openings each day ---------- */
+            function renderDaily() {
+              var data = state.daily, host = $('fridge-daily');
+              if (!data) return;
+              var days = data.days, n = days.length;
+              var sel = -1;
+              days.forEach(function (d, i) { if (d.date === state.day) sel = i; });
+              $('fridge-daily-sub').textContent = n
+                ? plural(days.reduce(function (a, d) { return a + d.count; }, 0), 'opening', 'openings') + ' from ' + medDate(days[0].date) + ' to ' + medDate(days[n - 1].date) + '. Tap a day to see it hour by hour.'
+                : 'No openings were recorded in these dates.';
+              drawBars(host, {
+                height: 250, selected: sel,
+                label: 'Bar chart of openings per day with a seven-day average line. Use the left and right arrow keys to read each day, and Enter to see that day hour by hour.',
+                items: days.map(function (d) { return { v: d.count, soft: !d.complete }; }),
+                line: days.map(function (d) { return d.avg7; }),
+                ticks: function (cnt, pw) {
+                  var every = Math.max(1, Math.ceil(cnt / Math.max(2, Math.floor(pw / 62)))), out = [];
+                  for (var i = cnt - 1; i >= 0; i -= every) out.push({ i: i, text: shortDate(days[i].date) });
+                  return out;
+                },
+                tip: function (i) {
+                  var d = days[i], rows = [{ value: num(d.count), label: (d.count === 1 ? 'opening' : 'openings') + (d.complete ? '' : ' so far today') }];
+                  if (d.avg7 != null) rows.push({ value: round1(d.avg7), label: '7-day average', color: 'var(--fridge-series-2)' });
+                  return { title: longDate(d.date), rows: rows };
+                },
+                act: function (i) { selectDay(days[i].date, false); }
+              });
+              setTable('fridge-daily-table', ['Day', 'Openings', '7-day average', 'Typical time open'], days.slice().reverse().map(function (d) {
+                return [medDate(d.date), num(d.count) + (d.complete ? '' : ' so far'), d.avg7 == null ? '' : round1(d.avg7), d.avg_open_s == null ? '' : seconds(d.avg_open_s)];
+              }));
+            }
+
+            /* ---------- one day, hour by hour ---------- */
+            function selectDay(date, scroll) {
+              state.day = date;
+              renderDaily(); renderCalendar(); loadDay();
+              if (scroll) { var c = $('fridge-hours-card'); if (c.scrollIntoView) c.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }
+            }
+            function loadDay() {
+              var su = state.summary, date = state.day, first = su.all_time.first_date, today = su.today.date;
+              $('fridge-day-input').value = date;
+              $('fridge-day-input').min = first; $('fridge-day-input').max = today;
+              $('fridge-day-prev').disabled = date <= first;
+              $('fridge-day-next').disabled = date >= today;
+              $('fridge-hours-title').textContent = 'Hour by hour: ' + longDate(date);
+              if (state.hours[date]) { renderHours(); return; }
+              api('hourly', { start: date, end: date }).then(function (data) {
+                state.hours[date] = data;
+                if (state.day === date) renderHours();
+              }).catch(function () { $('fridge-hours-sub').textContent = 'This day could not be loaded. It will try again shortly.'; });
+            }
+            function renderHours() {
+              var data = state.hours[state.day];
+              if (!data) return;
+              var items = data.hours.map(function (x) { return { v: x.count, hour: x.hour }; });
+              var total = items.reduce(function (a, x) { return a + x.v; }, 0), partial = state.day === state.summary.today.date;
+              while (items.length < 24) items.push({ v: null, hour: items.length });
+              $('fridge-hours-sub').textContent = plural(total, 'opening', 'openings') + (partial ? ' so far today. The current hour is still filling in.' : ' that day.');
+              drawBars($('fridge-hours'), {
+                height: 210, items: items,
+                label: 'Bar chart of openings in each hour of ' + longDate(state.day) + '. Use the left and right arrow keys to read each hour.',
+                ticks: function (cnt, pw) { return hourTicks(Math.min(cnt, 24), pw).map(function (t) { return { i: t.i, text: hourShort(items[t.i].hour) }; }); },
+                tip: function (i) {
+                  var it = items[i];
+                  return { title: hourSpan(it.hour), rows: [it.v == null
+                    ? { value: 'Not yet', label: 'this hour is still to come', color: 'var(--fridge-axis)' }
+                    : { value: num(it.v), label: it.v === 1 ? 'opening' : 'openings' }] };
+                }
+              });
+              setTable('fridge-hours-table', ['Hour', 'Openings'], items.filter(function (x) { return x.v != null; }).map(function (x) { return [hourSpan(x.hour), num(x.v)]; }));
+            }
+
+            /* ---------- weekday by hour heatmap, typical day, weekdays ---------- */
+            function renderHeat() {
+              var data = state.heat, host = $('fridge-heat');
+              if (!data) return;
+              var grid = [], max = 0, best = null;
+              data.cells.forEach(function (c) {
+                var r = sunFirst(c.weekday);
+                grid[r * 24 + c.hour] = c;
+                if (c.avg != null && c.avg > max) { max = c.avg; best = c; }
+              });
+              var w = hostWidth(host), left = 34, topPad = 16, gap = 2;
+              var cw = (w - left) / 24, ch = Math.max(16, Math.min(28, cw)), hgt = topPad + 7 * ch;
+              var el = plotSvg(host, w, hgt, 'Grid of average openings for each hour of each day of the week. Use the arrow keys to move between hours.');
+              for (var r = 0; r < 7; r++) el.appendChild(s('text', { x: 0, y: topPad + r * ch + ch / 2 + 4 }, DAYS[r].slice(0, 3)));
+              var every = cw > 26 ? 2 : cw > 13 ? 3 : 6;
+              for (var hr = 0; hr < 24; hr += every) el.appendChild(s('text', { x: left + hr * cw, y: 11 }, hourShort(hr)));
+              for (var i = 0; i < 168; i++) {
+                var c = grid[i], fill = c ? shade(c.avg, max) : null;
+                el.appendChild(s('rect', { x: left + (i % 24) * cw, y: topPad + Math.floor(i / 24) * ch, width: Math.max(1, cw - gap), height: ch - gap, rx: 2,
+                  fill: fill || 'none', stroke: fill ? 'none' : 'var(--fridge-grid)' }));
+              }
+              var ring = s('rect', { width: cw + 2, height: ch + 2, rx: 3, fill: 'none', stroke: 'var(--fridge-ink)', 'stroke-width': 2, visibility: 'hidden' });
+              el.appendChild(ring);
+              interact(el, {
+                n: 168, keys: [-1, 1, -24, 24],
+                first: function () { return best ? sunFirst(best.weekday) * 24 + best.hour : 0; }, ok: function () { return true; },
+                at: function (x, y) {
+                  var col = Math.floor((x - left) / cw), row = Math.floor((y - topPad) / ch);
+                  return col < 0 || col > 23 || row < 0 || row > 6 ? -1 : row * 24 + col;
+                },
+                pos: function (i) { return { x: left + (i % 24) * cw + cw / 2, y: topPad + Math.floor(i / 24) * ch }; },
+                tip: function (i) {
+                  var c = grid[i], title = DAYS[Math.floor(i / 24)] + 's, ' + hourSpan(i % 24);
+                  if (!c || c.avg == null) return { title: title, rows: [{ value: 'No data', label: 'for this hour yet', color: 'var(--fridge-axis)' }] };
+                  return { title: title, rows: [{ value: round1(c.avg), label: 'openings on average' }, { value: num(c.total), label: 'in total over ' + plural(c.hours, 'week', 'weeks'), color: 'var(--fridge-axis)' }] };
+                },
+                mark: function (i) {
+                  if (i < 0) { ring.setAttribute('visibility', 'hidden'); return; }
+                  ring.setAttribute('x', left + (i % 24) * cw - 2); ring.setAttribute('y', topPad + Math.floor(i / 24) * ch - 2);
+                  ring.setAttribute('visibility', 'visible');
+                }
+              });
+              scaleLegend($('fridge-heat-legend'), max, 'openings an hour');
+              $('fridge-heat-foot').textContent = best && max > 0
+                ? 'Busiest in these dates: ' + DAYS[sunFirst(best.weekday)] + 's from ' + hourSpan(best.hour) + ', with about ' + round1(best.avg) + ' openings.'
+                : 'Not enough openings in these dates to show a pattern yet.';
+              setTable('fridge-heat-table', ['Hour'].concat(DAYS.map(function (d) { return d.slice(0, 3); })), (function () {
+                var rows = [];
+                for (var hr = 0; hr < 24; hr++) {
+                  var row = [hourLabel(hr)];
+                  for (var r = 0; r < 7; r++) { var c = grid[r * 24 + hr]; row.push(c && c.avg != null ? round1(c.avg) : ''); }
+                  rows.push(row);
+                }
+                return rows;
+              })());
+
+              var byHour = data.by_hour;
+              drawBars($('fridge-typical'), {
+                height: 190,
+                label: 'Bar chart of average openings for each hour of a typical day. Use the left and right arrow keys to read each hour.',
+                items: byHour.map(function (x) { return { v: x.avg }; }),
+                ticks: hourTicks,
+                tip: function (i) {
+                  var x = byHour[i];
+                  return { title: hourSpan(x.hour), rows: [{ value: x.avg == null ? 'No data' : round1(x.avg), label: 'openings on a typical day' }] };
+                }
+              });
+              setTable('fridge-typical-table', ['Hour', 'Average openings'], byHour.map(function (x) { return [hourSpan(x.hour), x.avg == null ? '' : round1(x.avg)]; }));
+
+              var wk = [], wmax = 0;
+              data.by_weekday.forEach(function (x) { wk[sunFirst(x.weekday)] = x; if (x.avg != null && x.avg > wmax) wmax = x.avg; });
+              var rowsHost = $('fridge-weekdays'); clear(rowsHost);
+              wk.forEach(function (x, i) {
+                var bar = h('div', { 'class': 'fridge-row-bar' });
+                bar.style.width = (x.avg && wmax ? Math.max(1, x.avg / wmax * 100) : 0) + '%';
+                if (!x.avg) bar.style.visibility = 'hidden';
+                rowsHost.appendChild(h('div', { 'class': 'fridge-row' }, [
+                  h('span', { 'class': 'fridge-row-label', text: DAYS[i] }),
+                  h('div', { 'class': 'fridge-row-track' }, [bar]),
+                  h('span', { 'class': 'fridge-row-value', text: x.avg == null ? 'no data yet' : avg1(x.avg) })
+                ]));
+              });
+            }
+
+            /* ---------- how long the door stays open ---------- */
+            function renderDur() {
+              var d = state.dur;
+              if (!d) return;
+              $('fridge-dur-stat').textContent = d.median_s == null ? 'Not known yet' : seconds(d.median_s);
+              $('fridge-dur-sub').textContent = d.median_s == null
+                ? 'No openings were timed in these dates.'
+                : 'is the typical time the door stays open. Half of openings are shorter than this and half are longer.';
+              var host = $('fridge-dur'); clear(host);
+              var max = 0; d.bins.forEach(function (b) { if (b.count > max) max = b.count; });
+              function name(b) {
+                function u(x) { return x >= 60 ? (x / 60) + ' min' : x + ' sec'; }
+                if (b.max_s == null) return 'Over ' + u(b.min_s);
+                if (b.max_s <= 60) return b.min_s + ' to ' + b.max_s + ' sec';
+                return (b.min_s / 60) + ' to ' + u(b.max_s);
+              }
+              d.bins.forEach(function (b) {
+                var bar = h('div', { 'class': 'fridge-row-bar' });
+                bar.style.width = (max ? b.count / max * 100 : 0) + '%';
+                if (!b.count) bar.style.visibility = 'hidden';
+                var pct = d.measured ? b.count / d.measured * 100 : 0;
+                var share = b.count && pct < 1 ? '<1%' : Math.round(pct) + '%';
+                host.appendChild(h('div', { 'class': 'fridge-row' }, [
+                  h('span', { 'class': 'fridge-row-label', text: name(b) }),
+                  h('div', { 'class': 'fridge-row-track' }, [bar]),
+                  h('span', { 'class': 'fridge-row-value', text: d.measured ? num(b.count) + ' (' + share + ')' : '0' })
+                ]));
+              });
+              var foot = [];
+              if (d.held_open) foot.push(plural(d.held_open, 'time', 'times') + ' the door was left open longer than the sensor keeps timing; each counts as one opening.');
+              if (d.too_short_excluded) foot.push(plural(d.too_short_excluded, 'very quick bump', 'very quick bumps') + ' (under ' + round1(state.summary.rules.min_open_ms / 1000) + ' second) not counted.');
+              $('fridge-dur-foot').textContent = foot.join(' ');
+            }
+
+            /* ---------- optional sensor sections (hidden until data exists) ---------- */
+            var ENV = [
+              { metric: 'temp_c', card: 'fridge-env-temp', unit: '°F', conv: function (c) { return c * 9 / 5 + 32; } },
+              { metric: 'humidity_pct', card: 'fridge-env-hum', unit: '%', conv: function (v) { return v; } },
+              { metric: 'pressure_hpa', card: 'fridge-env-pres', unit: 'inHg', conv: function (v) { return v * 0.02953; } },
+              { metric: 'fridge_temp_c', card: 'fridge-env-inside', unit: '°F', conv: function (c) { return c * 9 / 5 + 32; } },
+              { metric: 'weight_g', card: 'fridge-env-weight', unit: 'lb', conv: function (g) { return g / 453.592; } }
+            ];
+            function loadEnv() {
+              var have = state.summary.metrics || [];
+              var long = daysBetween(state.start, state.end) > 13;
+              var any = false;
+              ENV.forEach(function (e) {
+                var card = $(e.card);
+                if (have.indexOf(e.metric) < 0) { card.hidden = true; return; }
+                any = true;
+                api('readings', { metric: e.metric, start: state.start, end: state.end, bucket: long ? 'day' : 'hour' }).then(function (data) {
+                  state.env[e.metric] = data;
+                  renderEnv(e);
+                }).catch(function () { card.hidden = true; });
+              });
+              $('fridge-env-head').hidden = !any;
+            }
+            function renderEnv(e) {
+              var data = state.env[e.metric], card = $(e.card), host = card.querySelector('.fridge-env-plots');
+              if (!data) return;
+              var series = data.series.filter(function (x) { return x.points.length; });
+              card.hidden = !series.length;
+              if (!series.length) return;
+              clear(host);
+              series.forEach(function (sr, idx) {
+                var pts = sr.points.map(function (p) {
+                  var date = p.t.slice(0, 10), hr = p.t.length > 10 ? +p.t.slice(11, 13) : null;
+                  return { date: date, ms: pd(date).getTime() + (hr || 0) * 3600000,
+                    title: medDate(date) + (hr == null ? '' : ', ' + hourSpan(hr)),
+                    avg: e.conv(p.avg), min: e.conv(p.min), max: e.conv(p.max) };
+                });
+                if (series.length > 1) host.appendChild(h('p', { 'class': 'fridge-card-sub', text: 'Shelf ' + (idx + 1) }));
+                var plot = h('div', { 'class': 'fridge-plot' });
+                host.appendChild(plot);
+                drawLine(plot, { points: pts, unit: e.unit, label: 'Line chart of ' + card.querySelector('.fridge-card-title').textContent + (series.length > 1 ? ', shelf ' + (idx + 1) : '') + '. Use the left and right arrow keys to read each point.' });
+              });
+            }
+
+            /* ---------- range filter ---------- */
+            function setRange(preset, start, end) {
+              var su = state.summary, today = su.today.date, first = su.all_time.first_date;
+              state.preset = preset;
+              if (preset === 'custom') { state.start = start; state.end = end; }
+              else {
+                state.end = today;
+                state.start = preset === 'all' ? first : addDays(today, -(parseInt(preset, 10) - 1));
+              }
+              if (state.start < first) state.start = first;
+              if (state.end > today) state.end = today;
+              if (state.start > state.end) state.start = state.end;
+              Array.prototype.forEach.call(root.querySelectorAll('[data-fridge-range]'), function (b) {
+                b.setAttribute('aria-pressed', b.getAttribute('data-fridge-range') === preset ? 'true' : 'false');
+              });
+              var from = $('fridge-from'), to = $('fridge-to');
+              from.min = first; from.max = today; to.min = first; to.max = today;
+              from.value = state.start; to.value = state.end;
+            }
+            function loadRange() {
+              var p = { start: state.start, end: state.end };
+              var main = $('fridge-main');
+              main.setAttribute('data-busy', '1');
+              return Promise.all([api('daily', p), api('heatmap', p), api('durations', p)]).then(function (r) {
+                state.daily = r[0]; state.heat = r[1]; state.dur = r[2];
+                if (!state.day || state.day < state.start || state.day > state.end) state.day = state.end;
+                renderDaily(); renderHeat(); renderDur(); renderCalendar(); loadDay(); loadEnv();
+                var csvq = '?start=' + state.start + '&end=' + state.end + (DEVICE ? '&device=' + DEVICE : '');
+                $('fridge-csv-day').href = API + 'export.csv' + csvq + '&grain=day';
+                $('fridge-csv-hour').href = API + 'export.csv' + csvq + '&grain=hour';
+                main.removeAttribute('data-busy');
+              }).catch(function (e) { main.removeAttribute('data-busy'); throw e; });
+            }
+            Array.prototype.forEach.call(root.querySelectorAll('[data-fridge-range]'), function (b) {
+              b.addEventListener('click', function () {
+                if (!state.loaded) return;
+                setRange(b.getAttribute('data-fridge-range'));
+                loadRange().catch(function () { renderStatus(true); });
+              });
+            });
+            ['fridge-from', 'fridge-to'].forEach(function (id) {
+              $(id).addEventListener('change', function () {
+                var a = $('fridge-from').value, b = $('fridge-to').value;
+                if (!state.loaded || !/^\d{4}-\d{2}-\d{2}$/.test(a) || !/^\d{4}-\d{2}-\d{2}$/.test(b)) return;
+                if (a > b) { if (id === 'fridge-from') b = a; else a = b; }
+                setRange('custom', a, b);
+                loadRange().catch(function () { renderStatus(true); });
+              });
+            });
+            $('fridge-day-prev').addEventListener('click', function () { selectDay(addDays(state.day, -1), false); });
+            $('fridge-day-next').addEventListener('click', function () { selectDay(addDays(state.day, 1), false); });
+            $('fridge-day-input').addEventListener('change', function () {
+              var v = this.value, su = state.summary;
+              if (/^\d{4}-\d{2}-\d{2}$/.test(v) && v >= su.all_time.first_date && v <= su.today.date) selectDay(v, false);
+              else this.value = state.day;
+            });
+
+            /* ---------- load, refresh, states ---------- */
+            function show(which) {
+              $('fridge-loading').hidden = which !== 'loading';
+              $('fridge-empty').hidden = which !== 'empty';
+              $('fridge-error').hidden = which !== 'error';
+              $('fridge-main').hidden = which !== 'main';
+              $('fridge-status').hidden = which === 'error' || which === 'loading';
+            }
+            function enterAutoDemo() {
+              AUTODEMO = true; DEMO = true;
+              if (!demo) demo = buildDemo();
+              root.classList.add('fridge-demo');
+              var b = $('fridge-demo-banner');
+              b.innerHTML = '<strong>SAMPLE DATA.</strong> The counter is not installed at the fridge yet. These numbers are made up so you can see how this page will look. Real counts will replace them automatically.';
+              b.hidden = false;
+              $('fridge-downloads').hidden = true;
+            }
+            function refresh() {
+              if (!AUTODEMO) return refreshView();
+              return api('summary', {}, true).then(function (real) {
+                if (real && real.has_data) { location.reload(); return; }
+                return refreshView();
+              }, function () { return refreshView(); });
+            }
+            function refreshView() {
+              return api('summary').then(function (su) {
+                var changed = su.rev !== state.rev || !state.loaded || (state.summary && state.summary.today.date !== su.today.date);
+                state.summary = su;
+                renderStatus(false);
+                if (!su.has_data && !DEMO && !DEVICE) { enterAutoDemo(); return refreshView(); }
+                if (!su.has_data) { state.loaded = false; state.rev = su.rev; show('empty'); return; }
+                show('main');
+                if (!changed) return;
+                state.rev = su.rev; state.hours = {};
+                renderKpis();
+                setRange(state.preset, state.start, state.end);
+                state.loaded = true;
+                var calStart = addDays(su.today.date, -370);
+                return Promise.all([
+                  api('daily', { start: calStart, end: su.today.date }).then(function (d) { state.cal = d; renderCalendar(); }),
+                  loadRange()
+                ]);
+              }).catch(function () {
+                if (state.loaded) renderStatus(true); else show('error');
+              });
+            }
+            $('fridge-retry').addEventListener('click', function () { show('loading'); refresh(); });
+            document.addEventListener('visibilitychange', function () { if (!document.hidden) refresh(); });
+            state.timer = window.setInterval(function () { if (!document.hidden) refresh(); }, REFRESH_MS);
+            var resizeTimer = null, lastW = root.clientWidth;
+            window.addEventListener('resize', function () {
+              window.clearTimeout(resizeTimer);
+              resizeTimer = window.setTimeout(function () {
+                if (!state.loaded || root.clientWidth === lastW) return;
+                lastW = root.clientWidth; hideTip();
+                renderDaily(); renderHours(); renderHeat(); renderCalendar();
+                ENV.forEach(renderEnv);
+              }, 150);
+            });
+
+            /* ---------- sample data for ?demo=1 (made up in the browser) ---------- */
+            function buildDemo() {
+              var PROFILE = [0.1, 0.05, 0.05, 0.05, 0.1, 0.4, 1.2, 2.2, 2.6, 2.2, 2.0, 2.6, 3.2, 2.6, 2.2, 2.4, 3.0, 3.8, 3.6, 2.6, 1.8, 1.0, 0.5, 0.2];
+              var WEEK = [1.15, 0.9, 0.95, 1.0, 1.0, 1.1, 1.3];
+              var parts = {};
+              new Intl.DateTimeFormat('en-US', { timeZone: 'America/Chicago', year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', hourCycle: 'h23' })
+                .formatToParts(new Date()).forEach(function (p) { parts[p.type] = p.value; });
+              var today = parts.year + '-' + parts.month + '-' + parts.day, nowHour = +parts.hour % 24;
+              var N = 150, first = addDays(today, -(N - 1));
+              function rng(seed) { return function () { seed |= 0; seed = seed + 0x6D2B79F5 | 0; var t = Math.imul(seed ^ seed >>> 15, 1 | seed); t = t + Math.imul(t ^ t >>> 7, 61 | t) ^ t; return ((t ^ t >>> 14) >>> 0) / 4294967296; }; }
+              function poisson(r, lam) { var L = Math.exp(-lam), k = 0, p = 1; do { k++; p *= r(); } while (p > L); return k - 1; }
+              var days = [], byDate = {};
+              for (var i = 0; i < N; i++) {
+                var date = addDays(first, i), r = rng(pd(date).getTime() / 86400000), wd = dow(date);
+                var grow = 0.65 + 0.45 * i / N, quiet = r() < 0.04 ? 0.35 : 1, hours = [];
+                for (var hr = 0; hr < 24; hr++) hours.push(poisson(r, PROFILE[hr] * WEEK[wd] * grow * quiet));
+                var upto = date === today ? nowHour : 24;
+                var d = { date: date, wd: wd, hours: hours.slice(0, upto), temp: 58 + 14 * Math.sin(i / 9) + 8 * r() };
+                d.count = d.hours.reduce(function (a, b) { return a + b; }, 0);
+                days.push(d); byDate[date] = d;
+              }
+              function slice(p) {
+                var a = p.start && p.start > first ? p.start : first, b = p.end && p.end < today ? p.end : today;
+                return days.filter(function (d) { return d.date >= a && d.date <= b; });
+              }
+              function base(p) { return { tz: 'America/Chicago', start: p.start, end: p.end }; }
+              function sum(list) { return list.reduce(function (a, d) { return a + d.count; }, 0); }
+              function lastHours(nh, skip) {
+                var flat = [];
+                days.forEach(function (d) { d.hours.forEach(function (c) { flat.push(c); }); });
+                var endi = flat.length - skip, t = 0;
+                for (var i = Math.max(0, endi - nh); i < endi; i++) t += flat[i];
+                return t;
+              }
+              return {
+                summary: function () {
+                  var t = byDate[today], y = byDate[addDays(today, -1)], total = sum(days);
+                  return {
+                    tz: 'America/Chicago', rev: 'demo-' + today + '-' + nowHour, has_data: true, publish_granularity_s: 3600,
+                    data_through: today + 'T' + (nowHour < 10 ? '0' : '') + nowHour + ':00:00-06:00',
+                    today: { date: today, count: t.count, yesterday_same_time: y.hours.slice(0, nowHour).reduce(function (a, b) { return a + b; }, 0) },
+                    yesterday: { date: y.date, count: y.count },
+                    last_7_days: { count: lastHours(168, 0), previous: lastHours(168, 168), previous_complete: true },
+                    last_30_days: { count: lastHours(720, 0), previous: lastHours(720, 720), previous_complete: true },
+                    all_time: { count: total, first_date: first, days: N, avg_per_day: Math.round(total / N * 10) / 10 },
+                    sensor: { online: true, last_heard: today + 'T' + (nowHour < 10 ? '0' : '') + nowHour + ':00:00-06:00', devices: [] },
+                    metrics: ['temp_c'], rules: { min_open_ms: 1000, online_window_min: 40 }
+                  };
+                },
+                daily: function (p) {
+                  var out = base(p);
+                  out.days = slice(p).map(function (d) {
+                    var i = days.indexOf(d), complete = d.date < today, avg7 = null;
+                    if (complete && i >= 6) { var t = 0; for (var k = i - 6; k <= i; k++) t += days[k].count; avg7 = Math.round(t / 7 * 100) / 100; }
+                    return { date: d.date, weekday: (d.wd + 6) % 7, count: d.count, avg7: avg7, avg_open_s: 14 + (d.count % 7), held_open: 0, complete: complete };
+                  });
+                  return out;
+                },
+                hourly: function (p) {
+                  var out = base(p); out.hours = [];
+                  slice(p).forEach(function (d) { d.hours.forEach(function (c, hr) { out.hours.push({ date: d.date, hour: hr, count: c }); }); });
+                  return out;
+                },
+                heatmap: function (p) {
+                  var out = base(p), tot = [], occ = [], list = slice(p), wt = [0, 0, 0, 0, 0, 0, 0], wd = [0, 0, 0, 0, 0, 0, 0];
+                  for (var i = 0; i < 168; i++) { tot.push(0); occ.push(0); }
+                  list.forEach(function (d) {
+                    var m = (d.wd + 6) % 7;
+                    d.hours.forEach(function (c, hr) { tot[m * 24 + hr] += c; occ[m * 24 + hr]++; });
+                    if (d.date < today) { wt[m] += d.count; wd[m]++; }
+                  });
+                  out.cells = tot.map(function (t, i) { return { weekday: Math.floor(i / 24), hour: i % 24, total: t, hours: occ[i], avg: occ[i] ? Math.round(t / occ[i] * 100) / 100 : null }; });
+                  out.by_hour = []; out.by_weekday = [];
+                  for (var hr = 0; hr < 24; hr++) {
+                    var t = 0, o = 0;
+                    for (var m = 0; m < 7; m++) { t += tot[m * 24 + hr]; o += occ[m * 24 + hr]; }
+                    out.by_hour.push({ hour: hr, total: t, hours: o, avg: o ? Math.round(t / o * 100) / 100 : null });
+                  }
+                  for (var k = 0; k < 7; k++) out.by_weekday.push({ weekday: k, total: wt[k], days: wd[k], avg: wd[k] ? Math.round(wt[k] / wd[k] * 100) / 100 : null });
+                  return out;
+                },
+                durations: function (p) {
+                  var total = sum(slice(p)), share = [0.16, 0.34, 0.24, 0.14, 0.07, 0.04, 0.01], edges = [1, 5, 15, 30, 60, 120, 300], out = base(p);
+                  out.bins = share.map(function (f, i) { return { min_s: edges[i], max_s: i < 6 ? edges[i + 1] : null, count: Math.round(total * f * 0.97) }; });
+                  out.measured = out.bins.reduce(function (a, b) { return a + b.count; }, 0);
+                  out.held_open = Math.round(total * 0.01); out.too_short_excluded = Math.round(total * 0.03); out.not_reported = 0;
+                  out.median_s = total ? 14 : null; out.mean_s = total ? 27.5 : null; out.p90_s = total ? 70 : null;
+                  return out;
+                },
+                readings: function (p) {
+                  var out = base(p), pts = [];
+                  out.metric = p.metric; out.bucket = p.bucket;
+                  slice(p).forEach(function (d) {
+                    var c = (d.temp - 32) * 5 / 9;
+                    if (p.bucket === 'day') pts.push({ t: d.date, avg: c, min: c - 4, max: c + 5, n: 96 });
+                    else d.hours.forEach(function (_c, hr) {
+                      var v = c + 4.5 * Math.sin((hr - 9) / 24 * 2 * Math.PI);
+                      pts.push({ t: d.date + 'T' + (hr < 10 ? '0' : '') + hr + ':00:00-06:00', avg: v, min: v - 0.6, max: v + 0.6, n: 4 });
+                    });
+                  });
+                  out.series = p.metric === 'temp_c' ? [{ sensor: 'bmp280', points: pts }] : [];
+                  return out;
+                }
+              };
+            }
+            var demo = DEMO ? buildDemo() : null;
+
+            if (DEMO) { root.classList.add('fridge-demo'); $('fridge-demo-banner').hidden = false; $('fridge-downloads').hidden = true; }
+            if (DEVICE && !DEMO) {
+              $('fridge-device-banner').hidden = false;
+              $('fridge-device-name').textContent = DEVICE;
+            }
+            show('loading');
+            refresh();
+          })();
+          </script>
+---
+
+A small sensor on the door of the Hollygrove Community Fridge counts each time the door opens. That is all it does: there is no camera, and it knows nothing about who stops by. The numbers below help neighbors, volunteers and supporters see how much the fridge is used and when it most needs restocking.
+
+```{=html}
+<div id="fridge-app" class="fridge-app">
+<div id="fridge-demo-banner" class="fridge-banner" hidden><strong>SAMPLE DATA.</strong> These numbers are made up so you can see how this page will look. They are not real counts. <a href="./">See the real numbers</a>.</div>
+<div id="fridge-device-banner" class="fridge-banner" hidden><strong>TEST VIEW.</strong> Showing one device only: <span id="fridge-device-name"></span>. <a href="./">Back to the public numbers</a>.</div>
+<p id="fridge-status" class="fridge-status" hidden><span id="fridge-dot" class="fridge-dot" aria-hidden="true"></span><span id="fridge-status-text" role="status"></span></p>
+<div id="fridge-loading" class="fridge-panel"><p class="fridge-panel-title">Loading the latest numbers</p><p>One moment while we fetch the count.</p></div>
+<div id="fridge-empty" class="fridge-panel" hidden>
+<p class="fridge-panel-title">The counter is being set up</p>
+<p>Nothing has been counted yet. As soon as the fridge door starts opening, numbers and charts will appear here, updated through the day. Check back soon.</p>
+<p>Curious what this page will look like? <a href="?demo=1">See a preview with sample data</a>.</p>
+</div>
+<div id="fridge-error" class="fridge-panel" hidden>
+<p class="fridge-panel-title">We could not load the numbers right now</p>
+<p>The fridge counter keeps counting, and nothing is lost. This page will try again on its own in about a minute.</p>
+<p><button type="button" id="fridge-retry" class="fridge-btn">Try again now</button></p>
+</div>
+<div id="fridge-main" class="fridge-main" hidden>
+<div class="fridge-kpis">
+<div class="fridge-kpi"><p class="fridge-kpi-label">Today so far</p><p class="fridge-kpi-value" id="fridge-k-today">&nbsp;</p><p class="fridge-kpi-note" id="fridge-k-today-note"></p></div>
+<div class="fridge-kpi"><p class="fridge-kpi-label">Past 7 days</p><p class="fridge-kpi-value" id="fridge-k-7">&nbsp;</p><p class="fridge-kpi-note" id="fridge-k-7-note"></p></div>
+<div class="fridge-kpi"><p class="fridge-kpi-label">Past 30 days</p><p class="fridge-kpi-value" id="fridge-k-30">&nbsp;</p><p class="fridge-kpi-note" id="fridge-k-30-note"></p></div>
+<div class="fridge-kpi"><p class="fridge-kpi-label">All time</p><p class="fridge-kpi-value" id="fridge-k-all">&nbsp;</p><p class="fridge-kpi-note" id="fridge-k-all-note"></p></div>
+</div>
+<div class="fridge-card">
+<h3 class="fridge-card-title">Every day at a glance</h3>
+<p class="fridge-card-sub">Each square is one day. Darker means the door opened more often. Tap a day to see it hour by hour.</p>
+<ul class="fridge-legend" id="fridge-cal-legend"></ul>
+<div class="fridge-scroll" id="fridge-cal-scroll"><div class="fridge-plot" id="fridge-cal" style="min-height:130px"></div></div>
+<button type="button" class="fridge-link-btn" data-fridge-table="fridge-cal-table" aria-expanded="false">Show as a table</button>
+<div class="fridge-table-wrap" id="fridge-cal-table" hidden></div>
+</div>
+<h2 id="fridge-explore">Look closer</h2>
+<div class="fridge-filters" role="group" aria-label="Choose the dates for the charts below">
+<div class="fridge-seg">
+<button type="button" class="fridge-btn" data-fridge-range="7" aria-pressed="false">7 days</button>
+<button type="button" class="fridge-btn" data-fridge-range="30" aria-pressed="true">30 days</button>
+<button type="button" class="fridge-btn" data-fridge-range="90" aria-pressed="false">90 days</button>
+<button type="button" class="fridge-btn" data-fridge-range="all" aria-pressed="false">All</button>
+</div>
+<div class="fridge-custom"><label for="fridge-from">From</label><input type="date" id="fridge-from" class="fridge-date"><label for="fridge-to">to</label><input type="date" id="fridge-to" class="fridge-date"></div>
+</div>
+<div class="fridge-card">
+<h3 class="fridge-card-title">Openings each day</h3>
+<p class="fridge-card-sub" id="fridge-daily-sub">&nbsp;</p>
+<ul class="fridge-legend"><li><span class="fridge-key-rect" aria-hidden="true"></span>Openings that day</li><li><span class="fridge-key-rect fridge-key-soft" aria-hidden="true"></span>Today, still counting</li><li><span class="fridge-key-line" aria-hidden="true"></span>7-day average</li></ul>
+<div class="fridge-plot fridge-h-daily" id="fridge-daily"></div>
+<button type="button" class="fridge-link-btn" data-fridge-table="fridge-daily-table" aria-expanded="false">Show as a table</button>
+<div class="fridge-table-wrap" id="fridge-daily-table" hidden></div>
+</div>
+<div class="fridge-card" id="fridge-hours-card">
+<h3 class="fridge-card-title" id="fridge-hours-title">Hour by hour</h3>
+<p class="fridge-card-sub" id="fridge-hours-sub">&nbsp;</p>
+<div class="fridge-daynav">
+<button type="button" class="fridge-btn" id="fridge-day-prev" aria-label="Earlier day">&#8592; Earlier</button>
+<label class="fridge-sr" for="fridge-day-input">Day to show hour by hour</label>
+<input type="date" id="fridge-day-input" class="fridge-date">
+<button type="button" class="fridge-btn" id="fridge-day-next" aria-label="Later day">Later &#8594;</button>
+</div>
+<div class="fridge-plot fridge-h-hours" id="fridge-hours"></div>
+<button type="button" class="fridge-link-btn" data-fridge-table="fridge-hours-table" aria-expanded="false">Show as a table</button>
+<div class="fridge-table-wrap" id="fridge-hours-table" hidden></div>
+</div>
+<div class="fridge-card">
+<h3 class="fridge-card-title">When is the fridge busiest?</h3>
+<p class="fridge-card-sub">Average openings for each hour of each day of the week. Darker means busier.</p>
+<ul class="fridge-legend" id="fridge-heat-legend"></ul>
+<div class="fridge-plot" id="fridge-heat" style="min-height:140px"></div>
+<p class="fridge-card-foot" id="fridge-heat-foot">&nbsp;</p>
+<button type="button" class="fridge-link-btn" data-fridge-table="fridge-heat-table" aria-expanded="false">Show as a table</button>
+<div class="fridge-table-wrap" id="fridge-heat-table" hidden></div>
+</div>
+<div class="fridge-two">
+<div class="fridge-card">
+<h3 class="fridge-card-title">A typical day</h3>
+<p class="fridge-card-sub">Average openings in each hour.</p>
+<div class="fridge-plot fridge-h-typical" id="fridge-typical"></div>
+<button type="button" class="fridge-link-btn" data-fridge-table="fridge-typical-table" aria-expanded="false">Show as a table</button>
+<div class="fridge-table-wrap" id="fridge-typical-table" hidden></div>
+</div>
+<div class="fridge-card">
+<h3 class="fridge-card-title">By day of the week</h3>
+<p class="fridge-card-sub">Average openings per day.</p>
+<div class="fridge-rows" id="fridge-weekdays" style="min-height:11rem"></div>
+</div>
+</div>
+<div class="fridge-card">
+<h3 class="fridge-card-title">How long is the door open?</h3>
+<p class="fridge-stat" id="fridge-dur-stat">&nbsp;</p>
+<p class="fridge-card-sub" id="fridge-dur-sub">&nbsp;</p>
+<div class="fridge-rows" id="fridge-dur" style="min-height:11rem"></div>
+<p class="fridge-card-foot" id="fridge-dur-foot"></p>
+</div>
+<h2 id="fridge-env-head" hidden>At the fridge</h2>
+<div class="fridge-card" id="fridge-env-temp" hidden><h3 class="fridge-card-title">Air temperature at the fridge</h3><p class="fridge-card-sub">Measured by the sensor box, in degrees Fahrenheit. The shaded band shows the low and high.</p><div class="fridge-env-plots"></div></div>
+<div class="fridge-card" id="fridge-env-hum" hidden><h3 class="fridge-card-title">Humidity at the fridge</h3><p class="fridge-card-sub">Relative humidity, in percent.</p><div class="fridge-env-plots"></div></div>
+<div class="fridge-card" id="fridge-env-pres" hidden><h3 class="fridge-card-title">Air pressure</h3><p class="fridge-card-sub">Barometric pressure, in inches of mercury.</p><div class="fridge-env-plots"></div></div>
+<div class="fridge-card" id="fridge-env-inside" hidden><h3 class="fridge-card-title">Temperature inside the fridge</h3><p class="fridge-card-sub">In degrees Fahrenheit. Food keeps best at 40 degrees or colder.</p><div class="fridge-env-plots"></div></div>
+<div class="fridge-card" id="fridge-env-weight" hidden><h3 class="fridge-card-title">How full are the shelves?</h3><p class="fridge-card-sub">Weight on each shelf, in pounds. A drop means food went out; a jump means a restock.</p><div class="fridge-env-plots"></div></div>
+<p id="fridge-downloads" class="fridge-card-foot">Download the numbers for the dates chosen above: <a id="fridge-csv-day" href="/fridge/api/v1/export.csv?grain=day">openings by day (CSV)</a> or <a id="fridge-csv-hour" href="/fridge/api/v1/export.csv?grain=hour">openings by hour (CSV)</a>.</p>
+</div>
+</div>
+```
+
+## About these numbers
+
+**What is counted.** Each time the fridge door opens, the sensor adds one to the count and notes roughly how long the door stayed open.
+
+**What is not.** There is no camera and no microphone. The sensor does not see faces, phones or license plates, and it collects no names or personal information. It only knows that the door moved. We publish totals by the hour, about a quarter of an hour behind, and never the exact moment the door opened.
+
+**A door opening is not a visitor.** One neighbor might open the door twice. A volunteer stocking the shelves might open it five times. Read these numbers as "how busy was the fridge," not "how many people came."
+
+**The fine print.** Very quick bumps of the door (under a second) are not counted. If the door is left standing open, that counts as one opening. If the sensor loses power or its connection, openings can be missed, so the real totals may be a little higher than shown. All times are New Orleans time.
+
+Questions or ideas? [Get in touch](../contact/).

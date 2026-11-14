@@ -1,0 +1,157 @@
+
+Nick Johnson's original (Clamshell+Parts+Box+Standard.stl)
+  smallest distance between his two bodies as printed: 0.039 mm (a knuckle leg passing the corner of the other half's wall)
+  cone gap, inner joint (x 18.4-19.6): 0.177 mm
+  cone gap, end joint (x 13.0-14.3): 0.177 mm
+  knuckle round to its hollow in the other half (x 15.5-17, away from the cones): 0.196 mm
+
+demo-door-rev1.stl
+  [ok] demo-door-rev1.3mf holds the same plate (10882 triangles, 200.9 cm3)
+  [ok] separate bodies in the plate: 2 (want 2: frame and door, not fused)
+  [ok] frame watertight True, winding consistent True, volume 129.5 cm3, 5966 triangles
+  [ok] door watertight True, winding consistent True, volume 71.4 cm3, 4916 triangles
+  [ok] both bodies load as valid manifolds (manifold3d)
+  [ok] plate 152.40 x 128.90 x 50.80 mm, min z 0.0000: fits the 256 mm bed with 104 / 127 mm to spare
+  [ok] overall height 152.400 mm (target 152.4)
+  [ok] entry depth 50.800 mm (target 50.8)
+  frame width 81.30 mm, door 106.00 x 50.00 x 12.60 mm (height x width x thickness; knob stands 8.0 mm proud)
+  frame first-layer contact area 4269 mm2
+  door first-layer contact area 5264 mm2
+  [ok] smallest door-to-frame distance anywhere, print pose: 0.177 mm (want >= 0.15)
+  joint 1 at x 17.27: cone gap 0.177 mm, flat faces 0.400 mm, at the bed (first layer) 1.482 mm
+  [ok] joint 1 cone gap is the designed 0.177 mm
+  joint 2 at x 33.67: cone gap 0.177 mm, flat faces 0.400 mm, at the bed (first layer) 1.482 mm
+  [ok] joint 2 cone gap is the designed 0.177 mm
+  joint 3 at x 52.60: cone gap 0.177 mm, flat faces 0.400 mm, at the bed (first layer) 1.482 mm
+  [ok] joint 3 cone gap is the designed 0.177 mm
+  joint 4 at x 69.00: cone gap 0.177 mm, flat faces 0.400 mm, at the bed (first layer) 1.482 mm
+  [ok] joint 4 cone gap is the designed 0.177 mm
+  joint 5 at x 87.93: cone gap 0.177 mm, flat faces 0.400 mm, at the bed (first layer) 1.482 mm
+  [ok] joint 5 cone gap is the designed 0.177 mm
+  joint 6 at x 104.33: cone gap 0.177 mm, flat faces 0.400 mm, at the bed (first layer) 1.482 mm
+  [ok] joint 6 cone gap is the designed 0.177 mm
+  print-pose door edge to hinge jamb: 0.600 mm above the jamb's chamfer
+  the same at the bed: 3.091 mm
+  frame: 34 downward areas steeper than 50 deg from vertical, 593.6 mm2 in all
+      flat bridge     97.0 mm2  x 117.4..143.9  y 96.4..100.0  z 11.40..11.40  short side 3.7 mm
+  [ok] frame overhang at z 11.40: unsupported span 3.7 mm (limit 6)
+      curved/sloped   22.7 mm2  x 0.0..7.0  y 73.1..76.1  z 34.69..35.25  short side 3.0 mm
+  [ok] frame overhang at z 35.25: unsupported span 3.0 mm (limit 6)
+      curved/sloped   22.7 mm2  x 0.0..7.0  y 100.4..103.4  z 34.69..35.25  short side 3.0 mm
+  [ok] frame overhang at z 35.25: unsupported span 3.0 mm (limit 6)
+      flat bridge     12.0 mm2  x 24.0..27.0  y 58.6..62.6  z 20.10..20.10  short side 3.0 mm
+  [ok] frame overhang at z 20.10: unsupported span 3.0 mm (limit 6)
+      flat bridge     12.0 mm2  x 59.3..62.3  y 58.6..62.6  z 20.10..20.10  short side 3.0 mm
+  [ok] frame overhang at z 20.10: unsupported span 3.0 mm (limit 6)
+      flat bridge     12.0 mm2  x 94.6..97.6  y 58.6..62.6  z 20.10..20.10  short side 3.0 mm
+  [ok] frame overhang at z 20.10: unsupported span 3.0 mm (limit 6)
+      curved/sloped    8.6 mm2  x 120.4..142.9  y 102.3..102.6  z 8.20..8.39  short side 0.3 mm
+  [ok] frame overhang at z 8.39: unsupported span 0.3 mm (limit 6)
+      curved/sloped    8.6 mm2  x 120.4..142.9  y 93.8..94.1  z 8.20..8.39  short side 0.3 mm
+  [ok] frame overhang at z 8.39: unsupported span 0.3 mm (limit 6)
+      flat bridge      7.2 mm2  x 114.4..118.4  y 92.7..94.5  z 31.50..31.50  short side 1.8 mm
+  [ok] frame overhang at z 31.50: unsupported span 1.8 mm (limit 6)
+      flat bridge      7.2 mm2  x 114.4..118.4  y 101.9..103.7  z 31.50..31.50  short side 1.8 mm
+  [ok] frame overhang at z 31.50: unsupported span 1.8 mm (limit 6)
+      sign engraving: 24 letter ceilings at z 0.40, 383.7 mm2 in all, each bridged across a letter stroke (about 1.5 mm)
+  door: 3 downward areas steeper than 50 deg from vertical, 128.8 mm2 in all
+      flat bridge    109.7 mm2  x 80.8..110.8  y 13.2..16.8  z 11.40..11.40  short side 3.7 mm
+  [ok] door overhang at z 11.40: unsupported span 3.7 mm (limit 6)
+      curved/sloped    9.6 mm2  x 82.8..107.8  y 19.1..19.4  z 8.20..8.39  short side 0.3 mm
+  [ok] door overhang at z 8.39: unsupported span 0.3 mm (limit 6)
+      curved/sloped    9.6 mm2  x 82.8..107.8  y 10.6..10.9  z 8.20..8.39  short side 0.3 mm
+  [ok] door overhang at z 8.39: unsupported span 0.3 mm (limit 6)
+  face-to-face distance of the two fitted flanges, door closed: 2.60 mm (rated operating gap 10-15 mm)
+  at 90 deg the door spans z -50.3..12.6 (it swings out in front of the frame, z < 0)
+  [ok] swing 180 -> 0 deg in 2.5 deg steps (also with the door shifted +/-0.2 mm along the axis and +/-0.15 mm across it, and with the switch and magnet fitted): worst overlap 0.00000 mm3
+  closed (0 deg): smallest distance to the frame 0.093 mm; door bevel to stop rib 0.093 mm
+  pushed 0.25 deg past closed: overlap 22.833 mm3 (the stop rib)
+  pushed 0.50 deg past closed: overlap 82.460 mm3 (the stop rib)
+  pushed 1.00 deg past closed: overlap 199.012 mm3 (the stop rib)
+  [ok] the door reaches closed and lands on the stop rib within 0.5 deg of flush
+  closed gaps: bottom 0.80, top 0.60, hinge side 0.60, latch side 0.70 mm; in use the door drops 0.25 mm onto its cones
+  magnet travel at  5 deg open: 3.6 mm (magnet axis is 41.6 mm from the hinge axis)
+  magnet travel at 10 deg open: 7.3 mm (magnet axis is 41.6 mm from the hinge axis)
+  magnet travel at 15 deg open: 10.9 mm (magnet axis is 41.6 mm from the hinge axis)
+  magnet travel at 20 deg open: 14.4 mm (magnet axis is 41.6 mm from the hinge axis)
+  magnet travel at 30 deg open: 21.5 mm (magnet axis is 41.6 mm from the hinge axis)
+  frame wall thickness from 3000 inward rays: min 0.62, 1st percentile 1.41, median 7.00 mm; 0.1 % of the surface under 0.8 mm
+      thin spots lie in x 121.6..133.9  y 86.0..102.6  z 0.1..9.0 (crush ribs in the switch bores, knife edges of chamfers and grooves - not walls)
+  door wall thickness from 3000 inward rays: min 0.80, 1st percentile 1.46, median 12.60 mm; 0.3 % of the surface under 0.8 mm
+      thin spots lie in x 86.3..105.5  y 10.8..19.1  z 1.6..9.1 (crush ribs in the switch bores, knife edges of chamfers and grooves - not walls)
+  designed skins round the switch bores: 1.40 mm below, 1.20 mm above the flat cap; sign engraving to bore 1.00 mm
+  mass estimate (PLA, 1.2 mm skin + 15 % infill): frame 87 g, door 36 g; solid would be 161 g + 88 g
+  footprint 81.3 wide x 50.8 deep
+  door open   0 deg: centre of mass 67.5 mm above the table, 16.5 mm behind the front edge, margins front 16.5 back 34.3 left 40.8 right 40.5 mm; tips forward when pulled with 0.33 N at knob height
+  door open  90 deg: centre of mass 67.5 mm above the table, 8.3 mm behind the front edge, margins front 8.3 back 42.5 left 32.3 right 49.0 mm; tips forward when pulled with 0.17 N at knob height
+  [ok] door open 90 deg: centre of mass is inside the footprint by 8.3 mm at the nearest edge
+  door open 180 deg: centre of mass 67.5 mm above the table, 16.8 mm behind the front edge, margins front 16.8 back 34.0 left 24.1 right 57.2 mm; tips forward when pulled with 0.33 N at knob height
+
+demo-door-rev1-surface-switch.stl
+  [ok] demo-door-rev1-surface-switch.3mf holds the same plate (10058 triangles, 207.2 cm3)
+  [ok] separate bodies in the plate: 2 (want 2: frame and door, not fused)
+  [ok] frame watertight True, winding consistent True, volume 133.0 cm3, 5538 triangles
+  [ok] door watertight True, winding consistent True, volume 74.3 cm3, 4520 triangles
+  [ok] both bodies load as valid manifolds (manifold3d)
+  [ok] plate 152.40 x 128.90 x 50.80 mm, min z 0.0000: fits the 256 mm bed with 104 / 127 mm to spare
+  [ok] overall height 152.400 mm (target 152.4)
+  [ok] entry depth 50.800 mm (target 50.8)
+  frame width 81.30 mm, door 106.00 x 50.00 x 12.60 mm (height x width x thickness; knob stands 8.0 mm proud)
+  frame first-layer contact area 4285 mm2
+  door first-layer contact area 5303 mm2
+  [ok] smallest door-to-frame distance anywhere, print pose: 0.177 mm (want >= 0.15)
+  joint 1 at x 17.27: cone gap 0.177 mm, flat faces 0.400 mm, at the bed (first layer) 1.482 mm
+  [ok] joint 1 cone gap is the designed 0.177 mm
+  joint 2 at x 33.67: cone gap 0.177 mm, flat faces 0.400 mm, at the bed (first layer) 1.482 mm
+  [ok] joint 2 cone gap is the designed 0.177 mm
+  joint 3 at x 52.60: cone gap 0.177 mm, flat faces 0.400 mm, at the bed (first layer) 1.482 mm
+  [ok] joint 3 cone gap is the designed 0.177 mm
+  joint 4 at x 69.00: cone gap 0.177 mm, flat faces 0.400 mm, at the bed (first layer) 1.482 mm
+  [ok] joint 4 cone gap is the designed 0.177 mm
+  joint 5 at x 87.93: cone gap 0.177 mm, flat faces 0.400 mm, at the bed (first layer) 1.482 mm
+  [ok] joint 5 cone gap is the designed 0.177 mm
+  joint 6 at x 104.33: cone gap 0.177 mm, flat faces 0.400 mm, at the bed (first layer) 1.482 mm
+  [ok] joint 6 cone gap is the designed 0.177 mm
+  print-pose door edge to hinge jamb: 0.600 mm above the jamb's chamfer
+  the same at the bed: 3.091 mm
+  frame: 31 downward areas steeper than 50 deg from vertical, 479.4 mm2 in all
+      curved/sloped   22.7 mm2  x 0.0..7.0  y 100.4..103.4  z 34.69..35.25  short side 3.0 mm
+  [ok] frame overhang at z 35.25: unsupported span 3.0 mm (limit 6)
+      curved/sloped   22.7 mm2  x 0.0..7.0  y 73.1..76.1  z 34.69..35.25  short side 3.0 mm
+  [ok] frame overhang at z 35.25: unsupported span 3.0 mm (limit 6)
+      flat bridge     12.0 mm2  x 24.0..27.0  y 58.6..62.6  z 20.10..20.10  short side 3.0 mm
+  [ok] frame overhang at z 20.10: unsupported span 3.0 mm (limit 6)
+      flat bridge     12.0 mm2  x 59.3..62.3  y 58.6..62.6  z 20.10..20.10  short side 3.0 mm
+  [ok] frame overhang at z 20.10: unsupported span 3.0 mm (limit 6)
+      flat bridge     12.0 mm2  x 94.6..97.6  y 58.6..62.6  z 20.10..20.10  short side 3.0 mm
+  [ok] frame overhang at z 20.10: unsupported span 3.0 mm (limit 6)
+      flat bridge      7.2 mm2  x 79.8..81.6  y 113.9..117.9  z 31.50..31.50  short side 1.8 mm
+  [ok] frame overhang at z 31.50: unsupported span 1.8 mm (limit 6)
+      flat bridge      7.2 mm2  x 87.8..89.6  y 113.9..117.9  z 31.50..31.50  short side 1.8 mm
+  [ok] frame overhang at z 31.50: unsupported span 1.8 mm (limit 6)
+      sign engraving: 24 letter ceilings at z 0.40, 383.7 mm2 in all, each bridged across a letter stroke (about 1.5 mm)
+  door: 0 downward areas steeper than 50 deg from vertical, 0.0 mm2 in all
+  at 90 deg the door spans z -50.3..12.6 (it swings out in front of the frame, z < 0)
+  [ok] swing 180 -> 0 deg in 2.5 deg steps (also with the door shifted +/-0.2 mm along the axis and +/-0.15 mm across it): worst overlap 0.00000 mm3
+  closed (0 deg): smallest distance to the frame 0.093 mm; door bevel to stop rib 0.093 mm
+  pushed 0.25 deg past closed: overlap 22.833 mm3 (the stop rib)
+  pushed 0.50 deg past closed: overlap 82.460 mm3 (the stop rib)
+  pushed 1.00 deg past closed: overlap 199.012 mm3 (the stop rib)
+  [ok] the door reaches closed and lands on the stop rib within 0.5 deg of flush
+  closed gaps: bottom 0.80, top 0.60, hinge side 0.60, latch side 0.70 mm; in use the door drops 0.25 mm onto its cones
+  magnet travel at  5 deg open: 3.6 mm (magnet axis is 41.6 mm from the hinge axis)
+  magnet travel at 10 deg open: 7.3 mm (magnet axis is 41.6 mm from the hinge axis)
+  magnet travel at 15 deg open: 10.9 mm (magnet axis is 41.6 mm from the hinge axis)
+  magnet travel at 20 deg open: 14.4 mm (magnet axis is 41.6 mm from the hinge axis)
+  magnet travel at 30 deg open: 21.5 mm (magnet axis is 41.6 mm from the hinge axis)
+  frame wall thickness from 3000 inward rays: min 0.46, 1st percentile 4.00, median 7.00 mm; 0.0 % of the surface under 0.8 mm
+      thin spots lie in x 134.2..134.2  y 75.9..75.9  z 0.1..0.1 (crush ribs in the switch bores, knife edges of chamfers and grooves - not walls)
+  door wall thickness from 3000 inward rays: min 2.30, 1st percentile 3.62, median 12.60 mm; 0.0 % of the surface under 0.8 mm
+  mass estimate (PLA, 1.2 mm skin + 15 % infill): frame 86 g, door 35 g; solid would be 165 g + 92 g
+  footprint 81.3 wide x 50.8 deep
+  door open   0 deg: centre of mass 66.9 mm above the table, 16.6 mm behind the front edge, margins front 16.6 back 34.2 left 40.6 right 40.7 mm; tips forward when pulled with 0.33 N at knob height
+  door open  90 deg: centre of mass 66.9 mm above the table, 8.6 mm behind the front edge, margins front 8.6 back 42.2 left 32.3 right 49.0 mm; tips forward when pulled with 0.17 N at knob height
+  [ok] door open 90 deg: centre of mass is inside the footprint by 8.6 mm at the nearest edge
+  door open 180 deg: centre of mass 66.9 mm above the table, 16.9 mm behind the front edge, margins front 16.9 back 33.9 left 24.3 right 57.0 mm; tips forward when pulled with 0.33 N at knob height
+
+ALL HARD CHECKS PASS

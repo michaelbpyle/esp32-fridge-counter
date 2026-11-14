@@ -1,0 +1,18 @@
+# Add under `services:` in /opt/hollygrove/docker-compose.yml (same indent as `caddy:`).
+# The network key `hollygrove` already exists in that file.
+  fridge:
+    build: ./fridge/app
+    image: hollygrove-fridge:1
+    container_name: hollygrove-fridge
+    restart: unless-stopped
+    env_file: ./fridge/fridge.env
+    volumes:
+      - ./fridge/data:/data
+    networks:
+      - hollygrove
+    healthcheck:
+      test: ["CMD", "python", "-c", "import urllib.request,sys; sys.exit(0 if urllib.request.urlopen('http://127.0.0.1:8000/fridge/api/v1/health', timeout=4).status == 200 else 1)"]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 15s

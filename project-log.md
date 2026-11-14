@@ -29,6 +29,18 @@ THIS IS DISTINCT FROM build-out-tutorial.md:
 
 ---
 
+## Goals
+
+*(added 2026-09-24 per spec v1.1 rule 10 — DRAFT, reconstructed by Claude from this log, `build-out-tutorial.md` and `SWAMPNET-BRIEF.md`; unreviewed by Michael)*
+
+- Count how many times the Hollygrove Community Fridge door is opened — to see usage patterns, demonstrate impact to funders, and plan restocking. (Owner, 2026-11-14: "WiFi now, LTE later." The counter is built and tested on WiFi at the house on a generic ESP32-S3 DevKitC; it will not be deployed to the fridge until the Walter LTE board arrives, and the Walter is the deployment board.)
+- SUPERSEDED 2026-11-14 by the goal above: report it with **no WiFi, no SIM, and no recurring cost** via the Meshtastic/LoRa pivot (Heltec fridge node → gateway → self-hosted MQTT + Node-RED on TrueNAS).
+- Grow the node into full fridge-site telemetry, in phases: door count + weather on native Meshtastic modules; power-system health read from the site's real off-grid gear (Growatt inverter + EG4 BMS over Modbus/RS485), never hobby shunts; per-shelf weights (HX711) for stock level.
+- Partner with SwampNet (the New Orleans mutual-aid mesh) for the site survey and mesh integration rather than duplicating community infrastructure.
+- (Owner, 2026-11-14) Finish the job as a working system now: an ESP32 program that counts openings and reports over WiFi, able to switch to 4G LTE on a Walter board; dormant support for weather, pressure and shelf-weight sensors; a wiring diagram; a server and database on the hollygrove VM; an interactive dashboard at `hollygrovenola.org/fridge`; a printable demo door with a print-in-place hinge; and a case with a power and weatherproofing plan. The dashboard shows its charts directly at `/fridge/` (sample data, clearly marked, until real counts exist).
+
+---
+
 ## Shopping List
 
 **Objective**: Track the number of times the Hollygrove Community Fridge is opened.
@@ -69,6 +81,7 @@ THIS IS DISTINCT FROM build-out-tutorial.md:
 | WiFi (built-in) | $0 | Requires nearby WiFi network |
 | WiFi Bridge (#4-5 above) | $130 | Extends WiFi to fridge location |
 | ESP32 + SIM7080G cellular (Cat-M/NB-IoT) | ~$25-40 board + ~$14 SIM | Fallback if no gateway in LoRa range. ESP32 does cellular directly via TinyGSM (NOT a Pi). 1NCE SIM = 500MB/10yr, no monthly fee. See tutorial Option 7. |
+| **Walter** (ESP32-S3 + Sequans GM02SP LTE-M/NB-IoT, certified module) | €59 module / €250 DevKit (Mouser US DevKit $310) + SIM | POSSIBILITY (researched 2026-11-05). Pre-integrated alternative to the SIM7080G fallback; 9.5 µA deep sleep; Verizon-approved, no AT&T approval found; no LoRa. See tutorial Option 9. |
 
 ### Data Logging Options (choose one)
 See `build-out-tutorial.md` Section 6 for full details on each option.
@@ -88,10 +101,20 @@ See `build-out-tutorial.md` Section 6 for full details on each option.
 - [ ] Pico 2W reed switch wiring and testing
 
 ### Data Solution
-- [ ] Choose data logging backend (see options in tutorial)
-- [ ] Set up server/webhook on TrueNAS (explore via SSH)
+- [x] Choose data logging backend: own service + SQLite on the hollygrove VM (2026-11-14)
+- [x] Set up server on the hollygrove VM: container `hollygrove-fridge`, API at `https://hollygrovenola.org/fridge/api/v1/` (2026-11-14)
 - [x] Configure WiFi credentials (secrets.h - gitignored)
-- [ ] Test end-to-end data flow (off-USB, standalone WiFi)
+- [x] Test end-to-end data flow: bench board to live server over HTTPS, as test device `bench-01` (2026-11-14, on USB power)
+- [ ] Test with a real reed switch wired in, and off USB on a standalone 5 V supply
+
+### Open after the 2026-11-14 build
+- [ ] Owner: remaining questions in `DECISIONS-FOR-MICHAEL.md` (dashboard wording, power outlet and battery connection for the field install, weather sensor on the first install, database backup)
+- [ ] Get a Walter board; run the `walter` build on it for the first time (it has only been compiled)
+- [ ] Caliper checks, then first prints: demo door (`cad\demo-door\`), case (`cad\enclosure\`)
+- [ ] Buy: PETG or ASA, Hammond 1554H2GY box and glands, M3 brass heat-set inserts and M3 screws (owner confirmed none on hand), DS18B20, HX711 and load cells if wanted (lists in `docs\wiring\wiring.md` and `docs\power-and-enclosure.md`)
+- [ ] Build the field unit as `fridge-01` (key in `/opt/hollygrove/fridge/fridge.env` on the VM)
+- [ ] Commit and push the new work (nothing was committed)
+- [ ] Back up `/opt/hollygrove/fridge/data/fridge.db`
 
 ### Core Functionality
 - [x] Basic door counting with reed switch
@@ -105,6 +128,7 @@ See `build-out-tutorial.md` Section 6 for full details on each option.
 - [ ] Decide: join existing community mesh vs stand up own gateway
 - [ ] Decide: stock Meshtastic firmware vs custom RadioLib firmware
 - [ ] Replace WiFi/HTTP path in main.cpp with LoRa transmit
+- [ ] Walter (cellular) as fallback/companion: verify LTE-M coverage at 9000 Oleander and which carrier the IoT SIM uses; ask QuickSpot about AT&T/T-Mobile and the integrated SIM (tutorial Option 9)
 
 ### Sensors / Telemetry (all reported over Meshtastic)
 Native Meshtastic telemetry covers 3 of 4 sensors with NO custom code (Environment, Power,
@@ -140,8 +164,8 @@ spike. The sensor node draws 5V off the 48V battery via a buck converter (power 
 non-issue — it sips from the big system).
 
 ### Improvements
-- [ ] Persistent count storage (survives power loss)
-- [ ] Web dashboard for viewing count
+- [x] Persistent count storage (survives power loss) (2026-11-14)
+- [x] Web dashboard for viewing count: `https://hollygrovenola.org/fridge/` (2026-11-14)
 - [ ] Battery power option with deep sleep
 
 ### Deployment
@@ -152,6 +176,101 @@ non-issue — it sips from the big system).
 ---
 
 ## Session Log
+
+### 2026-11-14 - Overnight Build: Firmware, Wiring, Server, Dashboard, Demo Door, Case
+
+**Summary**:
+- Michael asked for six deliverables to be designed and built overnight without consulting him,
+  with a log of decisions to review in the morning. That log is `DECISIONS-FOR-MICHAEL.md`; each
+  agent's detailed list is in `docs\decisions\`. The work was split across agents and checked by
+  the lead session. Partway through, at Michael's request, the agents were moved to leaner models
+  without reducing scope.
+- **Firmware** (`src\`, `include\`, `docs\firmware.md`): rewritten. Door sampling runs in its own
+  task with a 50 ms debounce; each opening is an event with time and duration; events are kept in
+  a flash journal through outages and resent; a heartbeat goes every 15 minutes. The sending
+  method sits behind one interface: WiFi (`esp32s3` build) and Walter LTE-M (`walter` build, which
+  compiles but has never run on a Walter). BMP280, DS18B20, DHT and HX711 support is built in and
+  stays dormant when nothing is attached. The Pico 2W code moved to `legacy\`.
+- **Tested on the real board** (a DevKitC-style ESP32-S3, 16 MB flash, on COM8): 39 of 39 unit
+  tests passed on the board; against the live server over HTTPS it posted heartbeats and simulated
+  openings (HTTP 200), and a deliberate resend came back as a duplicate. Against a local stand-in:
+  events survived a reset and server outages. Not tested: a real reed switch, real sensors, the
+  LED colours, a Walter board.
+- **Wiring** (`docs\wiring\wiring-diagram.svg`, `wiring.md`): one pin map for all boards: reed
+  switch GPIO4, DS18B20 GPIO5, DHT GPIO6, I2C GPIO8/9, RS485 reserved GPIO16-18, HX711 clock
+  GPIO42 and data GPIO41/40/39/38.
+- **Server** (`server\`): FastAPI + SQLite service, 47 tests passing locally, deployed to the
+  hollygrove VM as container `hollygrove-fridge`. The public API gives hourly totals or coarser.
+  The deployment is recorded in the hollygrove log, Session 17
+  (`\\10.0.10.13\hollygrove\project-log.md`).
+- **Dashboard**: live at `https://hollygrovenola.org/fridge/`, empty until a field unit reports;
+  `?demo=1` shows sample data. Not linked from the site's navigation.
+- **Demo door** (`cad\demo-door\`): 152.4 mm tall, 50.8 mm deep entry, print-in-place cone hinge
+  (Nick Johnson's, CC BY-SA), press-fit mounts for the Gebildet recessed switch, and a second
+  variant for a surface-mount pair. Checked numerically only. The bare frame tips at a pull of
+  about 0.3 N at the knob, so a separate base plate (`demo-door-foot-rev1.stl`, held by two zip
+  ties, with wells for 16 quarters) was added; with it the computed tip-over force is about 1.7 N,
+  or 2.1 N with the coins. It slides at about 0.55 N, so it needs rubber feet.
+- **Case and power** (`cad\enclosure\`, `docs\power-and-enclosure.md`): a printable case in two
+  variants (Freenove on its breakout; DevKitC on the Universal breakout), a sled for a Hammond
+  1554H2GY weatherproof box, and a power plan (USB adapter on the inverter output first; an
+  isolated Mean Well DDR-15L-5 on the 48 V bus later). The LM2596 modules must not go on the
+  48 V battery. Nothing printed; several dimensions need a caliper check.
+- **Parts confirmed from order emails**: Gebildet recessed reed switches (5), BMP280 modules (5),
+  three generic ESP32-S3 DevKitC N16R8 boards, two Freenove ESP32-S3 boards, three Freenove
+  screw-terminal breakouts. Not owned: DS18B20, HX711, load cells, junction box, glands.
+
+**Changes outside this folder**:
+- hollygrove VM: new container, `fridge/` folder, Caddy route, page `site/fridge/index.qmd`.
+- This PC: a second PlatformIO folder `C:\Users\micha\.platformio-walter` for the Walter build,
+  and a few Python helper packages added to PlatformIO's own environment during a repair.
+- The board's original flash contents are saved at
+  `\\TRUENAS\Pyle-TNAS_Backups\BackUp - Projects\Microcontrollers\esp32-fridge-counter\`.
+- Nothing was committed or pushed.
+
+**Open Questions**: see `DECISIONS-FOR-MICHAEL.md`.
+
+**Owner's answers, same day (morning)**:
+- Direction: WiFi now, LTE later. WiFi is for testing at the house; nothing is deployed to the
+  fridge until the Walter arrives. Bench board: the generic DevKitC. Deployment board: Walter.
+- Dashboard: the charts belong at `/fridge/` itself, not one click further in. The page now shows
+  the full dashboard with clearly marked sample data until real counts exist, then switches by
+  itself. A first attempt at this change broke the page for a few minutes (the sample-data
+  generator was only built when the page was opened with `?demo=1`); fixed and checked on the live
+  site at desktop width.
+- Publishing lag shortened from one hour to 15 minutes (`FRIDGE_PUBLISH_GRANULARITY_S=900` in the
+  VM's `fridge.env`).
+- No navbar link yet. No M3 inserts or screws on hand: added to the to-buy list.
+- Commit and push approved.
+
+---
+
+### 2026-11-05 - Walter Cellular Module Researched (documented as a possibility)
+
+**Summary**:
+- Michael found the **Walter** board (QuickSpot/DPTechnics) and asked for it to be researched and
+  documented as a communication option. It is an ESP32-S3 plus Sequans GM02SP LTE-M/NB-IoT modem
+  and GNSS on one certified board. It has no LoRa, so it does not replace the Meshtastic plan.
+- Added **Option 9** to `build-out-tutorial.md` with specs, roles, cautions, software support, cost
+  and sources, and a pointer in the Recommendation. Added a row to the connectivity table and a
+  to-do below.
+- Findings that matter: 9.5 µA deep sleep; VIN is 3.0-5.5 V with no overvoltage protection (the
+  48 V battery needs a clean buck to 5 V); Verizon-approved, but **no AT&T approval found**; the
+  optional Walter Feels carrier has RS485 (useful for the Growatt/EG4 Modbus plan) but cannot
+  sit directly on the 48 V pack; LTE-M coverage in Hollygrove and the 1NCE US carrier are unverified;
+  bare-module USD price not confirmed (EUR 59 list; Mouser DevKit $310).
+- Datasheet rev 1.2 (2026-11-04) was read in full. Nothing was purchased or changed on hardware.
+
+**Open Questions**:
+- Does LTE-M reach 9000 Oleander on a 1NCE or Soracom SIM, and on which US network?
+- Is Walter worth a DevKit purchase as a fallback, or does the mesh path make it unnecessary?
+- Could Walter replace the companion ESP32-S3 aggregator in the Phase 2-3 design?
+
+**Files Changed**:
+- `build-out-tutorial.md` - Added Option 9 (Walter); updated Recommendation
+- `project-log.md` - This entry, connectivity table row, to-do
+
+---
 
 ### 2026-06-11 - Real Power System Identified; Telemetry Architecture Revised
 

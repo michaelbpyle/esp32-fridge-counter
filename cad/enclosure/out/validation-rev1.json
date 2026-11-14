@@ -1,0 +1,708 @@
+[
+ {
+  "variant": "fnk0091",
+  "carrier": "Freenove FNK0091 breakout (ESP32 / ESP32-S3, 2 x 20 socket)",
+  "board": "Freenove ESP32-S3 WROOM / WROOM Lite (2 x 20 pins)",
+  "rev": 1,
+  "solids": {
+   "case-base": {
+    "watertight": true,
+    "winding_consistent": true,
+    "manifold_status": "NoError",
+    "bodies": 1,
+    "triangles": 10862,
+    "volume_cm3": 85.2,
+    "euler": -20,
+    "stl_reload": {
+     "watertight": true,
+     "bad_edges": 0,
+     "volume_cm3": 85.2
+    },
+    "size_xyz": [
+     149.5,
+     123.5,
+     33.0
+    ],
+    "fits_bed_256": true,
+    "z_min": 0.0,
+    "overhangs_over_50deg": [
+     {
+      "z": 27.0,
+      "count": 5,
+      "area": 12.8,
+      "max_bridge": 0.8
+     }
+    ],
+    "thickness_min_p1_median": [
+     0.9,
+     1.6,
+     2.4
+    ]
+   },
+   "case-lid": {
+    "watertight": true,
+    "winding_consistent": true,
+    "manifold_status": "NoError",
+    "bodies": 1,
+    "triangles": 9640,
+    "volume_cm3": 44.57,
+    "euler": -8,
+    "stl_reload": {
+     "watertight": true,
+     "bad_edges": 0,
+     "volume_cm3": 44.57
+    },
+    "size_xyz": [
+     133.1,
+     123.5,
+     7.5
+    ],
+    "fits_bed_256": true,
+    "z_min": 0.0,
+    "overhangs_over_50deg": [
+     {
+      "z": 0.6,
+      "count": 61,
+      "area": 860.61,
+      "max_bridge": 1.53
+     }
+    ],
+    "thickness_min_p1_median": [
+     0.58,
+     1.6,
+     3.0
+    ]
+   },
+   "toe-clamp": {
+    "watertight": true,
+    "winding_consistent": true,
+    "manifold_status": "NoError",
+    "bodies": 1,
+    "triangles": 776,
+    "volume_cm3": 0.29,
+    "euler": 0,
+    "stl_reload": {
+     "watertight": true,
+     "bad_edges": 0,
+     "volume_cm3": 0.29
+    },
+    "size_xyz": [
+     9.0,
+     13.5,
+     3.0
+    ],
+    "fits_bed_256": true,
+    "z_min": 0.0,
+    "overhangs_over_50deg": [],
+    "thickness_min_p1_median": [
+     2.8,
+     2.8,
+     3.0
+    ]
+   },
+   "sled-1554h": {
+    "watertight": true,
+    "winding_consistent": true,
+    "manifold_status": "NoError",
+    "bodies": 1,
+    "triangles": 14058,
+    "volume_cm3": 61.74,
+    "euler": -234,
+    "stl_reload": {
+     "watertight": true,
+     "bad_edges": 0,
+     "volume_cm3": 61.74
+    },
+    "size_xyz": [
+     166.13,
+     105.68,
+     9.59
+    ],
+    "fits_bed_256": true,
+    "z_min": 0.0,
+    "overhangs_over_50deg": [],
+    "thickness_min_p1_median": [
+     1.39,
+     1.9,
+     3.0
+    ]
+   }
+  },
+  "problems": [],
+  "fit": {
+   "lid_base_overlap_mm3": 0.0,
+   "lip_to_wall_gap": 0.25,
+   "tongue_to_usb_bay_gap": 0.25,
+   "design_lip_clearance": 0.25,
+   "design_tongue_clearance": 0.25
+  },
+  "keepout_case_mm3": {
+   "carrier_pcb": {
+    "vs_base": 0.0,
+    "vs_lid": 0.0,
+    "vs_clamps": 0.0,
+    "note": "clamp fingers rest ON the PCB top face (contact, zero overlap)"
+   },
+   "carrier_top_parts": {
+    "vs_base": 0.0,
+    "vs_lid": 0.0,
+    "vs_clamps": 0.0
+   },
+   "carrier_solder_side": {
+    "vs_base": 0.0,
+    "vs_lid": 0.0,
+    "vs_clamps": 0.0
+   },
+   "board_pcb": {
+    "vs_base": 0.0,
+    "vs_lid": 0.0,
+    "vs_clamps": 0.0
+   },
+   "board_parts": {
+    "vs_base": 0.0,
+    "vs_lid": 0.0,
+    "vs_clamps": 0.0
+   },
+   "board_headers": {
+    "vs_base": 0.0,
+    "vs_lid": 0.0,
+    "vs_clamps": 0.0
+   },
+   "usb_plug_all": {
+    "vs_base": 0.0,
+    "vs_lid": 0.0,
+    "vs_clamps": 0.0
+   },
+   "clamps_vs_base_mm3": 0.0,
+   "clamps_vs_lid_mm3": 0.0
+  },
+  "pcb_to_fence_gap": 0.75,
+  "board_top_to_lid_gap": 8.0,
+  "sled": {
+   "box": "Hammond 1554H2GY (180 x 120 x 60 mm polycarbonate, IP66/IP68, UL 508A)",
+   "keepout_mm3": {
+    "carrier_pcb": 0.0,
+    "carrier_top_parts": 0.0,
+    "carrier_solder_side": 0.0,
+    "board_pcb": 0.0,
+    "board_headers": 0.0
+   },
+   "sled_size": [
+    166.13,
+    105.68
+   ],
+   "box_inside": [
+    172.91,
+    108.91,
+    54.5
+   ],
+   "side_clearance_to_box_walls": [
+    3.39,
+    1.61
+   ],
+   "m3_hole_pattern": [
+    132.0,
+    84.0
+   ],
+   "stack_top_above_box_floor": 31.6,
+   "headroom_under_box_lid": 22.9,
+   "carrier_edge_to_m3_screw": 22.4
+  },
+  "usb_opening": {
+   "width": 30.0,
+   "z0": 17.7,
+   "z1": 28.5,
+   "connector_recess_from_outer_wall": 31.55,
+   "plugs": [
+    {
+     "connector_x": -5.1,
+     "connector_z": 23.2,
+     "margin_left": 3.7,
+     "margin_right": 13.9,
+     "margin_below": 2.2,
+     "margin_above": 2.0
+    },
+    {
+     "connector_x": 5.1,
+     "connector_z": 23.2,
+     "margin_left": 13.9,
+     "margin_right": 3.7,
+     "margin_below": 2.2,
+     "margin_above": 2.0
+    }
+   ],
+   "position_source": "scaled from vendor drawings"
+  },
+  "case_dims": {
+   "outer_xy": [
+    119.5,
+    123.5
+   ],
+   "outer_with_ears_and_pocket": [
+    149.5,
+    123.5,
+    33.0
+   ],
+   "height_closed": 36.0,
+   "interior": [
+    114.7,
+    118.7,
+    30.6
+   ],
+   "wall": 2.4,
+   "floor": 2.4,
+   "lid": 3.0,
+   "lid_under_text": 2.4,
+   "fence": 1.6,
+   "pocket_wall": 1.6,
+   "exit_tooth": 3.0,
+   "exits": [
+    {
+     "label": "DOOR",
+     "x": -44.4,
+     "width": 4.2,
+     "depth": 3.6
+    },
+    {
+     "label": "I2C",
+     "x": -36.7,
+     "width": 5.2,
+     "depth": 4.6
+    },
+    {
+     "label": "1W",
+     "x": -28.9,
+     "width": 4.4,
+     "depth": 3.8
+    },
+    {
+     "label": "PWR",
+     "x": 43.75,
+     "width": 5.5,
+     "depth": 4.9
+    },
+    {
+     "label": "LOAD",
+     "x": 33.9,
+     "width": 8.2,
+     "depth": 3.6
+    },
+    {
+     "label": "LOAD",
+     "x": 22.7,
+     "width": 8.2,
+     "depth": 3.6
+    }
+   ],
+   "service_window": [
+    -15.5,
+    15.5,
+    -16.7,
+    -0.7
+   ],
+   "title_text": [
+    [
+     "Hollygrove",
+     7.0,
+     57.1
+    ],
+    [
+     "Community Fridge",
+     7.0,
+     98.1
+    ],
+    [
+     "door counter",
+     5.5,
+     54.6
+    ]
+   ],
+   "acc_grid": [
+    9,
+    2
+   ],
+   "keyholes": [
+    [
+     -67.75,
+     -15.0
+    ],
+    [
+     67.75,
+     -15.0
+    ]
+   ]
+  },
+  "fastener": "insert",
+  "files": [
+   "case-base-fnk0091-rev1.stl",
+   "case-base-fnk0091-rev1.3mf",
+   "case-lid-fnk0091-rev1.stl",
+   "case-lid-fnk0091-rev1.3mf",
+   "toe-clamp-rev1.stl",
+   "toe-clamp-rev1.3mf",
+   "sled-1554h-fnk0091-rev1.stl",
+   "sled-1554h-fnk0091-rev1.3mf"
+  ],
+  "previews": [
+   "preview-case-closed-fnk0091-rev1.png",
+   "preview-case-open-fnk0091-rev1.png",
+   "preview-case-exploded-fnk0091-rev1.png",
+   "preview-case-usb-end-fnk0091-rev1.png",
+   "preview-lid-underside-fnk0091-rev1.png",
+   "preview-sled-in-box-fnk0091-rev1.png",
+   "preview-sled-bare-fnk0091-rev1.png"
+  ]
+ },
+ {
+  "variant": "fnk0101",
+  "carrier": "Freenove FNK0101 universal breakout (0.6-1.0 in wide, <= 24 pins)",
+  "board": "ESP32-S3-DevKitC-1 style clone, dual USB-C (2 x 22 pins)",
+  "rev": 1,
+  "solids": {
+   "case-base": {
+    "watertight": true,
+    "winding_consistent": true,
+    "manifold_status": "NoError",
+    "bodies": 1,
+    "triangles": 10862,
+    "volume_cm3": 88.49,
+    "euler": -20,
+    "stl_reload": {
+     "watertight": true,
+     "bad_edges": 0,
+     "volume_cm3": 88.49
+    },
+    "size_xyz": [
+     149.3,
+     131.3,
+     33.0
+    ],
+    "fits_bed_256": true,
+    "z_min": 0.0,
+    "overhangs_over_50deg": [
+     {
+      "z": 27.0,
+      "count": 5,
+      "area": 12.8,
+      "max_bridge": 0.8
+     }
+    ],
+    "thickness_min_p1_median": [
+     0.9,
+     1.6,
+     2.4
+    ]
+   },
+   "case-lid": {
+    "watertight": true,
+    "winding_consistent": true,
+    "manifold_status": "NoError",
+    "bodies": 1,
+    "triangles": 9650,
+    "volume_cm3": 46.86,
+    "euler": -8,
+    "stl_reload": {
+     "watertight": true,
+     "bad_edges": 0,
+     "volume_cm3": 46.86
+    },
+    "size_xyz": [
+     132.9,
+     131.3,
+     7.5
+    ],
+    "fits_bed_256": true,
+    "z_min": 0.0,
+    "overhangs_over_50deg": [
+     {
+      "z": 0.6,
+      "count": 61,
+      "area": 860.61,
+      "max_bridge": 1.53
+     }
+    ],
+    "thickness_min_p1_median": [
+     0.65,
+     1.6,
+     3.0
+    ]
+   },
+   "toe-clamp": {
+    "watertight": true,
+    "winding_consistent": true,
+    "manifold_status": "NoError",
+    "bodies": 1,
+    "triangles": 776,
+    "volume_cm3": 0.29,
+    "euler": 0,
+    "stl_reload": {
+     "watertight": true,
+     "bad_edges": 0,
+     "volume_cm3": 0.29
+    },
+    "size_xyz": [
+     9.0,
+     13.5,
+     3.0
+    ],
+    "fits_bed_256": true,
+    "z_min": 0.0,
+    "overhangs_over_50deg": [],
+    "thickness_min_p1_median": [
+     2.8,
+     2.8,
+     3.0
+    ]
+   },
+   "sled-1554h": {
+    "watertight": true,
+    "winding_consistent": true,
+    "manifold_status": "NoError",
+    "bodies": 1,
+    "triangles": 14062,
+    "volume_cm3": 61.74,
+    "euler": -234,
+    "stl_reload": {
+     "watertight": true,
+     "bad_edges": 0,
+     "volume_cm3": 61.74
+    },
+    "size_xyz": [
+     166.13,
+     105.68,
+     9.59
+    ],
+    "fits_bed_256": true,
+    "z_min": 0.0,
+    "overhangs_over_50deg": [],
+    "thickness_min_p1_median": [
+     1.39,
+     1.89,
+     3.0
+    ]
+   }
+  },
+  "problems": [],
+  "fit": {
+   "lid_base_overlap_mm3": -0.0,
+   "lip_to_wall_gap": 0.25,
+   "tongue_to_usb_bay_gap": 0.25,
+   "design_lip_clearance": 0.25,
+   "design_tongue_clearance": 0.25
+  },
+  "keepout_case_mm3": {
+   "carrier_pcb": {
+    "vs_base": 0.0,
+    "vs_lid": 0.0,
+    "vs_clamps": 0.0,
+    "note": "clamp fingers rest ON the PCB top face (contact, zero overlap)"
+   },
+   "carrier_top_parts": {
+    "vs_base": 0.0,
+    "vs_lid": 0.0,
+    "vs_clamps": 0.0
+   },
+   "carrier_solder_side": {
+    "vs_base": 0.0,
+    "vs_lid": 0.0,
+    "vs_clamps": 0.0
+   },
+   "board_pcb": {
+    "vs_base": 0.0,
+    "vs_lid": 0.0,
+    "vs_clamps": 0.0
+   },
+   "board_parts": {
+    "vs_base": 0.0,
+    "vs_lid": 0.0,
+    "vs_clamps": 0.0
+   },
+   "board_headers": {
+    "vs_base": 0.0,
+    "vs_lid": 0.0,
+    "vs_clamps": 0.0
+   },
+   "usb_plug_all": {
+    "vs_base": 0.0,
+    "vs_lid": 0.0,
+    "vs_clamps": 0.0
+   },
+   "clamps_vs_base_mm3": 0.0,
+   "clamps_vs_lid_mm3": 0.0
+  },
+  "pcb_to_fence_gap": 0.75,
+  "board_top_to_lid_gap": 8.0,
+  "sled": {
+   "box": "Hammond 1554H2GY (180 x 120 x 60 mm polycarbonate, IP66/IP68, UL 508A)",
+   "keepout_mm3": {
+    "carrier_pcb": 0.0,
+    "carrier_top_parts": 0.0,
+    "carrier_solder_side": 0.0,
+    "board_pcb": 0.0,
+    "board_headers": 0.0
+   },
+   "sled_size": [
+    166.13,
+    105.68
+   ],
+   "box_inside": [
+    172.91,
+    108.91,
+    54.5
+   ],
+   "side_clearance_to_box_walls": [
+    3.39,
+    1.61
+   ],
+   "m3_hole_pattern": [
+    132.0,
+    84.0
+   ],
+   "stack_top_above_box_floor": 31.6,
+   "headroom_under_box_lid": 22.9,
+   "carrier_edge_to_m3_screw": 22.5
+  },
+  "usb_opening": {
+   "width": 30.0,
+   "z0": 17.7,
+   "z1": 28.5,
+   "connector_recess_from_outer_wall": 27.15,
+   "plugs": [
+    {
+     "connector_x": -6.25,
+     "connector_z": 23.2,
+     "margin_left": 2.55,
+     "margin_right": 15.05,
+     "margin_below": 2.2,
+     "margin_above": 2.0
+    },
+    {
+     "connector_x": 6.25,
+     "connector_z": 23.2,
+     "margin_left": 15.05,
+     "margin_right": 2.55,
+     "margin_below": 2.2,
+     "margin_above": 2.0
+    }
+   ],
+   "position_source": "ASSUMED (board can sit anywhere along the 24-pin socket)"
+  },
+  "case_dims": {
+   "outer_xy": [
+    119.3,
+    131.3
+   ],
+   "outer_with_ears_and_pocket": [
+    149.3,
+    131.3,
+    33.0
+   ],
+   "height_closed": 36.0,
+   "interior": [
+    114.5,
+    126.5,
+    30.6
+   ],
+   "wall": 2.4,
+   "floor": 2.4,
+   "lid": 3.0,
+   "lid_under_text": 2.4,
+   "fence": 1.6,
+   "pocket_wall": 1.6,
+   "exit_tooth": 3.0,
+   "exits": [
+    {
+     "label": "DOOR",
+     "x": -44.4,
+     "width": 4.2,
+     "depth": 3.6
+    },
+    {
+     "label": "I2C",
+     "x": -36.7,
+     "width": 5.2,
+     "depth": 4.6
+    },
+    {
+     "label": "1W",
+     "x": -28.9,
+     "width": 4.4,
+     "depth": 3.8
+    },
+    {
+     "label": "PWR",
+     "x": 43.75,
+     "width": 5.5,
+     "depth": 4.9
+    },
+    {
+     "label": "LOAD",
+     "x": 33.9,
+     "width": 8.2,
+     "depth": 3.6
+    },
+    {
+     "label": "LOAD",
+     "x": 22.7,
+     "width": 8.2,
+     "depth": 3.6
+    }
+   ],
+   "service_window": [
+    -15.0,
+    15.0,
+    -27.5,
+    -5.5
+   ],
+   "title_text": [
+    [
+     "Hollygrove",
+     7.0,
+     57.1
+    ],
+    [
+     "Community Fridge",
+     7.0,
+     98.1
+    ],
+    [
+     "door counter",
+     5.5,
+     54.6
+    ]
+   ],
+   "acc_grid": [
+    9,
+    2
+   ],
+   "keyholes": [
+    [
+     -67.65,
+     -15.0
+    ],
+    [
+     67.65,
+     -15.0
+    ]
+   ]
+  },
+  "fastener": "insert",
+  "files": [
+   "case-base-fnk0101-rev1.stl",
+   "case-base-fnk0101-rev1.3mf",
+   "case-lid-fnk0101-rev1.stl",
+   "case-lid-fnk0101-rev1.3mf",
+   "sled-1554h-fnk0101-rev1.stl",
+   "sled-1554h-fnk0101-rev1.3mf"
+  ],
+  "previews": [
+   "preview-case-closed-fnk0101-rev1.png",
+   "preview-case-open-fnk0101-rev1.png",
+   "preview-case-exploded-fnk0101-rev1.png",
+   "preview-case-usb-end-fnk0101-rev1.png",
+   "preview-lid-underside-fnk0101-rev1.png",
+   "preview-sled-in-box-fnk0101-rev1.png",
+   "preview-sled-bare-fnk0101-rev1.png"
+  ]
+ }
+]

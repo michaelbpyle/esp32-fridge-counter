@@ -1,0 +1,5 @@
+    # Door counter API (add inside the hollygrovenola.org:80 block, ABOVE the
+    # catch-all `handle {`). The path is passed through unchanged.
+    handle /fridge/api/* {
+        reverse_proxy fridge:8000
+    }

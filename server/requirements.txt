@@ -1,0 +1,4 @@
+# Runtime dependencies, pinned. Installed into the container image.
+fastapi==0.162.7
+uvicorn==0.54.0
+tzdata==2026.6

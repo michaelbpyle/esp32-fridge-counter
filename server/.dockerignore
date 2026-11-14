@@ -1,0 +1,13 @@
+.venv/
+__pycache__/
+*.pyc
+.pytest_cache/
+data/
+tests/
+tools/
+site-fridge/
+screenshots/
+deploy/
+fridge.env
+README.md
+requirements-dev.txt

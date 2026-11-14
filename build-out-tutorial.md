@@ -533,6 +533,104 @@ $0 recurring
 
 ---
 
+### Option 9: Walter (ESP32-S3 + LTE-M/NB-IoT/GNSS in one certified module) — [POSSIBILITY, researched 2026-11-05]
+
+**What it is**: [Walter](https://www.quickspot.io/) (QuickSpot, a brand of DPTechnics BV, Belgium) is a
+55 × 24.8 mm system-on-module that puts an **ESP32-S3** and a **Sequans GM02SP** cellular modem on one
+board. It is the "ESP32 + cellular modem" idea from Option 7, but pre-integrated and pre-certified, so
+there is no modem wiring, no TinyGSM, and no FCC testing to do. Datasheet checked: **rev 1.2, 2026-11-04**.
+
+**Where it fits**: this is a **cellular alternative/fallback**, not a replacement for the Meshtastic
+direction (Option 8). It has **no LoRa radio**. It would slot in where Option 7's SIM7080G was
+the fallback (no gateway in LoRa range), or as the single-board fridge node if the mesh path fails.
+Two possible roles:
+1. **Standalone cellular node** — reads the reed switch (and later sensors) and uploads over LTE-M
+   directly to a cloud/MQTT endpoint. No gateway, no SwampNet dependency, but a SIM fee.
+2. **Companion/aggregator** — replaces the planned companion ESP32-S3 (HX711 + Modbus + BME280) and
+   gives that data its own cellular uplink, independent of the mesh. Whether it could also feed the
+   Heltec over serial is untested; treat as an idea only.
+
+**Key specs (from the datasheet)**:
+| Item | Value |
+|---|---|
+| MCU | ESP32-S3-WROOM-1-N16R2 — dual-core LX7, 16 MiB flash, 2 MiB PSRAM, WiFi 4, BLE 5 |
+| Cellular | Sequans GM02SP — **LTE-M (Cat M1), NB-IoT (NB1/NB2)**. Not 5G, despite some marketing wording. No 2G/3G/Cat-1 |
+| GNSS | GPS + Galileo (receive only); not needed for a fixed fridge site |
+| SIM | **Nano-SIM holder** on the underside, plus an "integrated SIM" mentioned on the product page. eSIM/iSIM status unclear: a QuickSpot staff reply (2024) said eSIM/multi-IMSI SIMs work and iSIM (SGP32) is supported in hardware but no provider offers it yet. Not SIM-locked |
+| Deep sleep | **9.5 µA** (ESP32-S3 in deep sleep, modem in PSM, measured at 5.0 V) |
+| Active current | ~10 mA (modem PSM, CPU 10 MHz), ~60 mA (CPU 240 MHz), ~450 mA typical LTE transmit peak. Size the supply for **1.0 A at 5 V / 1.5 A at 3 V** worst case |
+| Power input | USB-C 5 V, or VIN pin **3.0–5.5 V**. Absolute max 5.5 V |
+| I/O | 24 usable GPIO at 3.3 V (not 5 V tolerant); UART/SPI/I2C/CAN/I2S/SD mappable to most pins; switchable 3V3 OUT (max 250 mA) |
+| Antennas | Two u.FL connectors (LTE, GNSS); WiFi/BLE on a PCB antenna. **Antennas are not included in the bare module** |
+| Temperature | -40 to +85 °C operating. Condensation not allowed, so it still needs the IP65 enclosure |
+| Certification | FCC ID **2BDGUWALTER**, ISED, CE, UKCA, RCM. **Verizon approved** (Open Development, LTE-M bands 4/12/13) as a modem. **No AT&T or T-Mobile approval found** in the datasheet or product pages |
+
+**Cautions specific to this project**:
+- **No overvoltage or reverse-polarity protection on VIN.** The 48 V battery must go through a good
+  buck converter to a clean regulated 5 V, with margin for transients. Never plug USB in while a carrier
+  board powers VIN, unless the carrier has an OR-ing diode (datasheet section 5.1.1).
+- **FCC conditions**: fixed installation, antenna at least 20 cm from people, per-band antenna gain
+  caps (for example 5.0 dBi on band 4, 8.6 dBi on band 12). Use an approved antenna such as the
+  Taoglas FXUB63.07.0150C (LTE) and FXP611.07.0092C (GNSS) listed in the datasheet.
+- **Library licence**: the WalterModem Arduino library is under DPTechnics's "5 clause" licence
+  (BSD-3-Clause plus a condition that closed-source binaries run only on a Walter board). Fine for
+  this open project; note it if firmware is ever redistributed commercially.
+- **Carrier coverage is unverified.** Walter is a modem, not a SIM. LTE-M coverage in Hollygrove on
+  whichever IoT SIM we pick (1NCE, Soracom) has not been checked. Which US network 1NCE uses for
+  LTE-M was not confirmed in research (one third-party guide lists AT&T roaming for 1NCE; treat as
+  anecdotal). Ask the SIM vendor and check their coverage map before buying.
+
+**Software**: Arduino (library `WalterModem` v1.6.1, ESP32 core already lists a "DPTechnics Walter"
+board), ESP-IDF, MicroPython, Zephyr; Toit is listed as future support on one page. Library examples
+cover **MQTT, MQTTS, HTTP/HTTPS, CoAP, UDP/TCP, AWS MQTT, ThingSpeak, positioning, modem firmware
+update, and BlueCherry** (QuickSpot's own cloud, optional). A plain MQTT publish to our
+self-hosted broker on TrueNAS would work the same as the WiFi path. A PlatformIO board definition for
+Walter was **not** found in the standard espressif32 platform; expect to use the Arduino-ESP32 board
+settings or a custom board JSON (this project already builds with PlatformIO). Every board ships
+pre-flashed with a demo that uploads to a public QuickSpot portal. Reflash before deploying.
+
+**Optional carrier board — Walter Feels (P000000105)**: open-source (KiCad) gateway board with
+a 2.5–26 V **MPPT solar input**, an LTC4015 charger/battery manager with coulomb counter (LiFePO4, Li-ion
+or lead-acid), **RS485, RS232, SDI-12 and CAN**, temperature/humidity/pressure/IMU sensors, microSD, and
+3.3/5/12 V outputs. The RS485 port matches the Phase 2 Growatt/EG4 Modbus plan. **Fit problem**: the
+board charges batteries of up to 9 LiFePO4 cells and takes at most 26 V in, so it cannot sit directly
+on the 48 V (16-cell) EG4 pack. It would need a separate 12–24 V feed, or be used only for its RS485 and
+sensors, or be skipped in favour of bare Walter + MAX485 + buck converter. Open question.
+
+**Cost** (list prices as found; USD for the bare module not confirmed):
+| Item | Price |
+|---|---|
+| Walter module (P000000100) | €59 excl. VAT (QuickSpot MSRP) |
+| Walter DevKit (module + Taoglas LTE/GNSS antennas + 2 USB-C cables + 250 MB/1-yr Soracom SIM) | €250 excl. VAT; Mouser US listing showed **$310** |
+| Walter Feels carrier board | €125 excl. VAT (QuickSpot MSRP) |
+| IoT SIM | 1NCE ~$14 / 500 MB / 10 yr (per Option 7) or Soracom |
+
+**Pros**: one certified board, no modem integration; very low sleep current; reads our sensors and
+phones home with no gateway; Verizon-approved; open-source hardware and libraries; RS485/CAN available
+through Walter Feels.
+
+**Cons**: costs more than a Heltec V3 fridge node; **recurring SIM cost** (small but not $0);
+depends on LTE-M coverage and a carrier staying up, whereas the mesh depends on neither; no AT&T
+approval found; newer product with a small community (the Arduino library repo had about 41 stars);
+no LoRa, so it cannot join SwampNet.
+
+**Complexity**: Medium | **Cost**: roughly the DevKit price for a first unit, then module + antennas +
+SIM; plus Walter Feels if used.
+
+**Next steps if pursued**: (1) ask the SIM vendor for LTE-M coverage at 9000 Oleander; (2) ask
+QuickSpot about AT&T/T-Mobile operation and the integrated SIM; (3) buy one DevKit and run the `mqtt`
+example against the TrueNAS broker; (4) measure real average current on the fridge's 5 V rail.
+
+**Sources**: [Walter datasheet rev 1.2](https://www.quickspot.io/datasheet/walter_datasheet.pdf) ·
+[Walter Feels datasheet rev 1.0](https://www.quickspot.io/datasheet/walter_feels_datasheet.pdf) ·
+[QuickSpot product page](https://www.quickspot.io/) ·
+[walter-arduino library and examples](https://github.com/QuickSpot/walter-arduino) ·
+[Soracom Walter store page](https://store.soracom.io/walter) ·
+[Mouser Walter DevKit P000000101](https://www.mouser.in/en/new/dptechnics/dptechnics-walter-devkit/) ·
+[CNX Software launch article](https://www.cnx-software.com/2023/01/02/walter-esp32-s3-board-supports-nb-iot-lte-m-and-gps/)
+
+---
+
 ### Recommendation
 
 For the Hollygrove Community Fridge:
@@ -554,5 +652,7 @@ For the Hollygrove Community Fridge:
 - Works anywhere with Cat-M coverage; no dependency on a nearby node
 - ~$25–40 board + ~$14 1NCE SIM (500 MB / 10 years, no monthly fee)
 - Soldered eSIM preferred for the outdoor enclosure
+- A pre-certified alternative to the DIY modem is **Walter** (Option 9): ESP32-S3 + LTE-M/NB-IoT in one
+  board. Researched, not yet bought. Verify LTE-M coverage and SIM carrier first.
 
 ---
