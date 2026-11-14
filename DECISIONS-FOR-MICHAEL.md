@@ -22,7 +22,12 @@ agent's full list, with reasons and alternatives, is in `docs\decisions\`:
 - **New instruction:** the charts belong at `/fridge/` itself. The page now shows the full
   dashboard with clearly marked sample data until real counts exist.
 
-Still open: 5, 7, 8, 9 and 12.
+- **12:** Backups installed: a daily TrueNAS snapshot of the hollygrove VM disk (14 days) and a
+  nightly clean copy of the fridge database on the VM.
+- **5:** Dashboard wording is fine for now; revisit before it gets a navbar link.
+- The work is merged into `main` and pushed.
+
+Still open: 7, 8 and 9 (all about the field install, which waits for the Walter).
 
 ## Questions that need your answer
 

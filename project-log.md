@@ -114,7 +114,6 @@ See `build-out-tutorial.md` Section 6 for full details on each option.
 - [ ] Buy: PETG or ASA, Hammond 1554H2GY box and glands, M3 brass heat-set inserts and M3 screws (owner confirmed none on hand), DS18B20, HX711 and load cells if wanted (lists in `docs\wiring\wiring.md` and `docs\power-and-enclosure.md`)
 - [ ] Build the field unit as `fridge-01` (key in `/opt/hollygrove/fridge/fridge.env` on the VM)
 - [ ] Commit and push the new work (nothing was committed)
-- [ ] Back up `/opt/hollygrove/fridge/data/fridge.db`
 
 ### Core Functionality
 - [x] Basic door counting with reed switch
@@ -241,7 +240,10 @@ non-issue — it sips from the big system).
 - Publishing lag shortened from one hour to 15 minutes (`FRIDGE_PUBLISH_GRANULARITY_S=900` in the
   VM's `fridge.env`).
 - No navbar link yet. No M3 inserts or screws on hand: added to the to-buy list.
-- Commit and push approved.
+- Commit and push approved; merged into `main` and pushed.
+- Backups: the owner chose "snapshot the whole VM". TrueNAS now snapshots the hollygrove VM disk
+  daily (kept 14 days) and the VM makes a nightly clean copy of the fridge database. Details in
+  the hollygrove log, Session 17. Both are on the same storage pool as the VM.
 
 ---
 
