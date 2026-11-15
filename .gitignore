@@ -14,3 +14,6 @@ include/secrets.h
 # Python caches
 __pycache__/
 *.pyc
+
+# Generated site pages (built by server/site-fridge/build_pages.py)
+server/site-fridge/out/

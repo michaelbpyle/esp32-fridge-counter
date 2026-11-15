@@ -257,6 +257,14 @@ non-issue — it sips from the big system).
   Walter plugs into header strips on an Adafruit Perma-Proto full-size board with screw terminals;
   the sled holds that board and an upright pad for the LTE antenna. Dimensions come from the
   datasheet, not a real board. The dev-board sleds and cases are unchanged.
+- Dashboard turned into a hub (owner, evening): `/fridge/` is now a short page with two cards,
+  `/fridge/sample/` (made-up numbers) and `/fridge/live/` (real counts from the WiFi test unit,
+  `bench-01`). Sources are `server\site-fridge\hub.qmd` and `dashboard.qmd`; `build_pages.py`
+  generates the three pages. When the fridge unit reports, set `LIVE_DEVICE = None` there.
+- A purchase request for the HNA president was written as a shared doc and recalculated from
+  the owner's notes: $629.63 of parts and tools, $730 with an estimated 15% for tax and shipping.
+- VS Code updated to 1.146.0 with its extensions; PlatformIO then upgraded itself to Core 6.2.0.
+  Both firmware builds still succeed.
 - Commit and push approved; merged into `main` and pushed.
 - Backups: the owner chose "snapshot the whole VM". TrueNAS now snapshots the hollygrove VM disk
   daily (kept 14 days) and the VM makes a nightly clean copy of the fridge database. Details in
