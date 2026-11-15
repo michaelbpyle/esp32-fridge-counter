@@ -274,6 +274,9 @@ non-issue — it sips from the big system).
   `include/config.h` and applied in `src/uplink/WifiUplink.cpp`; after reflashing, the 16 saved
   openings were delivered and accepted. Why full power worked in the morning and failed at night
   is not known.
+- Publishing lag changed again, to one minute (owner, 2026-11-15: he wants the numbers updated
+  every minute): `FRIDGE_PUBLISH_GRANULARITY_S=60` in the VM's `fridge.env`. The dashboard
+  already refreshes itself every minute.
 - Commit and push approved; merged into `main` and pushed.
 - Backups: the owner chose "snapshot the whole VM". TrueNAS now snapshots the hollygrove VM disk
   daily (kept 14 days) and the VM makes a nightly clean copy of the fridge database. Details in

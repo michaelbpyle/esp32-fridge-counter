@@ -1300,7 +1300,7 @@ A small sensor on the door of the Hollygrove Community Fridge counts each time t
 
 **What is counted.** Each time the fridge door opens, the sensor adds one to the count and notes roughly how long the door stayed open.
 
-**What is not.** There is no camera and no microphone. The sensor does not see faces, phones or license plates, and it collects no names or personal information. It only knows that the door moved. We publish totals by the hour, about a quarter of an hour behind, and never the exact moment the door opened.
+**What is not.** There is no camera and no microphone. The sensor does not see faces, phones or license plates, and it collects no names or personal information. It only knows that the door moved. We publish totals by the hour, about a minute behind, and never the exact moment the door opened.
 
 **A door opening is not a visitor.** One neighbor might open the door twice. A volunteer stocking the shelves might open it five times. Read these numbers as "how busy was the fridge," not "how many people came."
 
