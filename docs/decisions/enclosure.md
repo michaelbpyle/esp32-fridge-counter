@@ -217,3 +217,31 @@ measured, bought or installed. No file outside these was touched:
 - **Why it is listed:** the projects tree's standing rule is that the log is updated every
   session. Whoever closes out this session should add the entry.
 - **Confirm:** nothing; it is a hand-off note.
+
+## Field board (added 2026-11-14, after the owner chose the Walter)
+
+### 25. The Walter rides on a Perma-Proto board with headers and screw terminals, in its own sled
+
+- **Chose:** `sled-1554h-walter-rev1` in the Hammond 1554H2GY box. The Walter is plugged into two
+  14-pin female header strips soldered to an Adafruit Perma-Proto Full-sized Breadboard PCB
+  (product 1606, 157 x 51 mm), which also carries 3.5 mm screw-terminal blocks (Adafruit 724
+  and 725). The board is held by four toe clamps. The LTE antenna (Taoglas FXUB63.07.0150C,
+  96 x 21 x 0.2 mm) sticks to an upright pad on the sled, 22 mm from the board and 11 mm from
+  the nearest metal (the box screws). The Walter's USB-C faces the middle of the box.
+- **Why:** the Walter's datasheet (rev 1.3) describes only a bare module for plugging into
+  2.54 mm sockets, with no screw terminals, so field wiring needs a board. A proto board is the
+  cheapest way to get sockets and terminals together. The half-sized Perma-Proto, the first
+  choice, was out of stock, and the full-sized one fits the box. The datasheet also asks for
+  an OR-ing diode and 2 x 10 uF at VIN, which the proto board carries.
+- **Alternative:** a custom PCB with the datasheet's footprint (neater, needs a board
+  order); or the Walter DevKit (about $290, not chosen by the owner).
+- **Not achieved:** changing the SIM with the Walter in place. The card slot faces the antenna
+  end and only 3.45 mm remain to the box wall, so the Walter has to be lifted out of its
+  sockets. USB-C is reachable with the lid open.
+- **Unchanged:** every existing dev-board file (case, lid, both dev-board sleds, clamp) and the
+  generator's behaviour for them; the owner asked that none be archived. Decision 11's remark
+  that Walter was not checked against its datasheet is now settled by section "Walter sled" of
+  `\\TRUENAS\Pyle-TNAS_Individual\Projects\Microcontrollers\esp32-fridge-counter\cad\enclosure\docs\design-notes.md`.
+- **Confirm:** measure the real Walter and proto board before printing (README list); that the
+  firmware will pull GPIO0 low to switch on the 3.3 V sensor rail (it does not yet); and that
+  11 mm to the box screws is acceptable (use nylon screws for more).

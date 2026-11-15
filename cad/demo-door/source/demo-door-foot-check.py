@@ -2,10 +2,12 @@ r"""Checks for the demo door foot, and one render of the door standing on it.
 
     python demo-door-foot-check.py [--out DIR] [--no-render]
 
-Reads demo-door-foot-rev<FOOT_REV>.stl from --out (default: this folder) for the print checks,
+Reads demo-door-foot-rev<FOOT_REV>.stl from ..\print (or --out DIR) for the print checks,
 and rebuilds the frame, door and foot from their generators (in-use coordinates) for the
 clearance and tipping checks. Prints a report; also writes it to
-demo-door-foot-rev<FOOT_REV>-check.txt and writes demo-door-foot-rev<FOOT_REV>-standing-open-100.png.
+..\checks\demo-door-foot-rev<FOOT_REV>-check.txt and draws
+..\pictures\base-plate-rev<FOOT_REV>-with-door-rev<REV>.png (all into --out DIR if given).
+The door swings with the magnet block fitted, so its clearance to the foot is checked too.
 """
 import argparse
 import importlib.util
@@ -13,6 +15,7 @@ import io
 import os
 import sys
 
+sys.dont_write_bytecode = True
 import numpy as np
 import trimesh
 
@@ -77,7 +80,7 @@ def swing(m, open_deg, dx=0.0):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--out", default=HERE)
+    ap.add_argument("--out", default=None)
     ap.add_argument("--no-render", action="store_true")
     args = ap.parse_args()
     buf = io.StringIO()
@@ -85,8 +88,11 @@ def main():
     sys.stdout = type("Tee", (), {"write": lambda s, t: (real.write(t), buf.write(t)), "flush": lambda s: real.flush()})()
 
     name = "demo-door-foot-rev%d" % fg.FOOT_REV
-    print("\n%s" % name)
-    mesh = trimesh.load(os.path.join(args.out, name + ".stl"), force="mesh")
+    print("\n%s (with door rev %d)" % (name, gen.REV))
+    root = os.path.dirname(HERE)
+    d_print, d_checks, d_pics = ((args.out,) * 3 if args.out else
+                                 tuple(os.path.join(root, s) for s in ("print", "checks", "pictures")))
+    mesh = trimesh.load(os.path.join(d_print, name + ".stl"), force="mesh")
     parts = mesh.split(only_watertight=False)
     chk.check(len(parts) == 1, "one body: %d" % len(parts))
     chk.check(mesh.is_watertight and mesh.is_winding_consistent, "watertight %s, winding consistent %s, volume %.1f cm3"
@@ -101,7 +107,8 @@ def main():
     print("  wall thickness from inward rays: min %.2f, 1st percentile %.2f, median %.2f mm" % (d.min(), np.percentile(d, 1), np.median(d)))
 
     # ---- in-use geometry ---------------------------------------------------------------------
-    F, D = gen.build(True)
+    F, D = gen.build()
+    DM = D + gen.magnet_block()                          # the magnet swings with the door
     FT = fg.build_foot()
     ov = (F ^ FT).volume()
     gap = F.min_gap(FT, 2.0)
@@ -112,7 +119,7 @@ def main():
     worst, wa, gmin, ga = 0.0, None, 1e9, None
     for dx in (0.0, -gen.CONE_AXIAL_GAP):                   # door as printed, and dropped onto its cones
         for ang in np.arange(180.0, -0.01, -2.5):
-            dm = swing(D, ang, dx)
+            dm = swing(DM, ang, dx)
             v = (FT ^ dm).volume()
             if v > worst:
                 worst, wa = v, (ang, dx)
@@ -171,7 +178,7 @@ def main():
 
     print("\n%s" % ("ALL HARD CHECKS PASS" if not chk.FAILS else "FAILED: " + "; ".join(chk.FAILS)))
     sys.stdout = real
-    with open(os.path.join(args.out, name + "-check.txt"), "w") as f:
+    with open(os.path.join(d_checks, name + "-check.txt"), "w") as f:
         f.write(buf.getvalue())
 
     if not args.no_render:
@@ -179,9 +186,9 @@ def main():
         t = np.array([0.35, 0.5, -1.0])
         r = np.array([0.0, 1.0, 0.5])
         u = np.cross(t, r)
-        rnd.render([(tf, rnd.FRAME_RGB), (gen.to_trimesh(swing(D, 100)), rnd.DOOR_RGB), (tft, np.array([0.45, 0.47, 0.52]))],
-                   r, u, os.path.join(args.out, name + "-standing-open-100.png"),
-                   title="Standing on the foot, door open 100 deg (foot in grey)")
+        rnd.render([(tf, rnd.FRAME_RGB), (gen.to_trimesh(swing(D, 100)), rnd.DOOR_RGB), (gen.to_trimesh(gen.switch_block()), rnd.PART_RGB), (gen.to_trimesh(swing(gen.magnet_block(), 100)), rnd.PART_RGB), (tft, np.array([0.45, 0.47, 0.52]))],
+                   r, u, os.path.join(d_pics, "base-plate-rev%d-with-door-rev%d.png" % (fg.FOOT_REV, gen.REV)),
+                   title="Door rev %d standing on base plate (foot) rev %d, door open 100 deg (foot grey, switch and magnet blue)" % (gen.REV, fg.FOOT_REV))
 
 
 if __name__ == "__main__":

@@ -1,0 +1,66 @@
+
+demo-door-foot-rev1 (with door rev 2)
+  [ok] one body: 1
+  [ok] watertight True, winding consistent True, volume 72.7 cm3
+  [ok] print size 133.5 x 120.3 x 19.0 mm, min z 0.0000 (bed 256)
+  foot: 4 downward areas steeper than 50 deg from vertical, 104.9 mm2 in all
+      flat bridge     52.3 mm2  z 1.20  short side 3.2 mm
+  [ok] foot overhang at z 1.20: unsupported span 3.2 mm (limit 6)
+      flat bridge     52.3 mm2  z 1.20  short side 3.2 mm
+  [ok] foot overhang at z 1.20: unsupported span 3.2 mm (limit 6)
+      flat bridge      0.1 mm2  z 7.00  short side 0.0 mm
+  [ok] foot overhang at z 7.00: unsupported span 0.0 mm (limit 6)
+      flat bridge      0.1 mm2  z 7.00  short side 0.0 mm
+  [ok] foot overhang at z 7.00: unsupported span 0.0 mm (limit 6)
+  wall thickness from inward rays: min 1.30, 1st percentile 2.40, median 3.00 mm
+  [ok] frame sits in the foot without overlap (0.00000 mm3); smallest frame-to-foot distance 0.000 mm (sill on the plate = 0)
+  sill to lip (sideways clearance): 0.400 mm
+  [ok] door swing 180 -> 0 deg in 2.5 deg steps (also dropped 0.25 mm onto its cones) never touches the foot: worst overlap 0.00000 mm3
+  smallest door-to-foot distance during the swing: 4.55 mm (at 172.5 deg, drop 0.25)
+  masses (PLA, 1.2 mm skin + 15 % infill): frame 87 g, door 35 g, foot 64 g; ballast 16 US quarters = 91 g
+  foot footprint y -33.6..85.9, z -47.6..85.1 (front edge 47.6 mm in front of the frame); sill alone y -9.0..72.3, z 0..50.8
+  force at the knob (horizontal, along the knob's path) that tips the stand, N:
+      open   no foot: opening  closing |  foot: opening  closing |  foot + quarters: opening  closing
+        0 deg          0.34     0.69 |           2.00     1.90 |                     3.66     2.13
+        5 deg          0.33     0.72 |           2.03     1.96 |                     3.73     2.20
+       10 deg          0.33     0.76 |           2.08     2.04 |                     3.84     2.29
+       15 deg          0.33     0.80 |           2.16     2.14 |                     3.99     2.40
+       20 deg          0.33     0.86 |           2.25     2.26 |                     4.18     2.54
+       25 deg          0.33     0.93 |           2.38     2.40 |                     4.30     2.71
+       30 deg          0.34     1.02 |           2.51     2.38 |                     4.00     2.94
+       35 deg          0.35     1.12 |           2.43     2.20 |                     3.66     3.09
+       40 deg          0.38     1.05 |           2.25     2.05 |                     3.39     3.00
+       45 deg          0.41     1.00 |           2.11     1.94 |                     3.18     2.84
+       50 deg          0.45     0.97 |           1.99     1.86 |                     3.02     2.71
+       55 deg          0.53     0.94 |           1.90     1.80 |                     2.89     2.61
+       60 deg          0.65     0.92 |           1.83     1.75 |                     2.78     2.55
+       65 deg          0.72     0.92 |           1.78     1.73 |                     2.71     2.50
+       70 deg          0.70     0.92 |           1.74     1.71 |                     2.66     2.48
+       75 deg          0.68     0.92 |           1.71     1.71 |                     2.62     2.47
+       80 deg          0.67     0.94 |           1.70     1.73 |                     2.61     2.48
+       85 deg          0.66     0.96 |           1.70     1.75 |                     2.62     2.52
+       90 deg          0.66     0.78 |           1.71     1.80 |                     2.65     2.57
+       95 deg          0.66     0.57 |           1.74     1.85 |                     2.70     2.65
+      100 deg          0.66     0.45 |           1.78     1.93 |                     2.77     2.75
+      105 deg          0.67     0.38 |           1.84     2.02 |                     2.87     2.88
+      110 deg          0.69     0.34 |           1.92     2.14 |                     3.01     3.04
+      115 deg          0.72     0.31 |           2.03     2.30 |                     3.18     3.25
+      120 deg          0.76     0.29 |           2.17     2.47 |                     3.19     3.52
+      125 deg          0.81     0.27 |           2.35     2.46 |                     2.98     3.86
+      130 deg          0.89     0.27 |           2.43     2.31 |                     2.76     4.19
+      135 deg          0.92     0.26 |           2.31     2.18 |                     2.59     4.10
+      140 deg          0.87     0.26 |           2.19     2.09 |                     2.45     3.91
+      145 deg          0.82     0.26 |           2.09     2.02 |                     2.34     3.77
+      150 deg          0.78     0.27 |           2.01     1.96 |                     2.26     3.66
+      155 deg          0.75     0.27 |           1.96     1.93 |                     2.19     3.59
+      160 deg          0.73     0.28 |           1.91     1.92 |                     2.15     3.55
+      165 deg          0.71     0.29 |           1.89     1.91 |                     2.12     3.54
+      170 deg          0.69     0.31 |           1.87     1.93 |                     2.11     3.55
+      175 deg          0.69     0.32 |           1.88     1.96 |                     2.11     3.59
+      180 deg          0.68     0.34 |           1.89     2.00 |                     2.13     3.66
+  worst case over 0-180 deg: no foot 0.33 / 0.26 N, foot 1.70 / 1.71 N, foot + quarters 2.11 / 2.13 N (opening / closing)
+  [ok] with the foot (no ballast) tipping takes at least 1.5 N at the knob in both directions: 1.70 N
+  sliding instead of tipping, foot: about 0.55 N at friction coefficient 0.3 (weight 1.83 N)
+  sliding instead of tipping, foot + quarters: about 0.82 N at friction coefficient 0.3 (weight 2.72 N)
+
+ALL HARD CHECKS PASS

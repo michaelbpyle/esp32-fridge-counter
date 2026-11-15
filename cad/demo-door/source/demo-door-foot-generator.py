@@ -1,7 +1,7 @@
 r"""Demo door FOOT: a separate base plate that the rev 1 demo door frame stands in, so the
 stand does not tip over when the door is worked by its knob.
 
-    python demo-door-foot-generator.py               writes next to this script
+    python demo-door-foot-generator.py               writes into ..\print
     python demo-door-foot-generator.py --out DIR     writes into DIR (scratch tests)
 
 Writes demo-door-foot-rev<FOOT_REV>.stl / .3mf and refuses to overwrite: bump FOOT_REV first.
@@ -30,6 +30,7 @@ import importlib.util
 import os
 import sys
 
+sys.dont_write_bytecode = True
 import numpy as np
 import trimesh
 from manifold3d import Manifold, OpType
@@ -144,7 +145,7 @@ def to_print(m):
 
 def main():
     ap = argparse.ArgumentParser()
-    ap.add_argument("--out", default=HERE)
+    ap.add_argument("--out", default=os.path.join(os.path.dirname(HERE), "print"))
     args = ap.parse_args()
     foot = to_print(build_foot())
     mesh = gen.to_trimesh(foot)

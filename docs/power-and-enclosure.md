@@ -40,7 +40,7 @@ At 0.6 W continuous the node uses about 14 Wh per day, about 0.3 percent of the 
 battery's 5.12 kWh. Power budget is not a constraint; safety and reliability are.
 
 Sources: project log (80 to 120 mA measured class figure for the WiFi firmware), Walter
-datasheet rev 1.2 as summarised in `build-out-tutorial.md` Option 9.
+datasheet rev 1.2 as summarised in `docs\archive\build-out-tutorial.md` Option 9.
 
 ## 3. Power options compared
 

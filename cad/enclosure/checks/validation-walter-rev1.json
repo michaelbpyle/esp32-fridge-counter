@@ -1,0 +1,244 @@
+{
+ "part": "sled-1554h-walter",
+ "rev": 1,
+ "walter": "DPTechnics / QuickSpot Walter P000000100 (datasheet rev 1.3)",
+ "proto_board": "Adafruit Perma-Proto Full-sized Breadboard PCB (product 1606)",
+ "fastener": "insert",
+ "solids": {
+  "sled-1554h-walter": {
+   "watertight": true,
+   "winding_consistent": true,
+   "manifold_status": "NoError",
+   "bodies": 1,
+   "triangles": 3888,
+   "volume_cm3": 69.72,
+   "euler": -20,
+   "stl_reload": {
+    "watertight": true,
+    "bad_edges": 0,
+    "volume_cm3": 69.72
+   },
+   "size_xyz": [
+    166.13,
+    105.68,
+    40.0
+   ],
+   "fits_bed_256": true,
+   "z_min": 0.0,
+   "overhangs_over_50deg": [],
+   "thickness_min_p1_median": [
+    1.5,
+    2.33,
+    3.0
+   ]
+  }
+ },
+ "problems": [],
+ "keepout_mm3": {
+  "proto_pcb": {
+   "vs_sled": 0.0,
+   "vs_clamps": 0.0
+  },
+  "terminals": {
+   "vs_sled": 0.0,
+   "vs_clamps": 0.0
+  },
+  "solder_side": {
+   "vs_sled": 0.0,
+   "vs_clamps": 0.0
+  },
+  "headers": {
+   "vs_sled": 0.0,
+   "vs_clamps": 0.0
+  },
+  "walter_pcb": {
+   "vs_sled": 0.0,
+   "vs_clamps": 0.0
+  },
+  "walter_top": {
+   "vs_sled": 0.0,
+   "vs_clamps": 0.0
+  },
+  "sim_holder": {
+   "vs_sled": 0.0,
+   "vs_clamps": 0.0
+  },
+  "usb_plug": {
+   "vs_sled": 0.0,
+   "vs_clamps": 0.0
+  },
+  "antenna": {
+   "vs_sled": 0.0,
+   "vs_clamps": 0.0
+  },
+  "clamps_vs_sled_mm3": 0.0
+ },
+ "box_fit": {
+  "box": "Hammond 1554H2GY (180 x 120 x 60 mm polycarbonate, IP66/IP68, UL 508A)",
+  "assembly_extent_xyz": [
+   -83.07,
+   83.07,
+   -52.84,
+   52.84,
+   0.0,
+   40.0
+  ],
+  "box_inside_xy": [
+   172.91,
+   108.91
+  ],
+  "side_clearance_x": [
+   3.39,
+   3.39
+  ],
+  "side_clearance_y": [
+   1.61,
+   1.61
+  ],
+  "walter_top_above_box_floor": 32.4,
+  "highest_point_above_box_floor": 46.0,
+  "headroom_under_box_lid": 8.5,
+  "headroom_over_walter": 22.1
+ },
+ "antenna": {
+  "part": "Taoglas FXUB63.07.0150C, 96 x 21 x 0.2 mm, 150 mm lead, I-PEX MHF I",
+  "pad_face_y": 48.84,
+  "z_range": [
+   16.0,
+   37.0
+  ],
+  "x_range": [
+   -30.0,
+   66.0
+  ],
+  "min_distance_to_metal_mm": {
+   "proto_pcb": 22.1,
+   "terminals": 60.0,
+   "headers": 37.0,
+   "walter_pcb": 34.2,
+   "walter_top": 34.2,
+   "screws_and_inserts": 11.2
+  },
+  "nearest_mm": 11.2,
+  "vendor_minimum_mm": 10,
+  "vendor_ideal_mm": 20
+ },
+ "usb_access": {
+  "plug_vs_sled_board_terminals_clamps_antenna_mm3": 0.0,
+  "plug_z_range": [
+   21.4,
+   28.0
+  ],
+  "tallest_thing_under_plug": 19.1
+ },
+ "sim_access": {
+  "walter_antenna_end_x": -83.0,
+  "free_beyond_walter_end_to_box_wall_mm": 3.45,
+  "proto_board_edge_x": -75.0,
+  "walter_overhang_beyond_board_mm": 8.0,
+  "free_height_under_sim_holder_mm": 10.45,
+  "nano_sim_length_mm": 12.3,
+  "note": "card enters from the antenna end; only the card's last few mm reach the box wall, so lift Walter out of its sockets to change the SIM, or fit the SIM before mounting"
+ },
+ "wifi_keepout": {
+  "copper_free_beyond_board_edge_mm": 8.0,
+  "vendor_minimum_mm": 6.0,
+  "note": "the proto board stops 8 mm short of Walter's antenna end (datasheet 6.5: copper-free 24.8 x 6 mm)"
+ },
+ "layout": {
+  "sled_plate": [
+   166.13,
+   105.68,
+   3.0
+  ],
+  "m3_hole_pattern": [
+   132.0,
+   84.0
+  ],
+  "proto_board_xy": [
+   -75.0,
+   82.0,
+   -23.0,
+   28.0
+  ],
+  "walter_usb_end_x": -28.0,
+  "walter_centre_y": 2.5,
+  "board_underside_z": 8.0,
+  "proto_top_z": 9.6,
+  "walter_pcb_bottom_z": 21.4,
+  "clamp_positions": [
+   [
+    -55.0,
+    -29.25
+   ],
+   [
+    -55.0,
+    34.25
+   ],
+   [
+    45.0,
+    -29.25
+   ],
+   [
+    45.0,
+    34.25
+   ]
+  ],
+  "cable_anchors": [
+   [
+    -50.0,
+    -43.0
+   ],
+   [
+    -30.0,
+    -43.0
+   ],
+   [
+    -10.0,
+    -43.0
+   ],
+   [
+    10.0,
+    -43.0
+   ],
+   [
+    30.0,
+    -43.0
+   ],
+   [
+    50.0,
+    -43.0
+   ],
+   [
+    -40.0,
+    41.5
+   ]
+  ],
+  "antenna_wall_x": [
+   -32.0,
+   68.0
+  ],
+  "antenna_wall_top_z": 40.0,
+  "terminal_row": [
+   -66.0,
+   76.0,
+   -19.5,
+   -12.5
+  ],
+  "terminal_positions_at_3p5mm": 40
+ },
+ "assumed_not_measured": [
+  "Walter and Perma-Proto outlines come from vendor documents, not calipers",
+  "Perma-Proto mounting-hole positions are not used by this sled (clamps hold the board)",
+  "SIM holder footprint 12 x 14 mm and header body height 8.5 mm are assumed",
+  "terminal-block height 9.5 mm is assumed"
+ ],
+ "files": [
+  "sled-1554h-walter-rev1.stl",
+  "sled-1554h-walter-rev1.3mf"
+ ],
+ "previews": [
+  "preview-sled-bare-walter-rev1.png",
+  "preview-sled-in-box-walter-rev1.png"
+ ]
+}

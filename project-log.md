@@ -110,6 +110,8 @@ See `build-out-tutorial.md` Section 6 for full details on each option.
 ### Open after the 2026-11-14 build
 - [ ] Owner: remaining questions in `DECISIONS-FOR-MICHAEL.md` (dashboard wording, power outlet and battery connection for the field install, weather sensor on the first install, database backup)
 - [ ] Get a Walter board; run the `walter` build on it for the first time (it has only been compiled)
+- [ ] Walter firmware gap: the program does not yet switch on the Walter's 3.3 V sensor rail (the carrier's design notes say GPIO0 must be pulled low), so sensors would get no power on a Walter. Fix and test when the board is in hand.
+- [ ] Print and test: demo door rev 2 and its base plate; the DevKitC bench case. Check the Walter carrier against the real board before printing it.
 - [ ] Caliper checks, then first prints: demo door (`cad\demo-door\`), case (`cad\enclosure\`)
 - [ ] Buy: PETG or ASA, Hammond 1554H2GY box and glands, M3 brass heat-set inserts and M3 screws (owner confirmed none on hand), DS18B20, HX711 and load cells if wanted (lists in `docs\wiring\wiring.md` and `docs\power-and-enclosure.md`)
 - [ ] Build the field unit as `fridge-01` (key in `/opt/hollygrove/fridge/fridge.env` on the VM)
@@ -240,6 +242,21 @@ non-issue — it sips from the big system).
 - Publishing lag shortened from one hour to 15 minutes (`FRIDGE_PUBLISH_GRANULARITY_S=900` in the
   VM's `fridge.env`).
 - No navbar link yet. No M3 inserts or screws on hand: added to the to-buy list.
+- Folder cleanup (owner: "I want all the folders to be clean and organized"): a top-level
+  `README.md` maps the project; `build-out-tutorial.md`, `SWAMPNET-BRIEF.md` and
+  `SWAMPNET-EMAIL.md` moved to `docs\archive\` (earlier entries in this log name them at their old
+  top-level location); the eight files in `research\` got short plain names; `cad\demo-door\` and
+  `cad\enclosure\` reorganised into print / pictures / source / checks.
+- The door's reed switch is the surface-mount pair, not the recessed Gebildet. Owner's caliper
+  readings, foam tape included: 33.91 long, 14.27 wide overall, body 7.88 wide and 9.21 high,
+  flange 2.83 thick. Demo door rev 2 is built around it; no pilot holes, the foam tape holds it.
+- Walter: the owner will buy the bare module plus antenna and SIM, and wants carriers for both
+  the dev board and the Walter ("do not archive the current dev board yet").
+- A priced shopping list is in `docs\shopping-list.md`.
+- Walter carrier designed (`cad\enclosure\print\weatherproof-box-sled\sled-1554h-walter-rev1`): the
+  Walter plugs into header strips on an Adafruit Perma-Proto full-size board with screw terminals;
+  the sled holds that board and an upright pad for the LTE antenna. Dimensions come from the
+  datasheet, not a real board. The dev-board sleds and cases are unchanged.
 - Commit and push approved; merged into `main` and pushed.
 - Backups: the owner chose "snapshot the whole VM". TrueNAS now snapshots the hollygrove VM disk
   daily (kept 14 days) and the VM makes a nightly clean copy of the fridge database. Details in

@@ -13,10 +13,18 @@ Pure Python: manifold3d (solid modelling), trimesh (export / checks), numpy,
 matplotlib (text outlines only), Pillow (preview PNGs).
 
 Usage:
-  python generate_enclosure.py                 # build every variant into ./out
+  python generate_enclosure.py                 # build every variant into the folder above source/
   python generate_enclosure.py --variant a     # one variant
-  python generate_enclosure.py --outdir X      # write somewhere else
+  python generate_enclosure.py --outdir X      # write the whole layout under X instead
   python generate_enclosure.py --no-render     # skip the PNG previews
+
+Output layout under the output root (default: the folder that holds source/):
+  print/bench-case-<folder>/       case base, case lid, toe clamp (STL + 3MF)
+  print/weatherproof-box-sled/     the junction-box sleds (both variants)
+  pictures/bench-case-<folder>/    case previews
+  pictures/weatherproof-box-sled/  sled previews
+  checks/validation-rev<REV>.json
+<folder> is the "folder" entry of the variant (devkitc, freenove).
 
 Files are stamped with REV (for example case-base-fnk0091-rev1.stl). The script
 REFUSES to overwrite an existing file: bump REV when the geometry changes.
@@ -36,7 +44,8 @@ import numpy as np
 import manifold3d as m3
 from manifold3d import Manifold, CrossSection
 
-REV = 1
+REV = 1                 # case and the two dev-board sleds (do not change)
+REV_WALTER = 1          # Walter sled: a separate part with its own revision count
 
 # --------------------------------------------------------------------------
 # 1. PARAMETERS YOU ARE EXPECTED TO EDIT
@@ -120,9 +129,9 @@ BOARDS = {
 # Variants = which board sits on which carrier.
 #   usb_edge  distance from the carrier's -Y edge to the dev board's USB-end edge
 VARIANTS = {
-    "a": dict(tag="fnk0091", carrier="fnk0091", board="freenove_s3", usb_edge=16.4,
+    "a": dict(tag="fnk0091", folder="freenove", carrier="fnk0091", board="freenove_s3", usb_edge=16.4,
               usb_edge_note="scaled from vendor drawings"),
-    "b": dict(tag="fnk0101", carrier="fnk0101", board="devkitc_clone", usb_edge=12.0,
+    "b": dict(tag="fnk0101", folder="devkitc", carrier="fnk0101", board="devkitc_clone", usb_edge=12.0,
               usb_edge_note="ASSUMED (board can sit anywhere along the 24-pin socket)"),
     # Example for later: Walter on the universal carrier.
     # "c": dict(tag="fnk0101-walter", carrier="fnk0101", board="walter", usb_edge=12.0,
@@ -985,10 +994,14 @@ def electronics_items(v, zc, with_plug=True):
     return items
 
 
-def make_previews(v, case, sled, clamp, outdir):
+def make_previews(v, case, sled, clamp, outroot):
     d = case["dims"]
     car = CARRIERS[v["carrier"]]
     tag = f"{v['tag']}-rev{REV}"
+    outdir = os.path.join(outroot, "pictures", f"bench-case-{v['folder']}")
+    sled_dir = os.path.join(outroot, "pictures", SLED_DIR)
+    os.makedirs(outdir, exist_ok=True)
+    os.makedirs(sled_dir, exist_ok=True)
     base, lid = case["base"], case["lid"]
     clamps = [toe_clamp().rotate([0, 0, 0 if sy < 0 else 180]).translate([x, y, d["zct"]])
               for (x, y, sy) in clamp_positions(car)]
@@ -1029,12 +1042,12 @@ def make_previews(v, case, sled, clamp, outdir):
                     for sx in (-1, 1) for sy in (-1, 1)])
     cl2 = union([toe_clamp().rotate([0, 0, 0 if sy < 0 else 180]).translate(
         [x, y, sd["zc"] + car["pcb_t"]]) for (x, y, sy) in clamp_positions(car)])
-    p = os.path.join(outdir, f"preview-sled-in-box-{tag}.png")
+    p = os.path.join(sled_dir, f"preview-sled-in-box-{tag}.png")
     render([(shell + bosses, COL["boxc"]), (sled["sled"], COL["sled"]), (cl2, COL["clamp"])]
            + electronics_items(v, sd["zc"], False), p, az=-25, el=52)
     paths.append(p)
 
-    p = os.path.join(outdir, f"preview-sled-bare-{tag}.png")
+    p = os.path.join(sled_dir, f"preview-sled-bare-{tag}.png")
     render([(sled["sled"], COL["sled"])], p, az=-25, el=50)
     paths.append(p)
     return paths
@@ -1045,14 +1058,19 @@ def make_previews(v, case, sled, clamp, outdir):
 # --------------------------------------------------------------------------
 
 
-def export(parts_print, tag, outdir, shared_done):
+SLED_DIR = "weatherproof-box-sled"
+
+
+def export(parts_print, v, outroot):
+    """Write each part into its print folder. The toe clamp is the same part
+    for every variant, so each bench-case folder gets its own copy."""
     written = []
+    tag = v["tag"]
     for name, man in parts_print.items():
         stem = f"{name}-rev{REV}" if name == "toe-clamp" else f"{name}-{tag}-rev{REV}"
-        if name == "toe-clamp":
-            if shared_done.get(name):
-                continue
-            shared_done[name] = True
+        sub = SLED_DIR if name.startswith("sled") else f"bench-case-{v['folder']}"
+        outdir = os.path.join(outroot, "print", sub)
+        os.makedirs(outdir, exist_ok=True)
         tm = to_trimesh(man)
         for ext in ("stl", "3mf"):
             path = os.path.join(outdir, f"{stem}.{ext}")
@@ -1064,17 +1082,379 @@ def export(parts_print, tag, outdir, shared_done):
     return written
 
 
-def main():
-    ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
-    ap.add_argument("--variant", choices=sorted(VARIANTS) + ["all"], default="all")
-    ap.add_argument("--outdir", default=os.path.join(os.path.dirname(os.path.abspath(__file__)), "out"))
-    ap.add_argument("--no-render", action="store_true")
-    ap.add_argument("--no-export", action="store_true", help="validate only")
-    args = ap.parse_args()
-    os.makedirs(args.outdir, exist_ok=True)
+# --------------------------------------------------------------------------
+# 11. Walter carrier sled for the Hammond box (its own revision, REV_WALTER)
+#
+# Stack: DPTechnics / QuickSpot Walter plugged into two 14-pin female header
+# strips soldered to an Adafruit Perma-Proto full-sized board (157 x 51 mm),
+# which also carries the screw terminals. The sled holds the proto board with
+# the same corner pads, fences and toe clamps as the other sleds, has the same
+# four M3 mounting holes, a row of zip-tie anchors for the incoming cables and
+# an upright pad that carries the flat LTE antenna.
+#
+# Sled coordinates: origin = centre of the sled plate (as the other sleds);
+# +X is the long side of the box, -Y is the side with the cable glands.
+# Datasheet coordinates (X from the Walter centre line, positive towards pins
+# 15 to 28 in the top view; Y from the USB-C end) map to sled coordinates with
+# w_xy(): the Walter lies along X, USB-C end towards +X, antenna end towards -X.
+# --------------------------------------------------------------------------
+
+# Walter, datasheet rev 1.3 (2026-11-11), section 6 and tables 4 and 5.
+WALTER = dict(
+    label="DPTechnics / QuickSpot Walter P000000100 (datasheet rev 1.3)",
+    w=24.8, l=55.0, pcb_t=1.6,                 # outline 55.00 x 24.80, 1.6 +/- 10 %
+    row_x=8.89, pitch=2.54, pins=14, pin1_y=9.72,   # two 14-pin rows 17.78 apart
+    usb_x=-4.31,                                # USB-C centre line, top side
+    ufl_lte=(3.0, 4.3), ufl_gnss=(7.3, 4.3),    # u.FL connectors, top side
+    sim=(0.5, 40.2), sim_w=12.0, sim_l=14.0,    # nano-SIM holder centre (sim_w, sim_l ASSUMED)
+    sim_h=1.35,                                 # holder below the PCB
+    top_h=3.4,                                  # USB-C receptacle, the tallest top part
+    above_carrier=11.8,                         # PCB underside above carrier in an 8.5 mm socket
+    socket_h=8.5,                               # female header body height (typical, not on the vendor page)
+)
+
+# Adafruit Perma-Proto Full-sized Breadboard PCB (product 1606): 157 x 51 mm,
+# 1.6 mm FR4, five-hole strips across the width and a 0.3 in centre channel.
+PROTO = dict(name="Adafruit Perma-Proto Full-sized Breadboard PCB (product 1606)",
+             w=157.0, l=51.0, t=1.6)
+PB_X0, PB_Y0 = -75.0, -23.0                    # lower-left corner of the proto board (sled XY)
+PB_XC, PB_YC = PB_X0 + PROTO["w"] / 2, PB_Y0 + PROTO["l"] / 2
+WALTER_X_USB = -28.0                            # sled X of the Walter's USB-C end edge
+PROTO_CLAMP_XS = (-55.0, 45.0)                  # toe-clamp bosses on both long edges
+TERM = dict(x0=-66.0, x1=76.0, y0=-19.5, y1=-12.5, h=9.5)   # screw-terminal row (placeholder)
+RIB_W = 4.5                                     # support rib in the proto board's centre channel
+
+ANT = dict(l=96.0, w=21.0, t=0.2, x0=-30.0, z0=16.0)   # Taoglas FXUB63.07.0150C, flat
+ANT_WALL_T = 4.0
+ANT_WALL_X = (-32.0, 68.0)
+ANT_WALL_TOP = 40.0
+ANT_RECESS = 0.5                               # shallow pocket the antenna sits in
+ANT_LIP = 1.5                                  # 45 degree shelf under the antenna
+CABLE_ANCHOR_XS = (-50.0, -30.0, -10.0, 10.0, 30.0, 50.0)
+CABLE_ANCHOR_Y = -43.0
+COAX_ANCHOR = (-40.0, 41.5)
+SLED_NAME_WALTER = "sled-1554h-walter"
+
+
+def w_xy(X, Y):
+    """Walter datasheet coordinates (X from centre line, Y from USB-C end) to sled XY."""
+    return WALTER_X_USB - Y, PB_YC - X
+
+
+def wbox(X0, X1, Y0, Y1, z0, z1):
+    """Box given in Walter datasheet coordinates, placed in the sled frame."""
+    xa, ya = w_xy(X0, Y0)
+    xb, yb = w_xy(X1, Y1)
+    return box(min(xa, xb), max(xa, xb), min(ya, yb), max(ya, yb), z0, z1)
+
+
+def proto_bay(zb):
+    """Corner pads, fences and clamp bosses for the proto board, standing on a
+    surface at height zb. Returns (add, cut, clamp_positions)."""
+    t = PROTO["t"]
+    x0, x1, y0, y1 = PB_X0, PB_X0 + PROTO["w"], PB_Y0, PB_Y0 + PROTO["l"]
+    add, cut = [], []
+    for (cx, sx) in ((x0, -1), (x1, 1)):
+        for (cy, sy) in ((y0, -1), (y1, 1)):
+            # no fence at the +X end: the proto board is flush with the plate there
+            xo, xi = cx + sx * (PCB_CLR + (FENCE_T if sx < 0 else 0.0)), cx - sx * PAD
+            yo, yi = cy + sy * (PCB_CLR + FENCE_T), cy - sy * PAD
+            add.append(box(min(xo, xi), max(xo, xi), min(yo, yi), max(yo, yi), zb, zb + PAD_H + t))
+    cut.append(box(x0 - PCB_CLR, x1 + PCB_CLR, y0 - PCB_CLR, y1 + PCB_CLR, zb + PAD_H, zb + PAD_H + t + 50))
+    hd = FASTENER_HOLE_D[FASTENER]
+    clamps = []
+    for cxm in PROTO_CLAMP_XS:
+        for sy in (-1, 1):
+            by = (y0 - PCB_CLR - CLAMP_BOSS_OFFSET) if sy < 0 else (y1 + PCB_CLR + CLAMP_BOSS_OFFSET)
+            add.append(cyl(cxm, by, CLAMP_BOSS_R, zb, zb + PAD_H + t))
+            cut.append(cyl(cxm, by, hd / 2, zb + PAD_H + t - 6.3, zb + PAD_H + t + 1))
+            clamps.append((cxm, by, sy))
+    # support rib in the 0.3 in centre channel, where the Perma-Proto has no holes,
+    # under the two header rows so the board does not flex when Walter is pressed in
+    xa, _ = w_xy(0, WALTER["pin1_y"] + 13 * WALTER["pitch"] + 1.27)
+    xb, _ = w_xy(0, WALTER["pin1_y"] - 1.27)
+    add.append(box(xa, xb, PB_YC - RIB_W / 2, PB_YC + RIB_W / 2, zb, zb + PAD_H))
+    return union(add), union(cut), clamps
+
+
+def build_sled_walter():
+    s = {}
+    outline = sled_outline()
+    plate = extrude(outline, 0, SLED_T)
+    add, cut = [], []
+    for sx in (-1, 1):
+        for sy in (-1, 1):
+            cut.append(cyl(sx * BOX["m3_x"] / 2, sy * BOX["m3_y"] / 2, SCREW_CLEAR_D / 2, -1, SLED_T + 1))
+    bay_add, bay_cut, clamps = proto_bay(SLED_T - 0.01)
+    # keep the pads and fences on the plate (the proto board is flush with the plate's +X end)
+    bay_add = bay_add ^ extrude(outline, -1, 80)
+    add.append(bay_add)
+    cut.append(bay_cut.translate([0, 0, 0.01]))
+    s["clamps"] = clamps
+    # strain relief: a row of zip-tie anchors across the cable-gland side, plus one for the antenna lead
+    s["anchors"] = [(x, CABLE_ANCHOR_Y) for x in CABLE_ANCHOR_XS] + [COAX_ANCHOR]
+    for (x, y) in s["anchors"]:
+        add.append(tent_anchor(x, y, SLED_T - 0.01))
+    # upright antenna pad on the +Y edge: wall, shallow pocket, 45 degree shelf
+    y_face = outline.bounds()[3] - ANT_WALL_T
+    s["ant_face_y"] = round(y_face, 2)
+    x0, x1 = ANT_WALL_X
+    add.append(box(x0, x1, y_face, y_face + ANT_WALL_T, SLED_T - 0.01, ANT_WALL_TOP))
+    ax0, ax1 = ANT["x0"] - 0.5, ANT["x0"] + ANT["l"] + 0.5
+    z_top = ANT["z0"] + ANT["w"] + 0.5
+    # pocket with a 45 degree roof (no flat ceiling to bridge)
+    pocket = poly([(y_face - 1.5, ANT["z0"]), (y_face + ANT_RECESS, ANT["z0"]),
+                   (y_face + ANT_RECESS, z_top), (y_face - 1.5, z_top + ANT_RECESS + 1.5)])
+    cut.append(extrude_yz(pocket, ax0, ax1))
+    # shelf under the antenna: flat top, 45 degree underside, 0.8 mm at its tip
+    shelf = poly([(y_face + 0.01, ANT["z0"] - ANT_LIP - 0.8), (y_face + 0.01, ANT["z0"]),
+                  (y_face - ANT_LIP, ANT["z0"]), (y_face - ANT_LIP, ANT["z0"] - 0.8)])
+    add.append(extrude_yz(shelf, ax0, ax1))
+    sled = plate + union(add) - union(cut)
+    s["zc"] = SLED_T + PAD_H
+    return dict(sled=finish(sled), dims=s)
+
+
+def walter_stack(zc, y_face):
+    """Placeholder solids for the proto board, the Walter, headers, terminals and
+    the antenna (keep-out volumes and previews). zc = underside of the proto board."""
+    W, P = WALTER, PROTO
+    zct = zc + P["t"]
+    out = {}
+    x0, x1, y0, y1 = PB_X0, PB_X0 + P["w"], PB_Y0, PB_Y0 + P["l"]
+    out["proto_pcb"] = box(x0, x1, y0, y1, zc, zct)
+    out["terminals"] = box(TERM["x0"], TERM["x1"], TERM["y0"], TERM["y1"], zct, zct + TERM["h"])
+    # solder tails under the board, 3 mm, except over the four corner pads and the rib
+    tails = box(x0, x1, y0, y1, zc - 3.0, zc)
+    corners = [box(min(cx, cx - sx * (PAD + 0.5)), max(cx, cx - sx * (PAD + 0.5)),
+                   min(cy, cy - sy * (PAD + 0.5)), max(cy, cy - sy * (PAD + 0.5)), zc - 10, zc + 1)
+               for (cx, sx) in ((x0, -1), (x1, 1)) for (cy, sy) in ((y0, -1), (y1, 1))]
+    xa, _ = w_xy(0, W["pin1_y"] + 13 * W["pitch"] + 1.27)
+    xb, _ = w_xy(0, W["pin1_y"] - 1.27)
+    rib = box(xa, xb, PB_YC - RIB_W / 2, PB_YC + RIB_W / 2, zc - 10, zc + 1)
+    out["solder_side"] = tails - union(corners + [rib])
+    # two 14-pin female headers (8.5 mm) with Walter's own header body above them
+    ya, yb = W["pin1_y"] - 1.27, W["pin1_y"] + 13 * W["pitch"] + 1.27
+    z_wb = zct + W["above_carrier"]
+    out["headers"] = union([wbox(sx * W["row_x"] - 1.27, sx * W["row_x"] + 1.27, ya, yb, zct, z_wb)
+                            for sx in (-1, 1)])
+    z_wt = z_wb + W["pcb_t"]
+    out["walter_pcb"] = wbox(-W["w"] / 2, W["w"] / 2, 0, W["l"], z_wb, z_wt)
+    out["walter_top"] = wbox(-W["w"] / 2, W["w"] / 2, 0, W["l"], z_wt, z_wt + W["top_h"])
+    sx_, sl_ = W["sim"]
+    out["sim_holder"] = wbox(sx_ - W["sim_w"] / 2, sx_ + W["sim_w"] / 2, sl_ - W["sim_l"] / 2,
+                             sl_ + W["sim_l"] / 2, z_wb - W["sim_h"], z_wb)
+    zu = z_wt + W["top_h"] / 2
+    plug = wbox(W["usb_x"] - 6.2, W["usb_x"] + 6.2, -45.0, 0.5, zu - 3.3, zu + 3.3)
+    out["usb_plug"] = plug
+    out["antenna"] = box(ANT["x0"], ANT["x0"] + ANT["l"], y_face + ANT_RECESS - ANT["t"],
+                         y_face + ANT_RECESS, ANT["z0"], ANT["z0"] + ANT["w"])
+    out["z"] = dict(proto_top=zct, walter_bottom=z_wb, walter_top=z_wt + W["top_h"])
+    return out
+
+
+def metal_near_antenna(clamps, zct):
+    """Metal parts the antenna must stay away from that are not in walter_stack:
+    the four box screws with their inserts and the four clamp screws."""
+    parts = []
+    for sx in (-1, 1):
+        for sy in (-1, 1):
+            x, y = sx * BOX["m3_x"] / 2, sy * BOX["m3_y"] / 2
+            parts.append(cyl(x, y, 2.9, SLED_T, SLED_T + 2.6))          # screw head
+            parts.append(cyl(x, y, 2.3, -BOX["boss_h"], SLED_T))        # screw shaft and insert
+    for (x, y, sy) in clamps:
+        parts.append(cyl(x, y, 2.9, zct + CLAMP_T, zct + CLAMP_T + 2.6))
+    return union(parts)
+
+
+def validate_walter(sled):
+    W, P = WALTER, PROTO
+    rep = dict(part=SLED_NAME_WALTER, rev=REV_WALTER, walter=W["label"], proto_board=P["name"],
+               fastener=FASTENER, solids={}, problems=[])
+    s, d = sled["sled"], sled["dims"]
+    ok, tm = check_solid(SLED_NAME_WALTER, s, rep["solids"])
+    sol = rep["solids"][SLED_NAME_WALTER]
+    if not ok:
+        rep["problems"].append("sled: not a single watertight body (in memory or after STL reload)")
+    b = tm.bounds
+    size = (b[1] - b[0]).round(2).tolist()
+    sol["size_xyz"] = size
+    sol["fits_bed_256"] = bool(max(size[0], size[1]) <= BED and size[2] <= BED)
+    sol["z_min"] = round(float(b[0][2]), 3)
+    sol["overhangs_over_50deg"] = summarize_overhangs(overhangs(tm))
+    sol["thickness_min_p1_median"] = list(wall_thickness(tm))
+    if not sol["fits_bed_256"]:
+        rep["problems"].append("sled: does not fit the bed")
+    if sol["overhangs_over_50deg"]:
+        rep["problems"].append("sled: overhangs over 50 degrees (needs supports)")
+
+    el = walter_stack(d["zc"], d["ant_face_y"])
+    zct = el["z"]["proto_top"]
+    clamps = union([toe_clamp().rotate([0, 0, 0 if sy < 0 else 180]).translate([x, y, zct])
+                    for (x, y, sy) in d["clamps"]])
+    keep = {}
+    for nm in ("proto_pcb", "terminals", "solder_side", "headers", "walter_pcb", "walter_top",
+               "sim_holder", "usb_plug", "antenna"):
+        keep[nm] = dict(vs_sled=vol(el[nm] ^ s), vs_clamps=vol(el[nm] ^ clamps))
+        if max(keep[nm].values()) > 1e-3:
+            rep["problems"].append(f"keep-out violated: {nm}")
+    keep["clamps_vs_sled_mm3"] = vol(clamps ^ s)
+    rep["keepout_mm3"] = keep
+
+    # headroom and fit in the Hammond box (stack on 6 mm bosses, box lid on)
+    parts_all = union([s, el["proto_pcb"], el["terminals"], el["headers"], el["walter_pcb"],
+                       el["walter_top"], el["sim_holder"], el["antenna"], clamps])
+    bb = to_trimesh(parts_all).bounds
+    z_top_stack = el["z"]["walter_top"]
+    rep["box_fit"] = dict(
+        box=BOX["name"],
+        assembly_extent_xyz=[round(float(bb[0][0]), 2), round(float(bb[1][0]), 2),
+                             round(float(bb[0][1]), 2), round(float(bb[1][1]), 2),
+                             round(float(bb[0][2]), 2), round(float(bb[1][2]), 2)],
+        box_inside_xy=[BOX["inside_l"], BOX["inside_w"]],
+        side_clearance_x=[round(BOX["inside_l"] / 2 + float(bb[0][0]), 2),
+                          round(BOX["inside_l"] / 2 - float(bb[1][0]), 2)],
+        side_clearance_y=[round(BOX["inside_w"] / 2 + float(bb[0][1]), 2),
+                          round(BOX["inside_w"] / 2 - float(bb[1][1]), 2)],
+        walter_top_above_box_floor=round(BOX["boss_h"] + z_top_stack, 2),
+        highest_point_above_box_floor=round(BOX["boss_h"] + float(bb[1][2]), 2),
+        headroom_under_box_lid=round(BOX["inside_h"] - BOX["boss_h"] - float(bb[1][2]), 2),
+        headroom_over_walter=round(BOX["inside_h"] - BOX["boss_h"] - z_top_stack, 2),
+    )
+    if (bb[0][0] < -BOX["inside_l"] / 2 or bb[1][0] > BOX["inside_l"] / 2 or
+            bb[0][1] < -BOX["inside_w"] / 2 or bb[1][1] > BOX["inside_w"] / 2 or
+            rep["box_fit"]["headroom_under_box_lid"] < 5.0):
+        rep["problems"].append("assembly does not fit the box with the lid on")
+
+    # LTE antenna: distance to metal (datasheet: at least 10 mm, ideally 20 mm)
+    metal = metal_near_antenna(d["clamps"], zct)
+    dist = {}
+    for nm in ("proto_pcb", "terminals", "headers", "walter_pcb", "walter_top"):
+        dist[nm] = round(float(el["antenna"].min_gap(el[nm], 60.0)), 1)
+    dist["screws_and_inserts"] = round(float(el["antenna"].min_gap(metal, 60.0)), 1)
+    near = min(dist.values())
+    rep["antenna"] = dict(part="Taoglas FXUB63.07.0150C, 96 x 21 x 0.2 mm, 150 mm lead, I-PEX MHF I",
+                          pad_face_y=d["ant_face_y"], z_range=[ANT["z0"], ANT["z0"] + ANT["w"]],
+                          x_range=[ANT["x0"], ANT["x0"] + ANT["l"]], min_distance_to_metal_mm=dist,
+                          nearest_mm=near, vendor_minimum_mm=10, vendor_ideal_mm=20)
+    if near < 10.0:
+        rep["problems"].append("antenna closer than 10 mm to metal")
+
+    # access: USB-C plug (drawn 45 mm long, over the board, nothing above 19.1 mm in its way)
+    rep["usb_access"] = dict(
+        plug_vs_sled_board_terminals_clamps_antenna_mm3=vol(el["usb_plug"] ^ union(
+            [s, el["proto_pcb"], el["terminals"], el["headers"], el["antenna"], clamps])),
+        plug_z_range=[round(float(to_trimesh(el["usb_plug"]).bounds[0][2]), 2),
+                      round(float(to_trimesh(el["usb_plug"]).bounds[1][2]), 2)],
+        tallest_thing_under_plug=round(zct + TERM["h"], 2))
+    sx_, sl_ = W["sim"]
+    xs, _ = w_xy(0, W["l"])
+    holder_x, _ = w_xy(0, sl_)
+    rep["sim_access"] = dict(
+        walter_antenna_end_x=round(xs, 2),
+        free_beyond_walter_end_to_box_wall_mm=round(BOX["inside_l"] / 2 + xs, 2),
+        proto_board_edge_x=PB_X0,
+        walter_overhang_beyond_board_mm=round(PB_X0 - xs, 2),
+        free_height_under_sim_holder_mm=round(el["z"]["walter_bottom"] - W["sim_h"] - zct, 2),
+        nano_sim_length_mm=12.3,
+        note="card enters from the antenna end; only the card's last few mm reach the box wall, so "
+             "lift Walter out of its sockets to change the SIM, or fit the SIM before mounting")
+    rep["wifi_keepout"] = dict(
+        copper_free_beyond_board_edge_mm=round(PB_X0 - xs, 2), vendor_minimum_mm=6.0,
+        note="the proto board stops 8 mm short of Walter's antenna end (datasheet 6.5: copper-free 24.8 x 6 mm)")
+    rep["layout"] = dict(
+        sled_plate=[round(float(b[1][0] - b[0][0]), 2), round(float(b[1][1] - b[0][1]), 2), SLED_T],
+        m3_hole_pattern=[BOX["m3_x"], BOX["m3_y"]],
+        proto_board_xy=[PB_X0, PB_X0 + P["w"], PB_Y0, PB_Y0 + P["l"]],
+        walter_usb_end_x=WALTER_X_USB, walter_centre_y=PB_YC,
+        board_underside_z=d["zc"], proto_top_z=zct, walter_pcb_bottom_z=el["z"]["walter_bottom"],
+        clamp_positions=[(x, round(y, 2)) for (x, y, _sy) in d["clamps"]],
+        cable_anchors=d["anchors"], antenna_wall_x=list(ANT_WALL_X), antenna_wall_top_z=ANT_WALL_TOP,
+        terminal_row=[TERM["x0"], TERM["x1"], TERM["y0"], TERM["y1"]],
+        terminal_positions_at_3p5mm=int((TERM["x1"] - TERM["x0"]) // 3.5))
+    rep["assumed_not_measured"] = [
+        "Walter and Perma-Proto outlines come from vendor documents, not calipers",
+        "Perma-Proto mounting-hole positions are not used by this sled (clamps hold the board)",
+        "SIM holder footprint 12 x 14 mm and header body height 8.5 mm are assumed",
+        "terminal-block height 9.5 mm is assumed",
+    ]
+    return rep
+
+
+def make_previews_walter(sled, outroot):
+    d = sled["dims"]
+    outdir = os.path.join(outroot, "pictures", SLED_DIR)
+    os.makedirs(outdir, exist_ok=True)
+    el = walter_stack(d["zc"], d["ant_face_y"])
+    zct = el["z"]["proto_top"]
+    cl = union([toe_clamp().rotate([0, 0, 0 if sy < 0 else 180]).translate([x, y, zct])
+                for (x, y, sy) in d["clamps"]])
+    tag = f"walter-rev{REV_WALTER}"
+    paths = []
+    p = os.path.join(outdir, f"preview-sled-bare-{tag}.png")
+    render([(sled["sled"], COL["sled"])], p, az=-25, el=50)
+    paths.append(p)
+    bl, bw = BOX["inside_l"] / 2, BOX["inside_w"] / 2
+    shell = box(-bl - 3.5, bl + 3.5, -bw - 3.5, bw + 3.5, -BOX["boss_h"] - 3.0, 39.0) \
+        - box(-bl, bl, -bw, bw, -BOX["boss_h"], 60.0)
+    bosses = union([cyl(sx * BOX["m3_x"] / 2, sy * BOX["m3_y"] / 2, 4.0, -BOX["boss_h"], 0)
+                    for sx in (-1, 1) for sy in (-1, 1)])
+    items = [(shell + bosses, COL["boxc"]), (sled["sled"], COL["sled"]), (cl, COL["clamp"]),
+             (el["proto_pcb"], COL["pcb"]), (el["terminals"], (90, 160, 90)),
+             (el["headers"], COL["parts"]), (el["walter_pcb"], COL["board"]),
+             (el["walter_top"], COL["metal"]), (el["usb_plug"], COL["plug"]),
+             (el["antenna"], (200, 70, 150))]
+    p = os.path.join(outdir, f"preview-sled-in-box-{tag}.png")
+    render(items, p, az=-25, el=52)
+    paths.append(p)
+    return paths
+
+
+def export_walter(sled, outroot):
+    outdir = os.path.join(outroot, "print", SLED_DIR)
+    os.makedirs(outdir, exist_ok=True)
+    tm = to_trimesh(sled["sled"])
+    written = []
+    for ext in ("stl", "3mf"):
+        path = os.path.join(outdir, f"{SLED_NAME_WALTER}-rev{REV_WALTER}.{ext}")
+        if os.path.exists(path):
+            raise SystemExit(f"REFUSING to overwrite {path}\n"
+                             f"Bump REV_WALTER at the top of this script (currently {REV_WALTER}).")
+        tm.export(path)
+        written.append(path)
+    return written
+
+
+def main_walter(args):
+    print("== Walter sled (part rev %d)" % REV_WALTER)
+    sled = build_sled_walter()
+    rep = validate_walter(sled)
+    if not args.no_export:
+        rep["files"] = [os.path.basename(p) for p in export_walter(sled, args.outdir)]
+    if not args.no_render:
+        rep["previews"] = [os.path.basename(p) for p in make_previews_walter(sled, args.outdir)]
+    s = rep["solids"][SLED_NAME_WALTER]
+    print(f"  watertight={s['watertight']} stl_reload={s['stl_reload']} bodies={s['bodies']} "
+          f"size={s['size_xyz']} vol={s['volume_cm3']} cm3 thickness(min/p1/med)={s['thickness_min_p1_median']}")
+    print(f"  overhangs over 50 deg: {s['overhangs_over_50deg'] or 'none'}")
+    print(f"  box fit: {rep['box_fit']}")
+    print(f"  antenna nearest metal: {rep['antenna']['nearest_mm']} mm")
+    print(f"  problems: {rep['problems'] or 'none'}")
+    rpath = os.path.join(args.outdir, "checks", f"validation-walter-rev{REV_WALTER}.json")
+    if not args.no_export:
+        os.makedirs(os.path.dirname(rpath), exist_ok=True)
+        if os.path.exists(rpath):
+            raise SystemExit(f"REFUSING to overwrite {rpath}; bump REV_WALTER.")
+        with open(rpath, "w", encoding="utf-8") as fh:
+            json.dump(rep, fh, indent=1)
+    return bool(rep["problems"])
+
+
+def main_legacy(args):
+    """Case, lid, toe clamp and the two dev-board sleds (revision REV)."""
     keys = sorted(VARIANTS) if args.variant == "all" else [args.variant]
     clamp = toe_clamp()
-    shared, all_reports, failed = {}, [], False
+    all_reports, failed = [], False
     for k in keys:
         v = VARIANTS[k]
         print(f"== variant {k}: {v['carrier']} + {v['board']}")
@@ -1082,7 +1462,7 @@ def main():
         rep, parts_print = validate(v, case, sled, clamp)
         rep["fastener"] = FASTENER
         if not args.no_export:
-            rep["files"] = [os.path.basename(p) for p in export(parts_print, v["tag"], args.outdir, shared)]
+            rep["files"] = [os.path.basename(p) for p in export(parts_print, v, args.outdir)]
         if not args.no_render:
             rep["previews"] = [os.path.basename(p) for p in
                                make_previews(v, case, sled, clamp, args.outdir)]
@@ -1094,14 +1474,37 @@ def main():
         print(f"  fit: {rep['fit']}")
         print(f"  problems: {rep['problems'] or 'none'}")
         failed |= bool(rep["problems"])
-    rpath = os.path.join(args.outdir, f"validation-rev{REV}.json")
+    rpath = os.path.join(args.outdir, "checks", f"validation-rev{REV}.json")
     if not args.no_export:
+        os.makedirs(os.path.dirname(rpath), exist_ok=True)
         if os.path.exists(rpath):
             raise SystemExit(f"REFUSING to overwrite {rpath}; bump REV.")
         with open(rpath, "w", encoding="utf-8") as fh:
             json.dump(all_reports, fh, indent=1)
     else:
         print(json.dumps(all_reports, indent=1))
+    return failed
+
+
+
+def main():
+    ap = argparse.ArgumentParser(description=__doc__.split("\n\n")[0])
+    ap.add_argument("--part", choices=["all", "legacy", "walter"], default="all",
+                    help="legacy = case, lid, clamp and dev-board sleds; walter = the Walter sled only")
+    ap.add_argument("--variant", choices=sorted(VARIANTS) + ["all"], default="all",
+                    help="dev-board variant (legacy part only)")
+    ap.add_argument("--outdir", default=os.path.dirname(os.path.dirname(os.path.abspath(__file__))),
+                    help="output root; print/, pictures/ and checks/ are created under it "
+                         "(default: the folder that holds source/)")
+    ap.add_argument("--no-render", action="store_true")
+    ap.add_argument("--no-export", action="store_true", help="validate only")
+    args = ap.parse_args()
+    os.makedirs(args.outdir, exist_ok=True)
+    failed = False
+    if args.part in ("all", "legacy"):
+        failed |= main_legacy(args)
+    if args.part in ("all", "walter"):
+        failed |= main_walter(args)
     sys.exit(1 if failed else 0)
 
 
