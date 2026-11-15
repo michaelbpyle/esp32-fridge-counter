@@ -265,6 +265,15 @@ non-issue — it sips from the big system).
   the owner's notes: $629.63 of parts and tools, $730 with an estimated 15% for tax and shipping.
 - VS Code updated to 1.146.0 with its extensions; PlatformIO then upgraded itself to Core 6.2.0.
   Both firmware builds still succeed.
+- First real reed-switch openings recorded on the bench board (surface-mount pair on GPIO4).
+- WiFi fault found and fixed (late evening): from about 22:05 the board could not use the home
+  network, and after a restart could not join it at all. A temporary diagnostic showed the
+  network visible at -31 dBm and every join failing with disconnect reason 2 (AUTH_EXPIRE): the
+  eero access point never answered the authentication request. With transmit power lowered to
+  8.5 dBm the board joined first time, twice. `WIFI_TX_POWER` (default 8.5 dBm) was added to
+  `include/config.h` and applied in `src/uplink/WifiUplink.cpp`; after reflashing, the 16 saved
+  openings were delivered and accepted. Why full power worked in the morning and failed at night
+  is not known.
 - Commit and push approved; merged into `main` and pushed.
 - Backups: the owner chose "snapshot the whole VM". TrueNAS now snapshots the hollygrove VM disk
   daily (kept 14 days) and the VM makes a nightly clean copy of the fridge database. Details in

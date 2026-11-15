@@ -134,6 +134,7 @@ class WifiUplink : public Uplink {
     Serial.printf("[wifi] trying network %u of %u\n", (unsigned)(idx + 1), (unsigned)kNetCount);
     WiFi.disconnect();
     WiFi.begin(kNets[idx].ssid, kNets[idx].password);
+    WiFi.setTxPower(WIFI_TX_POWER);  // see config.h: full power fails to authenticate on this board
   }
 
   size_t netIdx_ = 0;

@@ -150,6 +150,16 @@
 #ifndef WIFI_ATTEMPT_MS
 #define WIFI_ATTEMPT_MS 15000UL
 #endif
+// WiFi transmit power. At full power (the ESP32 default, about 20 dBm) this DevKitC-style
+// board could not join the home network: the access point never answered its
+// authentication request (disconnect reason 2, AUTH_EXPIRE), although the network was
+// visible at -31 dBm. At 8.5 dBm it joined first time, every time (tested 2026-11-14).
+// Lower power costs range; raise it one step at a time if the board is moved far from the
+// access point. Values: WIFI_POWER_8_5dBm, WIFI_POWER_11dBm, WIFI_POWER_13dBm,
+// WIFI_POWER_15dBm, WIFI_POWER_17dBm, WIFI_POWER_19_5dBm.
+#ifndef WIFI_TX_POWER
+#define WIFI_TX_POWER WIFI_POWER_8_5dBm
+#endif
 #define NTP_SERVER_1 "pool.ntp.org"
 #define NTP_SERVER_2 "time.cloudflare.com"
 #define NTP_SERVER_3 "time.google.com"
