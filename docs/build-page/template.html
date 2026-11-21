@@ -1,0 +1,517 @@
+<title>Fridge Counter Build</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600&family=Space+Grotesk:wght@500;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: one reading column; the six deliverables with their pictures, then open questions and changes. */
+:root {
+  --bg: #F3F5F2; --surface: #FFFFFF; --fg: #23302A; --muted: #5C6B62; --line: #D5DDD6;
+  --sage: #7A9F80; --sage-deep: #47694E; --sage-wash: #E3EEE4;
+  --done: #2F6B3C; --done-wash: #DDEFE0; --ask: #8A3B12; --ask-wash: #F8E4D8;
+  --display: "Space Grotesk", "Segoe UI", system-ui, sans-serif;
+  --body: "Inter", "Segoe UI", system-ui, sans-serif;
+  --mono: "JetBrains Mono", ui-monospace, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --bg: #141A16; --surface: #1C2520; --fg: #E4ECE5; --muted: #9DAEA3; --line: #33413A;
+  --sage: #8FB596; --sage-deep: #A9CDB0; --sage-wash: #24332A;
+  --done: #8FD09B; --done-wash: #1F3526; --ask: #F0A77E; --ask-wash: #3D271B; color-scheme: dark } }
+:root[data-theme="dark"] {
+  --bg: #141A16; --surface: #1C2520; --fg: #E4ECE5; --muted: #9DAEA3; --line: #33413A;
+  --sage: #8FB596; --sage-deep: #A9CDB0; --sage-wash: #24332A;
+  --done: #8FD09B; --done-wash: #1F3526; --ask: #F0A77E; --ask-wash: #3D271B; color-scheme: dark }
+body { background: var(--bg); color: var(--fg); font: 16px/1.6 var(--body); }
+.wrap { max-width: 880px; margin: 0 auto; padding-block: 28px 56px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px));
+  display: flex; flex-direction: column; gap: 36px; }
+h1, h2, h3 { font-family: var(--display); text-wrap: balance; margin: 0; line-height: 1.2; }
+h1 { font-size: 2rem; font-weight: 700; }
+h2 { font-size: 1.25rem; font-weight: 700; padding-bottom: 6px; border-bottom: 3px solid var(--sage); }
+h3 { font-size: 1.08rem; font-weight: 500; }
+p { margin: 0; max-width: 68ch; }
+a { color: var(--sage-deep); }
+code { font-family: var(--mono); font-size: 0.86em; background: var(--sage-wash); padding: 1px 5px; border-radius: 4px; overflow-wrap: anywhere; }
+.eyebrow { font-size: 0.75rem; letter-spacing: 0.12em; text-transform: uppercase; color: var(--sage-deep); font-weight: 600; }
+header, section { display: flex; flex-direction: column; gap: 12px; }
+.stamp { color: var(--muted); font-size: 0.9rem; }
+.board { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 12px; }
+.item { background: var(--surface); border: 1px solid var(--line); border-radius: 8px; padding: 16px; display: flex; flex-direction: column; gap: 8px; min-width: 0; }
+.item-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 8px 12px; }
+.item p, .item li { font-size: 0.95rem; }
+.item ul { margin: 0; padding-left: 20px; }
+.where { color: var(--muted); font-size: 0.85rem; }
+.pill { font-size: 0.72rem; font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase; padding: 2px 9px; border-radius: 999px; white-space: nowrap; }
+.pill.done { color: var(--done); background: var(--done-wash); }
+.pill.ask { color: var(--ask); background: var(--ask-wash); }
+.shots { display: flex; flex-wrap: wrap; gap: 12px; align-items: flex-start; }
+figure { margin: 0; display: flex; flex-direction: column; gap: 4px; flex: 1 1 240px; min-width: 0; }
+figure.wide { flex-basis: 100%; }
+figure img { width: 100%; height: auto; border: 1px solid var(--line); border-radius: 6px; background: #fff; }
+figure.tall img { max-height: 640px; object-fit: cover; object-position: top; }
+figcaption { color: var(--muted); font-size: 0.82rem; }
+.scroll { overflow-x: auto; }
+table { border-collapse: collapse; width: 100%; font-size: 0.93rem; }
+th, td { text-align: left; vertical-align: top; padding: 8px 10px; border-bottom: 1px solid var(--line); }
+th { font-weight: 600; color: var(--muted); font-size: 0.8rem; letter-spacing: 0.05em; text-transform: uppercase; }
+ul.plain { margin: 0; padding-left: 22px; display: flex; flex-direction: column; gap: 8px; max-width: 70ch; }
+/* System map */
+:root { --power: #9A6A00; --map-bg: #FBFCFA; }
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --power: #E8B94A; --map-bg: #18201B; } }
+:root[data-theme="dark"] { --power: #E8B94A; --map-bg: #18201B; }
+.chips { display: flex; flex-wrap: wrap; gap: 8px; }
+.chip { font: 500 0.88rem var(--body); color: var(--fg); background: var(--surface); border: 1px solid var(--line); border-radius: 999px; padding: 6px 14px; cursor: pointer; }
+.chip:hover { border-color: var(--sage); }
+.chip[aria-pressed="true"] { background: var(--sage-wash); border-color: var(--sage-deep); color: var(--sage-deep); font-weight: 600; }
+.chip:focus-visible, .part:focus-visible { outline: 3px solid var(--sage-deep); outline-offset: 2px; }
+.mapwrap { overflow-x: auto; border: 1px solid var(--line); border-radius: 8px; background: var(--map-bg); }
+.mapwrap svg { display: block; width: 100%; min-width: 720px; height: auto; max-height: 680px; aspect-ratio: 1200 / 640; color: var(--fg); }
+.part { cursor: pointer; }
+.part, .link { transition: opacity 0.3s; }
+.dim { opacity: 0.14; }
+.o { fill: var(--surface); stroke: currentColor; stroke-width: 1.6; }
+.o2 { fill: var(--sage-wash); stroke: currentColor; stroke-width: 1.2; }
+.thin { fill: none; stroke: currentColor; stroke-width: 1; }
+.opt { stroke-dasharray: 4 3; }
+.data { fill: none; stroke: var(--sage-deep); stroke-width: 2.2; }
+.pwr { fill: none; stroke: var(--power); stroke-width: 2.2; }
+.sig { fill: none; stroke: currentColor; stroke-width: 1.6; }
+.mt { font: 600 15px var(--display); fill: currentColor; }
+.ml { font: 500 11.5px var(--body); fill: currentColor; }
+.ms { font: 400 10.5px var(--body); fill: var(--muted); }
+.ld { font: 600 10.5px var(--body); fill: var(--sage-deep); }
+.lp { font: 600 10.5px var(--body); fill: var(--power); }
+.zd { opacity: 0; transition: opacity 0.35s; pointer-events: none; }
+.zd.show { opacity: 1; }
+.zt { font: 500 5.4px var(--body); fill: currentColor; }
+.zs { font: 400 4.8px var(--body); fill: var(--muted); }
+.hideon.gone { opacity: 0; }
+.hideon { transition: opacity 0.3s; }
+.detail { background: var(--surface); border: 1px solid var(--line); border-left: 4px solid var(--sage); border-radius: 8px; padding: 14px 16px; display: flex; flex-direction: column; gap: 8px; }
+.detail ul { margin: 0; padding-left: 20px; font-size: 0.95rem; }
+.detail .state { color: var(--muted); font-size: 0.88rem; }
+@media (prefers-reduced-motion: reduce) { .part, .link, .zd, .hideon { transition: none; } }
+</style>
+
+<div class="wrap">
+<header>
+  <span class="eyebrow">Hollygrove Community Fridge</span>
+  <h1>Fridge Counter Build</h1>
+  <p>All six pieces exist. The counter program runs on your bench board and reports to the live server, and the dashboard is public at <a href="https://hollygrovenola.org/fridge/">hollygrovenola.org/fridge</a>. Nothing has been printed yet, and the fridge unit waits for the Walter board.</p>
+  <p class="stamp">Update 7 &middot; Saturday, November 21, 2026. Final update for this session. The test unit reports over WiFi on its own power, with a real switch. Open decision: indoors or outdoors for the fridge unit.</p>
+</header>
+
+<section>
+  <h2>How the whole thing works</h2>
+  <p>A magnet on the fridge door and a switch on the frame tell a small computer when the door opens. The computer sends each opening over the cell network to the Hollygrove server, which adds them up and shows hourly totals on the public page. Pick a part to zoom in on it.</p>
+  <div class="chips" id="chips" role="group" aria-label="Parts of the system"></div>
+  <figure class="wide">
+  <div class="mapwrap">
+  <svg id="map" viewBox="0 0 1200 640" role="img" aria-label="System map: fridge door switch, weatherproof box with the Walter board, power from an outlet, cellular link, Hollygrove server and the public dashboard, plus the WiFi bench version">
+    <defs>
+      <marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse"><path d="M0,0 L10,5 L0,10 z" fill="context-stroke"/></marker>
+    </defs>
+
+    <!-- links -->
+    <g class="link" data-parts="fridge box sensors">
+      <path class="sig" d="M214,176 H300 V430 H400 V409" marker-end="url(#ah)"/>
+      <text class="ml" x="232" y="168">door wire</text>
+      <text class="ms" x="232" y="192">2 conductors</text>
+    </g>
+    <g class="link" data-parts="power box">
+      <path class="pwr" d="M404,522 H436"/>
+      <path class="pwr" d="M466,503 V412" marker-end="url(#ah)"/>
+      <text class="lp" x="474" y="455">5 volts</text>
+    </g>
+    <g class="link" data-parts="box cell">
+      <path class="data" d="M650,250 H742" marker-end="url(#ah)"/>
+      <text class="ld" x="662" y="242">LTE-M</text>
+    </g>
+    <g class="link" data-parts="cell server bench">
+      <path class="data" d="M858,325 H938" marker-end="url(#ah)"/>
+      <text class="ld" x="872" y="317">HTTPS</text>
+    </g>
+    <g class="link" data-parts="server dash">
+      <path class="data" d="M1060,402 V448" marker-end="url(#ah)"/>
+      <text class="ld" x="1070" y="430">hourly totals</text>
+    </g>
+    <g class="link" data-parts="bench cell">
+      <path class="data opt" d="M482,85 H850 V301" marker-end="url(#ah)"/>
+      <text class="ld" x="600" y="77">WiFi (bench only)</text>
+    </g>
+    <g class="link" data-parts="sensors box">
+      <path class="sig opt" d="M520,406 V448 H706 V424"/>
+    </g>
+
+    <!-- fridge -->
+    <g class="part" data-part="fridge" data-parts="fridge" tabindex="0" role="button" aria-label="Fridge door and switch">
+      <text class="mt" x="140" y="150" text-anchor="middle">Fridge door</text>
+      <rect class="o" x="50" y="170" width="180" height="290" rx="8"/>
+      <line class="thin" x1="50" y1="182" x2="230" y2="182"/>
+      <rect class="thin" x="58" y="190" width="164" height="262" rx="5"/>
+      <line class="sig" x1="72" y1="270" x2="72" y2="340"/>
+      <rect class="o2" x="192" y="171" width="22" height="9"/>
+      <rect class="o2" x="192" y="185" width="22" height="9"/>
+      <text class="ms hideon" x="140" y="478" text-anchor="middle">magnet on the door, switch on the frame</text>
+      <g class="zd" data-for="fridge">
+        <text class="zt" x="188" y="177" text-anchor="end">switch (on the frame)</text>
+        <text class="zt" x="188" y="192" text-anchor="end">magnet (on the door)</text>
+        <text class="zs" x="216" y="200" text-anchor="end">3 mm apart when shut; held by foam tape</text>
+        <text class="zs" x="216" y="207" text-anchor="end">door opens, magnet moves away, switch opens</text>
+        <text class="zs" x="76" y="262">handle</text>
+      </g>
+      <g data-parts="sensors">
+        <circle class="thin opt" cx="124" cy="300" r="6"/>
+        <line class="thin opt" x1="66" y1="372" x2="214" y2="372"/>
+        <g class="zd" data-for="fridge sensors">
+          <text class="zt" x="134" y="302">temperature probe (optional)</text>
+          <text class="zt" x="70" y="368">shelf scale (optional)</text>
+        </g>
+      </g>
+    </g>
+
+    <!-- box -->
+    <g class="part" data-part="box" data-parts="box" tabindex="0" role="button" aria-label="Weatherproof box">
+      <text class="mt" x="500" y="160" text-anchor="middle">Weatherproof box</text>
+      <rect class="o" x="350" y="170" width="300" height="230" rx="10"/>
+      <text class="ml hideon" x="500" y="290" text-anchor="middle">Walter board on its carrier</text>
+      <text class="ms hideon" x="500" y="306" text-anchor="middle">sealed; cables enter at the bottom</text>
+      <circle class="o2" cx="400" cy="400" r="6"/><circle class="o2" cx="466" cy="400" r="6"/><circle class="o2" cx="520" cy="400" r="6"/>
+      <g class="zd" data-for="box">
+        <rect class="o2" x="372" y="196" width="206" height="76" rx="3"/>
+        <text class="zs" x="376" y="203">carrier board (the sled holds it with clamps)</text>
+        <rect class="o" x="384" y="210" width="92" height="28" rx="2"/>
+        <text class="zt" x="430" y="226" text-anchor="middle">Walter (computer + cell modem)</text>
+        <text class="zs" x="430" y="233" text-anchor="middle">plugs into sockets; lifts out for service</text>
+        <g>
+          <rect class="o" x="380" y="252" width="22" height="14"/><text class="zt" x="391" y="261" text-anchor="middle">PWR</text>
+          <rect class="o" x="407" y="252" width="22" height="14"/><text class="zt" x="418" y="261" text-anchor="middle">DOOR</text>
+          <rect class="o" x="434" y="252" width="22" height="14"/><text class="zt" x="445" y="261" text-anchor="middle">I2C</text>
+          <rect class="o" x="461" y="252" width="22" height="14"/><text class="zt" x="472" y="261" text-anchor="middle">1W</text>
+          <rect class="o" x="488" y="252" width="22" height="14"/><text class="zt" x="499" y="261" text-anchor="middle">DHT</text>
+          <rect class="o" x="515" y="252" width="26" height="14"/><text class="zt" x="528" y="261" text-anchor="middle">RS485</text>
+          <rect class="o" x="546" y="252" width="26" height="14"/><text class="zt" x="559" y="261" text-anchor="middle">SCALE</text>
+        </g>
+        <text class="zs" x="482" y="247">screw terminals: each wire has a labelled place</text>
+        <path class="sig" d="M418,266 V330 H400 V394"/>
+        <path class="pwr" d="M391,266 V350 H466 V394"/>
+        <rect class="o" x="420" y="345" width="18" height="10"/><text class="zt" x="429" y="342" text-anchor="middle">fuse</text>
+        <path class="thin opt" d="M445,266 V310 H520 V394"/>
+        <rect class="o2" x="592" y="190" width="46" height="62" rx="2"/>
+        <text class="zt" x="615" y="218" text-anchor="middle">LTE</text><text class="zt" x="615" y="225" text-anchor="middle">antenna</text>
+        <path class="thin" d="M476,216 H592"/>
+        <text class="zs" x="534" y="213" text-anchor="middle">antenna lead</text>
+        <rect class="o" x="594" y="290" width="40" height="20" rx="2"/><text class="zt" x="614" y="302" text-anchor="middle">desiccant</text>
+        <circle class="o2" cx="650" cy="340" r="5"/><text class="zt" x="642" y="342" text-anchor="end">breather vent</text>
+        <text class="zt" x="408" y="393">door</text>
+        <text class="zt" x="474" y="393">power</text>
+        <text class="zt" x="528" y="393">sensors</text>
+        <text class="zs" x="566" y="386">sealed cable openings</text>
+      </g>
+    </g>
+
+    <!-- power -->
+    <g class="part" data-part="power" data-parts="power" tabindex="0" role="button" aria-label="Power">
+      <text class="mt" x="500" y="592" text-anchor="middle">Power</text>
+      <rect class="o" x="370" y="500" width="34" height="44" rx="4"/>
+      <line class="sig" x1="381" y1="514" x2="381" y2="524"/><line class="sig" x1="393" y1="514" x2="393" y2="524"/>
+      <rect class="o" x="436" y="503" width="60" height="38" rx="5"/>
+      <text class="ml" x="466" y="526" text-anchor="middle">USB</text>
+      <text class="ms hideon" x="387" y="560" text-anchor="middle">outlet</text>
+      <text class="ms hideon" x="466" y="560" text-anchor="middle">adapter</text>
+      <rect class="o opt" x="540" y="500" width="100" height="44" rx="5"/>
+      <text class="ms" x="590" y="519" text-anchor="middle">solar battery</text>
+      <text class="ms" x="590" y="533" text-anchor="middle">(later)</text>
+      <g class="zd" data-for="power">
+        <text class="zt" x="387" y="556" text-anchor="middle">wall outlet</text>
+        <text class="zs" x="387" y="563" text-anchor="middle">dry-goods room</text>
+        <text class="zt" x="466" y="556" text-anchor="middle">USB adapter</text>
+        <text class="zs" x="466" y="563" text-anchor="middle">turns 120 V into 5 V</text>
+        <text class="zs" x="474" y="470">low-voltage cable, about 10 ft</text>
+        <text class="zs" x="590" y="556" text-anchor="middle">to be planned with</text>
+        <text class="zs" x="590" y="563" text-anchor="middle">the solar installers</text>
+      </g>
+    </g>
+
+    <!-- cellular -->
+    <g class="part" data-part="cell" data-parts="cell" tabindex="0" role="button" aria-label="Cellular link and internet">
+      <text class="mt" x="780" y="178" text-anchor="middle">Cell network</text>
+      <path class="sig" d="M770,280 L780,215 L790,280 M774,255 H786 M777,235 H783"/>
+      <path class="thin" d="M766,212 A16,16 0 0 1 794,212 M760,204 A26,26 0 0 1 800,204"/>
+      <path class="data" d="M795,282 V296" marker-end="url(#ah)"/>
+      <rect class="o" x="735" y="298" width="122" height="54" rx="27"/>
+      <text class="ml" x="796" y="322" text-anchor="middle">internet</text>
+      <text class="ms" x="796" y="337" text-anchor="middle">Cloudflare</text>
+      <g class="zd" data-for="cell">
+        <text class="zt" x="800" y="222">cell tower</text>
+        <text class="zs" x="800" y="229">low-power "LTE-M" service</text>
+        <text class="zs" x="800" y="236">prepaid 10-year data plan</text>
+        <text class="zs" x="796" y="362" text-anchor="middle">encrypted all the way to the server</text>
+      </g>
+    </g>
+
+    <!-- server -->
+    <g class="part" data-part="server" data-parts="server" tabindex="0" role="button" aria-label="Hollygrove server">
+      <text class="mt" x="1060" y="140" text-anchor="middle">Hollygrove server</text>
+      <rect class="o" x="940" y="150" width="240" height="250" rx="10"/>
+      <rect class="o2" x="962" y="176" width="196" height="44" rx="5"/><text class="ml" x="1060" y="202" text-anchor="middle">web server</text>
+      <rect class="o2" x="962" y="252" width="196" height="44" rx="5"/><text class="ml" x="1060" y="278" text-anchor="middle">fridge service</text>
+      <rect class="o2" x="962" y="328" width="196" height="44" rx="5"/><text class="ml" x="1060" y="354" text-anchor="middle">database</text>
+      <path class="data" d="M1060,221 V250" marker-end="url(#ah)"/><path class="data" d="M1060,297 V326" marker-end="url(#ah)"/>
+      <g class="zd" data-for="server">
+        <text class="zs" x="1060" y="212" text-anchor="middle">also serves hollygrovenola.org and NextCloud</text>
+        <text class="zs" x="1060" y="288" text-anchor="middle">checks the device's key, drops duplicates</text>
+        <text class="zs" x="1060" y="364" text-anchor="middle">one row per opening: time and how long</text>
+        <text class="zs" x="1060" y="386" text-anchor="middle">copied nightly; whole server snapshotted daily</text>
+        <text class="zs" x="1066" y="238">every request</text>
+        <text class="zs" x="1066" y="314">saves</text>
+      </g>
+    </g>
+
+    <!-- dashboard -->
+    <g class="part" data-part="dash" data-parts="dash" tabindex="0" role="button" aria-label="Public dashboard">
+      <text class="mt" x="1060" y="606" text-anchor="middle">Public dashboard</text>
+      <rect class="o" x="975" y="452" width="170" height="124" rx="8"/>
+      <line class="thin" x1="975" y1="470" x2="1145" y2="470"/>
+      <rect class="o2" x="992" y="530" width="14" height="30"/><rect class="o2" x="1012" y="512" width="14" height="48"/><rect class="o2" x="1032" y="496" width="14" height="64"/><rect class="o2" x="1052" y="520" width="14" height="40"/><rect class="o2" x="1072" y="504" width="14" height="56"/><rect class="o2" x="1092" y="488" width="14" height="72"/><rect class="o2" x="1112" y="524" width="14" height="36"/>
+      <g class="zd" data-for="dash">
+        <text class="zs" x="1060" y="464" text-anchor="middle">hollygrovenola.org/fridge</text>
+        <text class="zs" x="1060" y="570" text-anchor="middle">totals by hour and day; never a single opening</text>
+      </g>
+    </g>
+
+    <!-- bench -->
+    <g class="part" data-part="bench" data-parts="bench" tabindex="0" role="button" aria-label="Bench version">
+      <text class="mt" x="426" y="40" text-anchor="middle">Bench version</text>
+      <rect class="o" x="370" y="52" width="112" height="66" rx="8"/>
+      <rect class="o2" x="386" y="70" width="80" height="30" rx="3"/>
+      <text class="ms hideon" x="426" y="134" text-anchor="middle">test board at the house</text>
+      <g class="zd" data-for="bench">
+        <text class="zt" x="426" y="87" text-anchor="middle">DevKitC board</text>
+        <text class="zs" x="426" y="62" text-anchor="middle">3D-printed case</text>
+        <text class="zs" x="426" y="110" text-anchor="middle">on a screw-terminal board</text>
+        <text class="zs" x="496" y="98">same program; reports as "bench-01",</text>
+        <text class="zs" x="496" y="105">which is kept out of the public numbers</text>
+      </g>
+    </g>
+
+    <!-- optional weather sensor -->
+    <g class="part" data-part="sensors" data-parts="sensors" tabindex="0" role="button" aria-label="Optional sensors">
+      <rect class="o opt" x="658" y="398" width="96" height="24" rx="4"/>
+      <text class="ms" x="706" y="414" text-anchor="middle">weather sensor</text>
+      <g class="zd" data-for="sensors">
+        <text class="zs" x="706" y="392" text-anchor="middle">outside the box, in shade</text>
+      </g>
+    </g>
+  </svg>
+  </div>
+  <figcaption>Green arrows carry the counts, the amber line is power, dashed parts are optional or for later. On a phone, scroll the map sideways.</figcaption>
+  </figure>
+  <div class="detail" id="detail" aria-live="polite"></div>
+</section>
+
+<section>
+  <h2>The six deliverables</h2>
+  <ul class="board">
+    <li class="item">
+      <div class="item-head"><h3>1. Counter program for the ESP32</h3><span class="pill done">Running on your board</span></div>
+      <p>The board on your desk runs the program as test device <code>bench-01</code>. Over HTTPS to the live server it sent heartbeats and simulated door openings, all accepted, and it kept reporting for hours.</p>
+      <ul>
+        <li>Each opening is recorded with its time and how long the door stayed open. Events are kept through power cuts and outages and resent.</li>
+        <li>WiFi today. The Walter LTE version compiles, but it has never run on a Walter, and it does not yet switch on the Walter's sensor power rail.</li>
+        <li>A real reed switch is now wired to it and counting. A WiFi fault with the eero access points was fixed by lowering the board's transmit power.</li>
+        <li>Not tested: real sensors, the status light's colours.</li>
+      </ul>
+      <span class="where"><code>src\</code>, <code>docs\firmware.md</code></span>
+    </li>
+    <li class="item">
+      <div class="item-head"><h3>2. Wiring diagram</h3><span class="pill done">Done</span></div>
+      <p>One pin layout works for all your board types. Each part is tagged as in use, on hand, or to buy.</p>
+      <div class="shots"><figure class="wide"><img src="{{IMG:wiring}}" alt="Wiring diagram: ESP32-S3 board in the middle with the reed switch and optional sensors around it"><figcaption>The reed switch goes to GPIO4 and ground. Everything else is optional.</figcaption></figure></div>
+      <span class="where"><code>docs\wiring\</code></span>
+    </li>
+    <li class="item">
+      <div class="item-head"><h3>3. Server and database</h3><span class="pill done">Live</span></div>
+      <p>A seventh container on the hollygrove VM, beside the website and NextCloud, with its own small database. Public numbers are hourly totals, about a minute behind, never the time of one opening. Bench data stays out of the public numbers.</p>
+      <ul>
+        <li>Backups: TrueNAS now snapshots the whole VM daily and keeps 14 days; the VM copies the fridge database nightly. Both are on the same storage pool as the VM.</li>
+      </ul>
+      <span class="where"><code>server\</code>; on the VM <code>/opt/hollygrove/fridge/</code></span>
+    </li>
+    <li class="item">
+      <div class="item-head"><h3>4. Dashboard</h3><span class="pill done">Live, sample data</span></div>
+      <p><a href="https://hollygrovenola.org/fridge/">hollygrovenola.org/fridge</a> is a short page with two cards: <a href="https://hollygrovenola.org/fridge/sample/">sample data</a> (made-up numbers) and <a href="https://hollygrovenola.org/fridge/live/">live data</a> from the WiFi test unit at the house, labelled as a test. No navigation-bar link yet. The picture below is from before the hub was added.</p>
+      <div class="shots"><figure class="tall wide"><img src="{{IMG:dash_live}}" alt="The live dashboard showing a sample data banner, headline counts, a calendar heatmap, daily bars with a trend line and an hourly chart"><figcaption>The live page (top part).</figcaption></figure></div>
+    </li>
+    <li class="item">
+      <div class="item-head"><h3>5. Demo door and frame</h3><span class="pill done">Rev 2, not printed</span></div>
+      <p>Built around the white surface-mount switch you measured. 152.4 mm tall with a 50.8 mm deep entry. Door and frame print together with the hinge already joined. The switch sticks inside the doorway and the magnet on the back of the door, 3 mm apart when shut, held by their foam tape.</p>
+      <ul>
+        <li>A separate base plate, held by two zip ties, keeps it from tipping; it needs rubber feet so it does not slide.</li>
+        <li>Checked by calculation only. The magnet pocket prints as a 15 mm bridge and may sag a little.</li>
+      </ul>
+      <div class="shots">
+        <figure><img src="{{IMG:door_foot}}" alt="Render of the door frame on its base plate with the red door open"><figcaption>On its base plate, door open.</figcaption></figure>
+        <figure><img src="{{IMG:door_switch}}" alt="Close-up render of the switch on the doorway wall beside the magnet on the door"><figcaption>Switch (wall) and magnet (door), door shut.</figcaption></figure>
+        <figure><img src="{{IMG:door_plate}}" alt="Render of the door and frame lying flat as they print"><figcaption>As it prints: one plate.</figcaption></figure>
+      </div>
+      <span class="where"><code>cad\demo-door\print\</code> holds the two files to print &middot; hinge by Nick Johnson, CC BY-SA</span>
+    </li>
+    <li class="item">
+      <div class="item-head"><h3>6. Case, power and weatherproofing</h3><span class="pill done">Designed, not printed</span></div>
+      <p>A printable bench case for each of your dev boards, and carriers that drop the electronics into a store-bought weatherproof box. There is now a carrier for the Walter: it plugs into a small prototyping board with screw terminals, and the carrier holds that board and the LTE antenna.</p>
+      <ul>
+        <li>Power, first install: a USB adapter on the inverter's 120 V output. Your LM2596 converters must not go on the 48 V battery.</li>
+        <li>Several dimensions come from documents, not a ruler; the Walter ones are from its datasheet. The case README has a caliper checklist.</li>
+      </ul>
+      <div class="shots">
+        <figure><img src="{{IMG:case_closed}}" alt="Render of the closed bench case with labelled cable slots"><figcaption>Bench case for the DevKitC board.</figcaption></figure>
+        <figure><img src="{{IMG:walter}}" alt="Render of the Walter carrier inside the weatherproof box with the antenna on an upright pad"><figcaption>Walter carrier in the weatherproof box.</figcaption></figure>
+      </div>
+      <span class="where"><code>cad\enclosure\print\</code>, <code>docs\power-and-enclosure.md</code></span>
+    </li>
+  </ul>
+</section>
+
+<section>
+  <h2>What it costs</h2>
+  <p>The purchase request for the HNA president lists every item in plain language, with your removals applied. Shipping and tax are a 15% estimate.</p>
+  <div class="scroll">
+  <table>
+    <thead><tr><th>Stage</th><th>Parts and tools</th><th>With tax and shipping</th></tr></thead>
+    <tbody>
+      <tr><td>1. Build and demonstrate, with soldering tools</td><td>$250.22</td><td>$290</td></tr>
+      <tr><td>2. Install at the fridge with the Walter</td><td>$307.92</td><td>$355</td></tr>
+      <tr><td>3. Extra sensors, optional</td><td>$71.49</td><td>$85</td></tr>
+      <tr><td><strong>Total</strong></td><td><strong>$629.63</strong></td><td><strong>$730</strong></td></tr>
+    </tbody>
+  </table>
+  </div>
+  <p class="stamp"><a href="https://claude.ai/artifact/PKgnuYVTnSb8u7AuHuJi8s">Fridge Door Counter: Purchase Request</a> is the page to hand over. Running from the solar battery is left out, to be planned with the solar installers.</p>
+  <p><strong>Cheaper option, not yet decided:</strong> putting the electronics indoors in the dry-goods room, in a printed case, with the Walter powered by USB-C on a breadboard, cuts the whole build to about $110 to $120. Outdoors with a hardware-store sealed box is about $180. The request above still shows the $730 outdoor version.</p>
+</section>
+
+<section>
+  <h2>Questions waiting for you</h2>
+  <ul class="plain">
+    <li><span class="pill ask">Ask</span> For the fridge install: is there a free 120 V outlet in the dry-goods room, and who would connect to the 48 V battery later?</li>
+    <li><span class="pill ask">Ask</span> Weather sensor on the fridge unit from day one, or door counts only?</li>
+    <li><span class="pill ask">Ask</span> Is there a date you want the demo door printed and working by?</li>
+    <li><span class="pill ask">Ask</span> Which reed switch goes on the real fridge: the surface-mount pair or the recessed ones?</li>
+  </ul>
+  <p class="stamp">Already answered: WiFi now and LTE on the Walter later; the generic DevKitC is the bench board; bare Walter module with antenna and SIM; no navigation-bar link yet; 15-minute publishing lag; dashboard wording fine for now.</p>
+</section>
+
+<section>
+  <h2>Changes to your machines</h2>
+  <ul class="plain">
+    <li><strong>ESP32 board:</strong> runs the new program. What it held before is saved on the Backups share.</li>
+    <li><strong>hollygrove VM:</strong> one new container, a <code>fridge/</code> folder, one web route, one page, and a nightly database-copy timer.</li>
+    <li><strong>TrueNAS:</strong> one new daily snapshot task for the hollygrove VM disk, kept 14 days.</li>
+    <li><strong>This PC:</strong> a second PlatformIO folder for the Walter build, plus a few Python helper packages added to PlatformIO during a repair.</li>
+    <li><strong>Git:</strong> all work is on <code>main</code> on GitHub. The WiFi password and device keys are not in it.</li>
+  </ul>
+</section>
+</div>
+<script>
+(function () {
+  var PARTS = [
+    { id: 'all', name: 'Whole system', box: [0, 0, 1200, 640],
+      title: 'The whole system',
+      lead: 'Door switch, computer in a sealed box, cell network, server, public page. Everything left of the cell tower is at the fridge; everything right of it already exists and is running.',
+      items: ['The fridge unit is not installed yet; it waits for the Walter board.', 'The server, database and dashboard are live now.', 'A test board at the house exercises the same path over WiFi.'],
+      state: 'Pick a part above, or select it on the map.' },
+    { id: 'fridge', name: 'Door switch', box: [10, 128, 300, 362],
+      title: 'Fridge door and switch',
+      lead: 'A magnet sticks to the door and a small switch sticks to the frame beside it. When the door is shut the magnet holds the switch closed; when the door opens the switch opens, and the computer counts one opening and times how long it lasts.',
+      items: ['Two wires run from the switch to the box. Nothing on the door itself needs power.', 'Very quick bumps (under a second) are not counted. A door left standing open counts once.', 'A temperature probe inside the fridge and a scale under a shelf can be added later.'],
+      state: 'Tested on the bench board with the real surface-mount switch. Not yet tried on a fridge door.' },
+    { id: 'box', name: 'Weatherproof box', box: [335, 140, 330, 290],
+      title: 'Inside the weatherproof box',
+      lead: 'A sealed plastic box near the fridge holds the Walter board, which is the computer and the cell modem in one. It plugs into a carrier board with labelled screw terminals, so each wire has an obvious place.',
+      items: ['A 3D-printed tray holds the carrier board and stands the antenna up, away from metal.', 'Cables come in through sealed openings at the bottom so water runs away from them.', 'A fuse protects the electronics; a vent and moisture packets keep the inside dry.', 'If the cell signal drops, openings are saved on the board and sent when it returns.'],
+      state: 'Designed from the Walter datasheet; not printed, and not checked against a real Walter.' },
+    { id: 'power', name: 'Power', box: [335, 395, 330, 205],
+      title: 'Power',
+      lead: 'A USB adapter in a wall outlet turns 120 volts into the 5 volts the board uses. A low-voltage cable carries that to the box.',
+      items: ['Nobody has to touch the solar battery for the first install.', 'Running it straight from the solar battery later is a job to plan with the solar installers.'],
+      state: 'The outlet in the dry-goods room still has to be confirmed on site.' },
+    { id: 'cell', name: 'Cell network', box: [640, 150, 310, 260],
+      title: 'Cell network and internet',
+      lead: 'The Walter sends its small messages over the cell network, on a low-power service meant for devices like this. From there they travel encrypted over the internet to the Hollygrove server.',
+      items: ['A prepaid data plan covers ten years; there is no monthly bill.', 'The fridge does not need WiFi.'],
+      state: 'Not tested: the Walter version of the program has only been compiled, and cell coverage at the fridge has not been checked.' },
+    { id: 'server', name: 'Server', box: [925, 118, 265, 300],
+      title: 'The Hollygrove server',
+      lead: 'The same server that runs hollygrovenola.org receives each message. A small service checks that it came from a known device, saves every opening in a database, and answers the dashboard with totals.',
+      items: ['It only ever gives out totals by the hour, about a minute behind.', 'Test boards are stored separately and never appear in the public numbers.', 'The database is copied every night and the whole server is snapshotted daily.'],
+      state: 'Live and tested with the bench board.' },
+    { id: 'dash', name: 'Dashboard', box: [925, 425, 265, 195],
+      title: 'The public dashboard',
+      lead: 'Anyone can open hollygrovenola.org/fridge to see how busy the fridge is: today, this week, by hour of the day, and over time.',
+      items: ['The page has two cards: sample data, and live counts from the WiFi test unit at the house.', 'When the fridge unit is installed, one setting points the live page at the real fridge counts.', 'It is not linked from the site menu yet.'],
+      state: 'Live.' },
+    { id: 'bench', name: 'Bench version', box: [335, 12, 500, 135],
+      title: 'Bench version at the house',
+      lead: 'A test board in a 3D-printed case runs the same program over home WiFi. It is how the program, the server and the dashboard were proven before anything goes to the fridge.',
+      items: ['It sits on a screw-terminal board, so sensors can be wired in to try them.', 'It reports as a test device and stays out of the public numbers.'],
+      state: 'Running now. The case is designed but not printed.' },
+    { id: 'sensors', name: 'Optional sensors', box: [20, 140, 740, 470],
+      title: 'Optional sensors',
+      lead: 'The program already understands several extra sensors. Each stays silent until one is plugged in, so they can be added one at a time.',
+      items: ['Weather sensor outside the box: temperature, humidity and air pressure.', 'Temperature probe inside the fridge, for food safety.', 'A scale under a shelf, to show how full the fridge is.', 'A link to the solar equipment, to report battery and panel status.'],
+      state: 'Only the pressure sensor is on hand; none has been tested on the board.' }
+  ];
+  var svg = document.getElementById('map'), chips = document.getElementById('chips'), detail = document.getElementById('detail');
+  var cur = [0, 0, 1200, 640], focus = 'all', raf = 0;
+  var reduce = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  function setBox(b) { cur = b; svg.setAttribute('viewBox', b.join(' ')); svg.style.aspectRatio = b[2] + ' / ' + b[3]; }
+  function animate(to) {
+    cancelAnimationFrame(raf);
+    if (reduce) { setBox(to); return; }
+    var from = cur.slice(), t0 = null;
+    function step(ts) {
+      if (t0 === null) t0 = ts;
+      var k = Math.min(1, (ts - t0) / 480), e = k < 0.5 ? 2 * k * k : 1 - Math.pow(-2 * k + 2, 2) / 2;
+      setBox(from.map(function (v, i) { return v + (to[i] - v) * e; }));
+      if (k < 1) raf = requestAnimationFrame(step);
+    }
+    raf = requestAnimationFrame(step);
+  }
+  function has(el, attr, id) { return (' ' + (el.getAttribute(attr) || '') + ' ').indexOf(' ' + id + ' ') >= 0; }
+  function show(id, instant) {
+    var p = PARTS.filter(function (x) { return x.id === id; })[0] || PARTS[0];
+    focus = p.id;
+    if (instant) { cancelAnimationFrame(raf); setBox(p.box); } else { animate(p.box); }
+    Array.prototype.forEach.call(svg.querySelectorAll('[data-parts]'), function (el) {
+      el.classList.toggle('dim', focus !== 'all' && !has(el, 'data-parts', focus));
+    });
+    Array.prototype.forEach.call(svg.querySelectorAll('.zd'), function (el) {
+      el.classList.toggle('show', has(el, 'data-for', focus));
+    });
+    Array.prototype.forEach.call(svg.querySelectorAll('.hideon'), function (el) {
+      el.classList.toggle('gone', focus !== 'all' && focus !== 'sensors');
+    });
+    Array.prototype.forEach.call(chips.children, function (b) { b.setAttribute('aria-pressed', String(b.dataset.id === focus)); });
+    detail.innerHTML = '';
+    var h = document.createElement('h3'); h.textContent = p.title; detail.appendChild(h);
+    var l = document.createElement('p'); l.textContent = p.lead; detail.appendChild(l);
+    var ul = document.createElement('ul');
+    p.items.forEach(function (t) { var li = document.createElement('li'); li.textContent = t; ul.appendChild(li); });
+    detail.appendChild(ul);
+    var s = document.createElement('p'); s.className = 'state'; s.textContent = p.state; detail.appendChild(s);
+  }
+  PARTS.forEach(function (p) {
+    var b = document.createElement('button');
+    b.type = 'button'; b.className = 'chip'; b.id = 'chip-' + p.id; b.dataset.id = p.id; b.textContent = p.name;
+    b.addEventListener('click', function () { show(focus === p.id ? 'all' : p.id); });
+    chips.appendChild(b);
+  });
+  Array.prototype.forEach.call(svg.querySelectorAll('.part'), function (g) {
+    function go() { var id = g.getAttribute('data-part'); show(focus === id ? 'all' : id); }
+    g.addEventListener('click', go);
+    g.addEventListener('keydown', function (e) { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); go(); } });
+  });
+  document.addEventListener('keydown', function (e) { if (e.key === 'Escape') show('all'); });
+  var h0 = (location.hash || '').slice(1);
+  show(PARTS.some(function (p) { return p.id === h0; }) ? h0 : 'all', true);
+})();
+</script>

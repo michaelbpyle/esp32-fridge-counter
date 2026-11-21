@@ -270,7 +270,8 @@ Not tested: a real reed switch (only `sim`; the switch itself was bench-tested i
 | Upload fails part-way or "MD5 mismatch" | Keep `upload_speed = 230400` in `platformio.ini`; faster speeds corrupt data on this board's USB chip. Try another cable. |
 | No COM port appears | Use the port marked UART/COM, and a data cable (some cables only charge). The CH343 driver is in `\\TRUENAS\Pyle-TNAS_Individual\Projects\Microcontrollers\Freenove\Freenove_ESP32_S3_WROOM_Board-main\Freenove_ESP32_S3_WROOM_Board-main\CH343`. |
 | Nothing printed in the monitor | Speed must be 115200. Press RST. |
-| `[wifi] trying network 1 of 1` repeats | Wrong WiFi name or password in `secrets.h`, or a 5 GHz-only network (the ESP32 needs 2.4 GHz). |
+| `[wifi] trying network 1 of 1` repeats | Wrong WiFi name or password in `secrets.h`, or a 5 GHz-only network (the ESP32 needs 2.4 GHz). If the name and password are right and the network is close, it is the transmit-power fault in the next row. |
+| WiFi shows "connected" but every post fails, or the board cannot join a strong nearby network | Seen on 2026-11-14 with the DevKitC board and eero access points: at full transmit power the access point never answered the board's authentication request (disconnect reason 2, AUTH_EXPIRE). Fixed by `WIFI_TX_POWER` in `include\config.h`, now 8.5 dBm by default. If the board is moved far from the access point and cannot reach it, raise the value one step at a time. |
 | LED blinks red, `[post] failed: HTTP 404` | The server is not answering at that path. Events are kept; nothing to do on the device. |
 | `[post] failed: no HTTP response (error -1)` | No internet, DNS or TLS problem. Events are kept. |
 | LED blinks magenta, `HTTP 401` | `DEVICE_KEY` does not match the server for this `DEVICE_ID`. |

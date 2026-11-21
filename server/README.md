@@ -23,7 +23,7 @@ built, because Docker is not installed on the dev PC. Nothing has been deployed.
                            v                                                  v
                 hollygrove-fridge (this app)                    /srv/site  = site/_site (Quarto output)
                 FastAPI + uvicorn, 1 worker                     /fridge/index.html is rendered from
-                           |                                    site/fridge/index.qmd (dashboard page)
+                           |                                    site/fridge/ (hub, sample/ and live/ pages)
                            v
             /data/fridge.db  (SQLite, WAL)  <- bind mount /opt/hollygrove/fridge/data
 ```
@@ -40,7 +40,9 @@ The only component that writes data is the ingest endpoint.
 | `fridge.env.example` | Template for the secrets file |
 | `deploy\docker-compose.fridge.yml` | Compose service snippet |
 | `deploy\Caddyfile.fridge-block.txt` | Caddy block |
-| `site-fridge\index.qmd` | Dashboard page (Quarto) |
+| `site-fridge\hub.qmd` | The page at `/fridge/`: two cards linking to the sample and live pages |
+| `site-fridge\dashboard.qmd` | The dashboard (Quarto). Source for both `/fridge/sample/` and `/fridge/live/` |
+| `site-fridge\build_pages.py` | Generates the three published pages into `site-fridge\out\fridge\` (not committed). `LIVE_DEVICE` there is `bench-01`, the WiFi test unit; set it to `None` when the fridge unit reports |
 | `tests\`, `requirements-dev.txt` | pytest suite |
 | `tools\load_synthetic.py` | Posts weeks of fake history through the real ingest path (local use only) |
 | `screenshots\` | Dashboard in populated, empty, demo (sample data) and API-down states, at 1280 and 390 px |
@@ -109,7 +111,7 @@ Errors: 400 for a bad parameter (short reason), 404 for an unknown device.
 
 All are constants in `app\config.py`, overridable by environment variable.
 
-- Privacy: the public API returns only counts by the hour or coarser. Individual event timestamps are never returned. In addition, rows only become public after the top of the next hour (`FRIDGE_PUBLISH_GRANULARITY_S=3600`), so watching a number change cannot reveal when a door opened more precisely than the hour. Device last-heard is floored to the hour. Signal strength, memory and similar device details are not public. Set the value to 0 to publish live. Client addresses are used only in memory for rate limiting and are never stored or logged.
+- Privacy: the public API returns only counts by the hour or coarser. Individual event timestamps are never returned. In addition, rows only become public after a delay set by `FRIDGE_PUBLISH_GRANULARITY_S`. The code default is 3600 (the top of the next hour). The owner set production to 60 on 2026-11-15, so counts appear about a minute behind; someone watching the page can therefore see a count change within a minute of a door opening, although the charts still show hourly totals only. Device last-heard is floored to the hour. Signal strength, memory and similar device details are not public. Set the value to 0 to publish live. Client addresses are used only in memory for rate limiting and are never stored or logged.
 - An opening shorter than 1 second (`FRIDGE_MIN_OPEN_MS=1000`) is treated as a bounce and left out of public counts.
 - A door held open (`dur_ms` -1) counts once and is left out of duration statistics.
 - Test devices (`FRIDGE_TEST_DEVICES`) are stored but excluded from every public aggregate.
@@ -135,8 +137,8 @@ to make it visible immediately (otherwise it appears at the next hour):
 .venv/Scripts/python.exe tools/load_synthetic.py --url http://127.0.0.1:8765 --device fridge-01 --key local-dev-key-fridge-01 --weeks 7 --readings --backdate-db C:/path/to/data/fridge.db
 ```
 
-To see the dashboard locally, render `site-fridge\index.qmd` inside a copy of the site
-(`quarto render fridge/index.qmd`) and start the service with
+To see the dashboard locally, run `python build_pages.py` in `site-fridge\`, copy `out\fridge\` into a copy of the site
+and render it (`quarto render fridge/live/index.qmd`) and start the service with
 `FRIDGE_DEV_STATIC_DIR=<copy>/_site` (dev only; never set in production). Then open
 `http://127.0.0.1:8765/fridge/`, or `/fridge/?demo=1` for sample data.
 
@@ -162,7 +164,7 @@ cp Caddyfile /opt/hollygrove-backups/Caddyfile.$(date +%F)
 |---|---|
 | `Dockerfile`, `.dockerignore`, `requirements.txt`, `app\` (whole folder) | `/opt/hollygrove/fridge/app/` |
 | `fridge.env.example` | `/opt/hollygrove/fridge/fridge.env` (edited, see step 3) |
-| `site-fridge\index.qmd` | `/opt/hollygrove/site/fridge/index.qmd` |
+| `site-fridge\out\fridge\` (after `python build_pages.py`): `index.qmd`, `sample\index.qmd`, `live\index.qmd` | `/opt/hollygrove/site/fridge/` (same three paths) |
 
 ```bash
 sudo mkdir -p /opt/hollygrove/fridge/app /opt/hollygrove/fridge/data /opt/hollygrove/site/fridge
@@ -248,8 +250,10 @@ replaced the file (new inode) and Caddy still sees the old text, run
 
 ### 7. Render the page
 
-The watcher re-renders when `site/fridge/index.qmd` changes. If it does not, run the usual render
-for that file (`quarto render fridge/index.qmd` in `/opt/hollygrove/site`). Check that
+The watcher re-renders a page when its `.qmd` changes. It has twice missed one of these pages (a new
+folder is not watched until `hollygrove-render` is restarted, and one of two files copied together
+was skipped), so check each page and render any that is stale by hand, for example
+`quarto render fridge/live/index.qmd` in `/opt/hollygrove/site`. Check that
 `site/_site/fridge/index.html` exists. If `_quarto.yml` lists pages explicitly, no change should
 be needed, but confirm the page is built (Quarto 1.7.29 on the VM; the page was rendered with
 1.8.26 locally).
@@ -324,7 +328,15 @@ persistent change to the VM: agree it with the owner first. Restore: stop the se
 - New sensor or metric: nothing to change in the service. The device sends `readings` with any
   `sensor` and `metric` name (lowercase letters, digits, underscore, up to 32 characters). It is
   stored immediately and available at `readings?metric=<name>`. To show it on the page, add an
-  entry to the `ENV` list and a hidden card in `site-fridge\index.qmd`; the existing five
+  entry to the `ENV` list and a hidden card in `site-fridge\dashboard.qmd`; the existing five
   metrics (temperature, humidity, pressure, fridge temperature, shelf weight) already have cards that
   appear by themselves once data arrives.
 - Changing the time zone: set `FRIDGE_TZ`, then run `python -m app.cli relocalize` in the container.
+
+## State of the deployment (2026-11-21)
+
+- Deployed on the hollygrove VM on 2026-11-14 as container `hollygrove-fridge`. The runbook above was followed, with one change: the pages are now the hub plus `sample/` and `live/`.
+- Production settings in `/opt/hollygrove/fridge/fridge.env`: two device keys (`fridge-01`, `bench-01`), `FRIDGE_TEST_DEVICES=bench-01`, `FRIDGE_PUBLISH_GRANULARITY_S=60`.
+- Backups: `hollygrove-fridge-backup.timer` copies the database nightly at 01:45 into `fridge/data/backups/fridge-slot-00.db` to `fridge-slot-13.db`; TrueNAS snapshots the VM disk daily at 02:30 and keeps 14 days. Both are on the same storage pool as the VM.
+- The live page shows the test unit `bench-01` to the public on purpose during the WiFi test.
+- The VM's own record is Session 17 of `\\10.0.10.13\hollygrove\project-log.md`.

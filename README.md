@@ -4,10 +4,13 @@ A small device that counts how many times the Hollygrove Community Fridge door i
 shows the totals on a public page. It uses a magnetic switch on the door. There is no camera
 and it records nothing about people.
 
-- Dashboard: <https://hollygrovenola.org/fridge/> (shows sample data until the unit is at the
-  fridge)
-- Status: the counter program runs on a test board at the house over WiFi. The fridge unit
-  will use a Walter LTE board, which has not arrived yet.
+- Dashboard: <https://hollygrovenola.org/fridge/> has two cards: sample data, and live data
+  from the WiFi test unit at the house.
+- Status (2026-11-21): the counter program runs on a test board at the house over WiFi, with
+  a real reed switch wired to it. The fridge unit will use a Walter LTE board, which has not
+  been bought yet. Nothing has been 3D-printed.
+- Open decision: whether the fridge unit goes indoors in the dry-goods room (about $110 to
+  $120 to build) or outdoors at the fridge (about $180). See `DECISIONS-FOR-MICHAEL.md`.
 
 ## Where things are
 

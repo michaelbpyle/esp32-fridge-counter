@@ -108,7 +108,11 @@ See `build-out-tutorial.md` Section 6 for full details on each option.
 - [ ] Test with a real reed switch wired in, and off USB on a standalone 5 V supply
 
 ### Open after the 2026-11-14 build
-- [ ] Owner: remaining questions in `DECISIONS-FOR-MICHAEL.md` (dashboard wording, power outlet and battery connection for the field install, weather sensor on the first install, database backup)
+- [ ] **Next session starts here.** Owner to choose the cheaper design (asked 2026-11-18): electronics indoors in the dry-goods room in a printed case, Walter on USB-C power, breadboard, about $110 to $120; or outdoors with a hardware-store sealed box, about $180. Then rework the purchase request doc (https://claude.ai/artifact/PKgnuYVTnSb8u7AuHuJi8s), `docs\shopping-list.md` and the case (snap-on lid, no inserts) to match. Until then those three still describe the $730 outdoor version.
+- [ ] Owner: remaining questions in `DECISIONS-FOR-MICHAEL.md` (power outlet and battery connection for the field install, weather sensor on the first install, which reed switch goes on the real fridge, a date for the demo)
+- [ ] Confirm on site: the dry-goods room has a free outlet, is dry, gets a cell signal, and is within cable reach of the fridge door
+- [ ] Confirm whether the bare Walter ships with its pin headers soldered on, and whether the ELEGOO kits contain a 1 k resistor and a 100 nF capacitor for the door-wire filter
+- [ ] Build page (https://claude.ai/artifact/WsArBQkyjb76iJjARBP9BY): its source is in `docs\build-page\` (see the README there)
 - [ ] Get a Walter board; run the `walter` build on it for the first time (it has only been compiled)
 - [ ] Walter firmware gap: the program does not yet switch on the Walter's 3.3 V sensor rail (the carrier's design notes say GPIO0 must be pulled low), so sensors would get no power on a Walter. Fix and test when the board is in hand.
 - [ ] Print and test: demo door rev 2 and its base plate; the DevKitC bench case. Check the Walter carrier against the real board before printing it.
@@ -274,6 +278,12 @@ non-issue — it sips from the big system).
   `include/config.h` and applied in `src/uplink/WifiUplink.cpp`; after reflashing, the 16 saved
   openings were delivered and accepted. Why full power worked in the morning and failed at night
   is not known.
+- Cost (owner, 2026-11-18: "we're still riding way too high in costs for a silly little sensor"):
+  proposed moving the electronics indoors and printing the case, which cuts the build to about
+  $110 to $120. The owner had not chosen between indoors and outdoors when the session closed.
+- Board state at close (last checked 2026-11-15 01:07): running the `esp32s3` build with the
+  lower transmit power, on its own power supply, reporting over WiFi as `bench-01`; 61 openings
+  stored on the server, matching the board's lifetime count.
 - Publishing lag changed again, to one minute (owner, 2026-11-15: he wants the numbers updated
   every minute): `FRIDGE_PUBLISH_GRANULARITY_S=60` in the VM's `fridge.env`. The dashboard
   already refreshes itself every minute.

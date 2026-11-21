@@ -16,7 +16,8 @@ agent's full list, with reasons and alternatives, is in `docs\decisions\`:
   until the Walter arrives. The generic DevKitC is the bench board; the Walter is the deployment
   board. Meshtastic is superseded in the project log's goals.
 - **4:** No navbar link yet.
-- **6:** Publishing lag shortened to 15 minutes.
+- **6:** Publishing lag shortened to 15 minutes on 2026-11-14, then to one minute on 2026-11-15 at the
+  owner's instruction.
 - **10:** No M3 inserts or screws on hand; they are on the to-buy list.
 - **11:** Commit and push approved.
 - **New instruction:** the charts belong at `/fridge/` itself. The page now shows the full
@@ -28,6 +29,22 @@ agent's full list, with reasons and alternatives, is in `docs\decisions\`:
 - The work is merged into `main` and pushed.
 
 Still open: 7, 8 and 9 (all about the field install, which waits for the Walter).
+
+## Added after the overnight build (through 2026-11-21)
+
+- The door's reed switch is the surface-mount pair; demo door rev 2 is built for it.
+- `/fridge/` is a hub with `/fridge/sample/` and `/fridge/live/` (the WiFi test unit).
+- A purchase request for the HNA president exists as a shared doc: $629.63 of parts and tools, $730 with
+  an estimated 15% for tax and shipping.
+- WiFi transmit power was lowered to 8.5 dBm to fix a join failure with the eero access points.
+- A Walter carrier for the weatherproof box is designed (from the datasheet, unverified).
+
+**Open decision (asked 2026-11-18, not answered):** to cut cost, put the electronics indoors in the
+dry-goods room in a printed PLA case, power the Walter by USB-C, and use a breadboard, which brings
+the whole build to about $110 to $120; or keep it outdoors at the fridge with a hardware-store sealed
+box and printed fittings, about $180. The purchase request and the case design still show the
+$730 outdoor version until this is decided. Either way the case lid would change to snap on,
+so no brass inserts are needed.
 
 ## Questions that need your answer
 
